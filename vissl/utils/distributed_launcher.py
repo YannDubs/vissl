@@ -11,6 +11,7 @@ Supports two engines: train and extract_features
 import logging
 import tempfile
 from typing import Any, Callable, List
+import os
 
 import torch
 from iopath.common.file_io import g_pathmgr
@@ -27,6 +28,7 @@ from vissl.utils.env import set_env_vars
 from vissl.utils.io import cleanup_dir, copy_data_to_local, makedir
 from vissl.utils.logger import setup_logging, shutdown_logging
 from vissl.utils.misc import get_dist_run_id
+from vissl.utils.nlprun import set_nlp_cluster
 from vissl.utils.slurm import get_node_id
 
 
@@ -130,6 +132,9 @@ def launch_distributed(
     # copy the data to local if user wants. This can speed up dataloading.
     _copy_to_local(cfg)
 
+    if cfg.IS_NLP_CLUSTER:
+        prev_work_dir = set_nlp_cluster()
+
     try:
         if world_size > 1:
             torch.multiprocessing.spawn(
@@ -164,6 +169,9 @@ def launch_distributed(
             raise e
     finally:
         _cleanup_local_dir(cfg)
+
+        if cfg.IS_NLP_CLUSTER:
+            os.chdir(prev_work_dir)
 
     logging.info("All Done!")
     shutdown_logging()

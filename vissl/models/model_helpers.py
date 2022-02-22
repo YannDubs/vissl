@@ -74,10 +74,12 @@ def get_trunk_output_feature_names(model_config):
     If Feature eval mode is set, we get feature names from
     config.FEATURE_EVAL_SETTINGS.LINEAR_EVAL_FEAT_POOL_OPS_MAP.
     """
-    feature_names = []
     if is_feature_extractor_model(model_config):
         feat_ops_map = model_config.FEATURE_EVAL_SETTINGS.LINEAR_EVAL_FEAT_POOL_OPS_MAP
         feature_names = [item[0] for item in feat_ops_map]
+    else:
+        feature_names = model_config.TRUNK.OUT_FEATURE_KEYS
+
     return feature_names
 
 

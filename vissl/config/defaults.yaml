@@ -64,6 +64,7 @@ config:
   # ----------------------------------------------------------------------------------- #
   # GLOBAL DEFAULTS
   # ----------------------------------------------------------------------------------- #
+  IS_NLP_CLUSTER: False
   VERBOSE: False
   # how frequently to log training stats like batch time, loss, training eta etc.
   LOG_FREQUENCY: 10
@@ -616,6 +617,8 @@ config:
     # ----------------------------------------------------------------------------------- #
     TRUNK:
       NAME: "resnet"
+      OUT_FEATURE_KEYS: []
+
       # ------------------------------------------------------------- #
       # ResNe(X)t params
       # ------------------------------------------------------------- #
@@ -635,6 +638,7 @@ config:
         # for the pixel-wise task. Torchvision default is stride=2 and all other models
         # use this so we set the default as 2.
         LAYER4_STRIDE: 2
+        OUT_FEAT_KEYS: null
 
       # ------------------------------------------------------------- #
       # SimCLR-v2 ResNet params that includes selective kernel
@@ -951,6 +955,16 @@ config:
     # SimCLR InfoNCE LOSS (Specific to SimCLR https://arxiv.org/abs/2002.05709)
     # ----------------------------------------------------------------------------------- #
     simclr_info_nce_loss:
+      temperature: 0.1
+      buffer_params:
+        world_size: 64                # automatically inferred
+        embedding_dim: 128
+        effective_batch_size: 4096    # automatically inferred
+
+    # ----------------------------------------------------------------------------------- #
+    # Cntr ISSL
+    # ----------------------------------------------------------------------------------- #
+    cntr_issl_loss:
       temperature: 0.1
       buffer_params:
         world_size: 64                # automatically inferred

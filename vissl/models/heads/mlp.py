@@ -112,6 +112,46 @@ class MLP(nn.Module):
         return out
 
 
+
+@register_model_head("batchnorm")
+class Batchnorm(nn.Module):
+    def __init__(
+        self,
+        model_config: AttrDict,
+        dim: int,
+    ):
+        """
+        Args:
+            model_config (AttrDict): dictionary config.MODEL in the config file
+        """
+        super().__init__()
+        self.norm = nn.BatchNorm1d(
+                        dim,
+                        eps=model_config.HEAD.BATCHNORM_EPS,
+                        momentum=model_config.HEAD.BATCHNORM_MOMENTUM,
+                    )
+
+    def forward(self, batch: torch.Tensor):
+        """
+        Args:
+            batch (torch.Tensor): 2D torch tensor or 4D tensor of shape `N x C x 1 x 1`
+        Returns:
+            out (torch.Tensor): 2D output torch tensor
+        """
+        if isinstance(batch, list):
+            assert (
+                len(batch) == 1
+            ), "Batchnorm input should be either a tensor (2D, 4D) or list containing 1 tensor."
+            batch = batch[0]
+        if batch.ndim > 2:
+            assert all(
+                d == 1 for d in batch.shape[2:]
+            ), f"Batchnorm expected 2D input tensor or 4D tensor of shape NxCx1x1. got: {batch.shape}"
+            batch = batch.reshape((batch.size(0), batch.size(1)))
+        out = self.norm(batch)
+        return out
+
+
 @register_model_head("mlp_fsdp")
 def MLP_FSDP(
     model_config: AttrDict,

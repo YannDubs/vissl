@@ -1,0 +1,165 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+from __future__ import annotations
+import logging
+import pprint
+
+import numpy as np
+import torch
+from classy_vision.generic.distributed_util import get_cuda_device_index, get_rank
+from classy_vision.losses import ClassyLoss, register_loss
+from torch import nn
+from vissl.config import AttrDict
+from vissl.utils.distributed_utils import gather_from_all
+
+
+@register_loss("cntr_issl_loss")
+class CntrISSLLoss(ClassyLoss):
+    """
+    This is the contrastive loss which was proposed in ISSL <IRL> paper.
+    See the paper for the details on the loss.
+
+    Config params:
+        temperature (float): the temperature to be applied on the logits
+        buffer_params:
+            world_size (int): total number of trainers in training
+            embedding_dim (int): output dimensions of the features projects
+            effective_batch_size (int): total batch size used (includes positives)
+    """
+
+    def __init__(self, loss_config: AttrDict, device: str = "gpu"):
+        super(CntrISSLLoss, self).__init__()
+
+        self.loss_config = loss_config
+        # loss constants
+        self.temperature = self.loss_config.temperature
+        self.buffer_params = self.loss_config.buffer_params
+        self.info_criterion = CntrISSLCriterion(
+            self.buffer_params, self.temperature
+        )
+
+    @classmethod
+    def from_config(cls, loss_config: AttrDict):
+        """
+        Instantiates SimclrInfoNCELoss from configuration.
+
+        Args:
+            loss_config: configuration for the loss
+
+        Returns:
+            SimclrInfoNCELoss instance.
+        """
+        return cls(loss_config)
+
+    def forward(self, output, target):
+        loss = self.info_criterion(output)
+        return loss
+
+    def __repr__(self):
+        repr_dict = {"name": self._get_name(), "info_average": self.info_criterion}
+        return pprint.pformat(repr_dict, indent=2)
+
+
+class CntrISSLCriterion(nn.Module):
+    """
+    The criterion corresponding to the contrastive ISSL loss as defined in the paper
+    <ISSL>.
+
+    Args:
+        temperature (float): the temperature to be applied on the logits
+        buffer_params:
+            world_size (int): total number of trainers in training
+            embedding_dim (int): output dimensions of the features projects
+            effective_batch_size (int): total batch size used (includes positives)
+    """
+
+    def __init__(self, buffer_params, temperature: float):
+        super(CntrISSLCriterion, self).__init__()
+
+        self.use_gpu = get_cuda_device_index() > -1
+        self.temperature = temperature
+        self.num_pos = 2
+        self.buffer_params = buffer_params
+        self.criterion = nn.CrossEntropyLoss()
+        self.dist_rank = get_rank()
+        self.pos_mask = None
+        self.precompute_pos_mask()
+        logging.info(f"Creating Info-NCE loss on Rank: {self.dist_rank}")
+
+    def precompute_pos_mask(self):
+        """
+        We precompute the positive and negative masks to speed up the loss calculation
+        """
+        # computed once at the begining of training
+        total_images = self.buffer_params.effective_batch_size
+        world_size = self.buffer_params.world_size
+        batch_size = total_images // world_size
+        orig_images = batch_size // self.num_pos
+        pos_mask = torch.eye(orig_images).bool().repeat(2, 2)
+        self.pos_mask = pos_mask.cuda(non_blocking=True) if self.use_gpu else pos_mask
+
+    def forward(self, embedding: list[torch.Tensor]):
+        """
+        Calculate the symmetric loss. Operates on embeddings tensor.
+        """
+
+        # to make the loss symmetric we passed the embeddings of both x,a into projector and predictor
+        # here z_pred should be thought as final layer in a neural net that needs to be dot proudct with W
+        # then classification loss. In reality W is the output of the projector.
+        z_pred, W = embedding
+
+        z_pred = nn.functional.normalize(z_pred, dim=1, p=2)
+        W = nn.functional.normalize(W, dim=1, p=2)
+
+        assert z_pred.ndim == 2
+        assert z_pred.shape[1] == int(self.buffer_params.embedding_dim)
+
+        batch_size = z_pred.shape[0]
+        T = self.temperature
+        num_pos = self.num_pos
+        assert batch_size % num_pos == 0, "Batch size should be divisible by num_pos"
+
+        # Step 1: gather all the weights. Shape example: 4096 x 128
+        W_buffer = self.gather_embeddings(W)
+
+        # Step 2: matrix multiply: 64 x 128 with 4096 x 128 = 64 x 4096 and
+        # divide by temperature => get logits
+        logits = torch.mm(z_pred, W_buffer.t()) / T
+
+        # Step 3: get predicted log proba for the positives. Shape example: 64 x 64
+        log_q = logits.log_softmax(-1)[:, :batch_size]
+
+        # Step 4: get cross entropy, by giving p=0.5 to both positives. Shape example: 64
+        # => - sum( p log q) = - sum(log q) / 2
+        log_q = log_q[self.pos_mask].view(batch_size, 2)
+        hat_H_mlz = - log_q.sum(1) / 2
+
+        return hat_H_mlz.mean()
+
+    def __repr__(self):
+        num_negatives = self.buffer_params.effective_batch_size - 2
+        T = self.temperature
+        num_pos = self.num_pos
+        repr_dict = {
+            "name": self._get_name(),
+            "temperature": T,
+            "num_negatives": num_negatives,
+            "num_pos": num_pos,
+            "dist_rank": self.dist_rank,
+        }
+        return pprint.pformat(repr_dict, indent=2)
+
+    @staticmethod
+    def gather_embeddings(embedding: torch.Tensor):
+        """
+        Do a gather over all embeddings, so we can compute the loss.
+        Final shape is like: (batch_size * num_gpus) x embedding_dim
+        """
+        if torch.distributed.is_available() and torch.distributed.is_initialized():
+            embedding_gathered = gather_from_all(embedding)
+        else:
+            embedding_gathered = embedding
+        return embedding_gathered

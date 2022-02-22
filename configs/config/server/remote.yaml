@@ -1,0 +1,6 @@
+# @package _global_
+config:
+    SLURM:
+      PARTITION: t4v2
+      ADDITIONAL_PARAMETERS:
+        qos: normal
