@@ -27,7 +27,7 @@ CFG=( "$@" )
 
 # create a temporary experiment folder to run the SLURM job in isolation
 RUN_ID=$(date +'%Y-%m-%d-%H-%M-%S')
-EXP_ROOT_DIR="/juice/scr/$USER/vissl/out/$RUN_ID"
+EXP_ROOT_DIR="./out/$RUN_ID"
 CHECKPOINT_DIR=${CHECKPOINT_DIR:-"$EXP_ROOT_DIR/checkpoints/"}
 
 echo "EXP_ROOT_DIR: $EXP_ROOT_DIR"
@@ -43,7 +43,7 @@ mkdir -p "$CHECKPOINT_DIR"
 export PYTHONPATH="$EXP_ROOT_DIR/:$PYTHONPATH"
 python -u "tools/run_distributed_engines.py" \
   "${CFG[@]}" \
-  hydra.run.dir="$EXP_ROOT_DIR" \
+  hydra.run.dir="." \
   config.SLURM.USE_SLURM=true \
   config.SLURM.LOG_FOLDER="$EXP_ROOT_DIR" \
   config.CHECKPOINT.DIR="$CHECKPOINT_DIR"

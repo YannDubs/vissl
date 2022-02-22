@@ -1,7 +1,7 @@
 # @package _global_
 config:
   VERBOSE: False
-  LOG_FREQUENCY: 50
+  LOG_FREQUENCY: 100
   TEST_ONLY: False
   TEST_MODEL: False
   SEED_VALUE: 0
@@ -23,7 +23,7 @@ config:
       DATA_SOURCES: [disk_folder]
       DATASET_NAMES: [imagenet1k_folder]
       DATA_PATHS: ["./data/imagenet256/train"]
-      BATCHSIZE_PER_REPLICA: 64
+      BATCHSIZE_PER_REPLICA: 96
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
         - name: ImgReplicatePil
@@ -83,6 +83,7 @@ config:
           embedding_dim: 2048
   OPTIMIZER:
       name: sgd
+      use_zero: False
       use_larc: True
       larc_config:
         clip: False

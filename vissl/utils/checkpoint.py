@@ -5,6 +5,7 @@
 import contextlib
 import hashlib
 import logging
+from pathlib import Path
 import os
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional
@@ -82,6 +83,13 @@ class CheckpointWriter:
         self._save(name=checkpoint_name, content=content)
         self._create_symbolic_link(checkpoint_name)
 
+        for old_ckpt in self.get_old_checkpoint_names():
+            old_ckpt_path = Path(self.checkpoint_folder) /  old_ckpt
+            if old_ckpt_path.is_file():
+                old_ckpt_path.unlink()
+                logging.info(f"Deleted old checkpoint: {old_ckpt_path}")
+
+
     def save_sharded_checkpoint(
         self, content: Dict[str, Any], shard_rank: int, world_size: int
     ):
@@ -114,6 +122,10 @@ class CheckpointWriter:
         if self.is_final_train_phase:
             return f"model_final_checkpoint_{self.mode}{self.mode_num}.torch"
         return f"model_{self.mode}{self.mode_num}.torch"
+
+    def get_old_checkpoint_names(self):
+        # keep 5 most recent
+        return [f"model_{self.mode}{i}.torch" for i in range(self.mode_num - 5) ]
 
     def get_checkpoint_shard_name(self, rank: int):
         if self.is_final_train_phase:
