@@ -10,6 +10,6 @@
     config.SLURM.MEM_GB=16 \
     config.SLURM.TIME_HOURS=2 \
     config.LOG_FREQUENCY=50 \
-    config.OPTIMIZER.num_epochs=4 \
-    config.DATA.TRAIN.DATA_LIMIT=500
+    config.OPTIMIZER.num_epochs=7 \
+    config.DATA.TRAIN.DATA_LIMIT=3000
 
