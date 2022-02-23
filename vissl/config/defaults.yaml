@@ -979,8 +979,8 @@ config:
       # ----------------------------------------------------------------------------------- #
       slfdstl_issl_loss:
         n_Mx : 50000  # automatically inferred from model HEAD settings
-        temperature_assign: 0.05
-        temperature_pred: 0.1
+        temperature_assign: 0.5
+        temperature_pred: 1
         num_crops: 2 # automatically inferred from data transforms
         crops_for_assign: [0, 1]
         beta_pM_unif: 1.7

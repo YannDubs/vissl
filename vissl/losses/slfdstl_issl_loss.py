@@ -73,8 +73,8 @@ class SlfdstlISSLCriterion(nn.Module):
 
     def __init__(self,
                  n_Mx : int = 50000,
-                 temperature_assign : float = 0.05,
-                 temperature_pred : float = 0.1,
+                 temperature_assign : float = 0.5,
+                 temperature_pred : float = 1,
                  num_crops : int = 2,
                  crops_for_assign : list[int] = [0,1],
                  beta_H_MlZ : float = 1.0,
