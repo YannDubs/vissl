@@ -156,12 +156,13 @@ class SlfdstlISSLCriterion(nn.Module):
         H_M /= len(all_p_Mlz)
         CE_pMlz_pMlza /= n_CE_pp
 
+        fit_pM_Unif = - H_M  # want to max entropy
         if self.ema_weight_marginal is not None:
             # try to balance the scaling in gradients due to running mean
-            H_M = H_M / self.ema_weight_marginal
+            fit_pM_Unif = fit_pM_Unif / self.ema_weight_marginal
 
         delta_H_MlZ = self.beta_H_MlZ - 1  # the first beta is due to KL -> CE
-        loss = CE_pMlz_qMlza + self.beta_pM_unif * H_M + delta_H_MlZ * CE_pMlz_pMlza
+        loss = CE_pMlz_qMlza + self.beta_pM_unif * fit_pM_Unif + delta_H_MlZ * CE_pMlz_pMlza
 
         return loss
 
