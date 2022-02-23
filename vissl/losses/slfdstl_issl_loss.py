@@ -77,10 +77,12 @@ class SlfdstlISSLCriterion(nn.Module):
                  temperature_pred : float = 0.1,
                  num_crops : int = 2,
                  crops_for_assign : list[int] = [0,1],
-                 beta_pM_unif : float = 1.7,
+                 beta_H_MlZ : float = 1.0,
+                 beta_pM_unif: float = 1.7,
                  ema_weight_marginal : float = 0.7,
                 ):
         super(SlfdstlISSLCriterion, self).__init__()
+        assert self.beta_H_MlZ >= 1
 
         self.n_Mx = n_Mx
         self.temperature_assign = temperature_assign
@@ -88,6 +90,7 @@ class SlfdstlISSLCriterion(nn.Module):
         self.num_crops = num_crops
         self.crops_for_assign = crops_for_assign
         self.beta_pM_unif = beta_pM_unif
+        self.beta_H_MlZ = beta_H_MlZ
         self.ema_weight_marginal = ema_weight_marginal
 
         if self.ema_weight_marginal is not None:
@@ -99,18 +102,25 @@ class SlfdstlISSLCriterion(nn.Module):
 
     def forward(self, output: List[torch.Tensor]):
         logits_assign, logits_predict = output
+        logits_assign = logits_assign.float() / self.temperature_assign
 
-        all_p_Mlz = F.softmax(logits_assign.float() / self.temperature_assign, dim=-1
+        all_p_Mlz = F.softmax(logits_assign, dim=-1
                               ).chunk(len(self.crops_for_assign))
+
+        all_log_p_Mlz = F.log_softmax(logits_assign, dim=-1
+                                      ).chunk(len(self.crops_for_assign))
 
         all_log_q_Mlz = F.log_softmax(logits_predict.float() / self.temperature_pred, dim=-1
                                      ).chunk(self.num_crops)
 
-        total_cross_ent = 0
-        total_marginal_ent = 0
-        n_cross_ent = 0
+        CE_pMlz_qMlz = 0
+        H_M = 0
+        CE_pMlz_pMlza = 0
+        n_CE_pq = 0
+        n_CE_pp = 0
         for i_p, p_Mlz in enumerate(all_p_Mlz):
 
+            ##### Ensure maximality #####
             # current marginal estimate p(M). batch shape: [] ; event shape: []
             p_M = p_Mlz.mean(0, keepdim=True)
             p_M = self.gather_marginal(p_M)  # avg marginal across all gpus
@@ -120,28 +130,38 @@ class SlfdstlISSLCriterion(nn.Module):
 
             # D[\hat{p}(M) || Unif(\calM)]. shape: []
             # for unif prior same as maximizing entropy. Could be computed once per GPU, but fast so ok
-            total_marginal_ent -= Categorical(probs=p_M).entropy()
+            H_M = H_M + Categorical(probs=p_M).entropy()
+            #############################
 
-            for i_q, log_qMlz in enumerate(all_log_q_Mlz):
+            ##### Ensure invariance and determinism of assignement #####
+            if self.beta_H_MlZ > 1:
+                for i_log_p, log_p_Mlz in enumerate(all_log_p_Mlz):
+                    if i_p == i_log_p:
+                        continue
+                    CE_pMlz_pMlza = CE_pMlz_pMlza - (p_Mlz * log_p_Mlz).sum(-1).mean(0)
+                    n_CE_pp += 1
+            #########################
+
+            for i_q, log_q_Mlz in enumerate(all_log_q_Mlz):
                 if i_p == i_q:
                     # we skip cases where student and teacher operate on the same view
                     continue
 
                 # KL = - H[M|Z] - E_{p(M|Z)}[log q(M|Z)]. As you want to have a deterministic
                 # p(M|Z) you want to min H[M|Z]. So min KL + H[M|Z] = - E_{p(M|Z)}[log q(M|Z)]
-                cross_ent = torch.sum(-p_Mlz * log_qMlz, dim=-1)
+                CE_pMlz_qMlz = CE_pMlz_qMlz - (p_Mlz * log_q_Mlz).sum(-1).mean(0)
+                n_CE_pq += 1
 
-                total_cross_ent += cross_ent.mean(0)
-                n_cross_ent += 1
-
-        total_cross_ent /= n_cross_ent
-        total_marginal_ent /= len(all_p_Mlz)
+        CE_pMlz_qMlz /= n_CE_pq
+        H_M /= len(all_p_Mlz)
+        CE_pMlz_pMlza /= n_CE_pp
 
         if self.ema_weight_marginal is not None:
             # try to balance the scaling in gradients due to running mean
-            total_marginal_ent = total_marginal_ent / self.ema_weight_marginal
+            H_M = H_M / self.ema_weight_marginal
 
-        loss = total_cross_ent + self.beta_pM_unif * total_marginal_ent
+        delta_H_MlZ = self.beta_H_MlZ - 1  # the first beta is due to KL -> CE
+        loss = CE_pMlz_qMlz + self.beta_pM_unif * H_M + delta_H_MlZ * CE_pMlz_pMlza
 
         return loss
 
@@ -154,6 +174,7 @@ class SlfdstlISSLCriterion(nn.Module):
             "num_crops": self.num_crops,
             "crops_for_assign": self.crops_for_assign,
             "beta_pM_unif": self.beta_pM_unif,
+            "beta_H_MlZ": self.beta_H_MlZ,
             "ema_weight_marginal": self.ema_weight_marginal,
         }
         return pprint.pformat(repr_dict, indent=2)
