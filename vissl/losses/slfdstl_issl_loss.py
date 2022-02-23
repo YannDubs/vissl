@@ -139,7 +139,7 @@ class SlfdstlISSLCriterion(nn.Module):
 
         if self.ema_weight_marginal is not None:
             # try to balance the scaling in gradients due to running mean
-            total_marginal_ent = total_marginal_ent / self.ema_weight_prior
+            total_marginal_ent = total_marginal_ent / self.ema_weight_marginal
 
         loss = total_cross_ent + self.beta_pM_unif * total_marginal_ent
 
