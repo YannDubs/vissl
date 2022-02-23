@@ -82,7 +82,7 @@ class SlfdstlISSLCriterion(nn.Module):
                  ema_weight_marginal : float = 0.7,
                 ):
         super(SlfdstlISSLCriterion, self).__init__()
-        assert self.beta_H_MlZ >= 1
+        assert beta_H_MlZ >= 1
 
         self.n_Mx = n_Mx
         self.temperature_assign = temperature_assign
@@ -113,7 +113,7 @@ class SlfdstlISSLCriterion(nn.Module):
         all_log_q_Mlz = F.log_softmax(logits_predict.float() / self.temperature_pred, dim=-1
                                      ).chunk(self.num_crops)
 
-        CE_pMlz_qMlz = 0
+        CE_pMlz_qMlza = 0
         H_M = 0
         CE_pMlz_pMlza = 0
         n_CE_pq = 0
@@ -135,24 +135,24 @@ class SlfdstlISSLCriterion(nn.Module):
 
             ##### Ensure invariance and determinism of assignement #####
             if self.beta_H_MlZ > 1:
-                for i_log_p, log_p_Mlz in enumerate(all_log_p_Mlz):
+                for i_log_p, log_p_Mlza in enumerate(all_log_p_Mlz):
                     if i_p == i_log_p:
                         continue
-                    CE_pMlz_pMlza = CE_pMlz_pMlza - (p_Mlz * log_p_Mlz).sum(-1).mean(0)
+                    CE_pMlz_pMlza = CE_pMlz_pMlza - (p_Mlz * log_p_Mlza).sum(-1).mean(0)
                     n_CE_pp += 1
             #########################
 
-            for i_q, log_q_Mlz in enumerate(all_log_q_Mlz):
+            for i_q, log_q_Mlza in enumerate(all_log_q_Mlz):
                 if i_p == i_q:
                     # we skip cases where student and teacher operate on the same view
                     continue
 
                 # KL = - H[M|Z] - E_{p(M|Z)}[log q(M|Z)]. As you want to have a deterministic
                 # p(M|Z) you want to min H[M|Z]. So min KL + H[M|Z] = - E_{p(M|Z)}[log q(M|Z)]
-                CE_pMlz_qMlz = CE_pMlz_qMlz - (p_Mlz * log_q_Mlz).sum(-1).mean(0)
+                CE_pMlz_qMlza = CE_pMlz_qMlza - (p_Mlz * log_q_Mlza).sum(-1).mean(0)
                 n_CE_pq += 1
 
-        CE_pMlz_qMlz /= n_CE_pq
+        CE_pMlz_qMlza /= n_CE_pq
         H_M /= len(all_p_Mlz)
         CE_pMlz_pMlza /= n_CE_pp
 
@@ -161,7 +161,7 @@ class SlfdstlISSLCriterion(nn.Module):
             H_M = H_M / self.ema_weight_marginal
 
         delta_H_MlZ = self.beta_H_MlZ - 1  # the first beta is due to KL -> CE
-        loss = CE_pMlz_qMlz + self.beta_pM_unif * H_M + delta_H_MlZ * CE_pMlz_pMlza
+        loss = CE_pMlz_qMlza + self.beta_pM_unif * H_M + delta_H_MlZ * CE_pMlz_pMlza
 
         return loss
 

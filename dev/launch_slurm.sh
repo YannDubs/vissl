@@ -21,19 +21,21 @@
 
 ######################### INPUT PARAMS ##################################
 
+EXP_ROOT_DIR="$1"
+shift
+
 CFG=( "$@" )
 
 ####################### setup experiment dir ###################################
 
 # create a temporary experiment folder to run the SLURM job in isolation
 RUN_ID=$(date +'%Y-%m-%d-%H-%M-%S')
-EXP_ROOT_DIR="out/$RUN_ID"
+#EXP_ROOT_DIR="out/$RUN_ID"
 CHECKPOINT_DIR=${CHECKPOINT_DIR:-"$EXP_ROOT_DIR/checkpoints"}
 
 echo "EXP_ROOT_DIR: $EXP_ROOT_DIR"
 echo "CHECKPOINT_DIR: $CHECKPOINT_DIR"
 
-rm -rf $EXP_ROOT_DIR
 mkdir -p "$EXP_ROOT_DIR"
 mkdir -p "$CHECKPOINT_DIR"
 #cp -r . $EXP_ROOT_DIR
