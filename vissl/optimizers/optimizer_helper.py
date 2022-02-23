@@ -281,6 +281,7 @@ def get_optimizer_param_groups(
     non_trainable_params = []
     for name, param in model.named_parameters():
         if name in model_config.NON_TRAINABLE_PARAMS:
+            print(f"Freezing {name}")
             param.requires_grad = False
             non_trainable_params.append(param)
 

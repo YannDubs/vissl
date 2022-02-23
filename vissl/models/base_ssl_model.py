@@ -115,8 +115,8 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
             start_idx = end_idx
             assert len(feat) == 1
             feats.append(feat[0])
-        feats = [torch.cat(feats)]
-        return self.heads_forward(feats, self.heads)
+        multi_feats = [torch.cat(feats[start:end]) for start, end in self.model_config.MULTI_RES_SPLIT_CROPS]
+        return self.heads_forward(multi_feats, self.heads)
 
     def single_input_forward(self, batch, feature_names, heads):
         """

@@ -4,3 +4,18 @@ config:
       PARTITION: t4v2
       ADDITIONAL_PARAMETERS:
         qos: normal
+
+# NOTE:
+# I also had to change the command in submitit. specifically in submitit/slurm/slurm.py
+# somewhere : /h/yannd/.conda/envs/lossyless/lib/python3.8/site-packages/submitit/slurm/
+# function: _make_sbatch_string replace the end with
+# lines += [
+#        "",
+#        "# command",
+#        "export SUBMITIT_EXECUTOR=slurm",
+#        "export NCCL_IB_DISABLE=1",
+#        f"srun --mem {mem} --output {stdout} {stderr_flag} --unbuffered {command}\n",
+#   ]
+#
+# and also had to add slurm to the path
+# export PATH="$PATH:/opt/slurm/bin"

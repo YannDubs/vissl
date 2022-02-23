@@ -18,7 +18,7 @@ config:
       LOG_PARAMS: False
       LOG_PARAMS_GRADIENTS: False
   DATA:
-    NUM_DATALOADER_WORKERS: 5
+    NUM_DATALOADER_WORKERS: 6
     TRAIN:
       DATA_SOURCES: [disk_folder]
       DATASET_NAMES: [imagenet1k_folder]
@@ -121,7 +121,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "cntr"
+    NAME: "simclr"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480

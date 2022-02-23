@@ -525,6 +525,9 @@ config:
     # we can optimize memory a bit by running forward pass through each crop
     # separately.
     SINGLE_PASS_EVERY_CROP: False
+    # In case multi-resolution inputs, can run head on specific crops. By default run all heads on last
+    # => return concatenation of crops[0,-1]
+    MULTI_RES_SPLIT_CROPS: [ [0, null] ]
     # ----------------------------------------------------------------------------------- #
     # Activation checkpointing from PyTorch
     # ----------------------------------------------------------------------------------- #
@@ -970,6 +973,18 @@ config:
         world_size: 64                # automatically inferred
         embedding_dim: 128
         effective_batch_size: 4096    # automatically inferred
+
+      # ----------------------------------------------------------------------------------- #
+      # Slfdstl ISSL
+      # ----------------------------------------------------------------------------------- #
+      slfdstl_issl_loss:
+        n_Mx : 50000  # automatically inferred from model HEAD settings
+        temperature_assign: 0.05
+        temperature_pred: 0.1
+        num_crops: 2 # automatically inferred from data transforms
+        crops_for_assign: [0, 1]
+        beta_pM_unif: 1.7
+        ema_weight_marginal: 0.7
 
     # ----------------------------------------------------------------------------------- #
     # Multi-crop version of SimCLR InfoNCE LOSS (supports multicrop augmentation proposed
