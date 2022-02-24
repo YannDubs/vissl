@@ -735,7 +735,7 @@ def has_final_checkpoint(
 
 def get_checkpoint_resume_files(
     checkpoint_folder: str,
-    config: AttrDict,
+    checkpoint_iter_frequency: int = 0,
     skip_final: bool = False,
     latest_checkpoint_resume_num: int = 1,
 ):
@@ -754,12 +754,13 @@ def get_checkpoint_resume_files(
                    helps to resume from instead a few checkpoints before the last checkpoint.
     """
     all_files = g_pathmgr.ls(checkpoint_folder)
+
     all_iters = []
     replace_prefix = "model_phase"
     # if we checkpoint at iterations too, we start from an iteration checkpoint
     # since that's latest than the phase end checkpoint. Sometimes, it's also
     # possible that there is no phase.
-    if config.CHECKPOINT.CHECKPOINT_ITER_FREQUENCY > 0:
+    if checkpoint_iter_frequency > 0:
         replace_prefix = "model_iteration"
 
     for f in all_files:
@@ -777,6 +778,7 @@ def get_checkpoint_resume_files(
     checkpoint_resume_num = max(0, latest_checkpoint_resume_num - 1)
     # len(all_iters) - 1 is the last index, checkpoint_resume_num can't be beyond that.
     checkpoint_resume_num = min(len(all_iters) - 1, checkpoint_resume_num)
+
     logging.info(f"checkpoint_resume_num: {checkpoint_resume_num}")
     if len(all_iters) > 0:
         all_iters.sort(reverse=True)
@@ -806,7 +808,7 @@ def get_resume_checkpoint(cfg: AttrDict, checkpoint_folder: str):
     if checkpoints_exists and cfg["CHECKPOINT"]["AUTO_RESUME"]:
         checkpoint_file = get_checkpoint_resume_files(
             checkpoint_folder,
-            cfg,
+            cfg.CHECKPOINT.CHECKPOINT_ITER_FREQUENCY,
             skip_final=cfg["CHECKPOINT"]["OVERWRITE_EXISTING"],
             latest_checkpoint_resume_num=cfg["CHECKPOINT"][
                 "LATEST_CHECKPOINT_RESUME_FILE_NUM"

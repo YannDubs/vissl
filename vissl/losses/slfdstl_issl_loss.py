@@ -140,6 +140,8 @@ class SlfdstlISSLCriterion(nn.Module):
                         continue
                     CE_pMlz_pMlza = CE_pMlz_pMlza - (p_Mlz * log_p_Mlza).sum(-1).mean(0)
                     n_CE_pp += 1
+            else:
+                n_CE_pp = 1
             #########################
 
             for i_q, log_q_Mlza in enumerate(all_log_q_Mlz):
