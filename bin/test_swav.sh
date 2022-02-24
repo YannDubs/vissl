@@ -4,7 +4,7 @@
 python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=pretrain/swav/swav_resnet \
-    config.CHECKPOINT.DIR="./checkpoints/test_swav" \
+    config.CHECKPOINT.DIR="./test_swav/checkpoints" \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
     config.SLURM.USE_SLURM=False \

@@ -7,4 +7,4 @@ python3 tools/run_distributed_engines.py \
     config.DATA.TRAIN.DATA_SOURCES=[disk_folder] \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet256/train"] \
     config=test/integration_test/quick_simclr \
-    config.CHECKPOINT.DIR="./checkpoints"
+    config.CHECKPOINT.DIR="./test_simclr_dir/checkpoints"
