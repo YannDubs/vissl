@@ -720,31 +720,21 @@ class LinearProbe(pl.LightningModule):
 ### PROJECT / DATA / MODEL SPECIFIC ###
 def load_train_val_test_features(path):
     """Load and return train, test np array of the pretrained features for a path."""
-    breakpoint()
-
     kwargs = dict(input_dir=path, layer="heads", flatten_features=False,)
     features = ExtractedFeaturesLoader.load_features(split="train", **kwargs)
     Z_train = features['features']
     Y_train = features['targets']
 
-    Z_test, Z_val, Y_test, Y_val = None, None
-    try:
-        features = ExtractedFeaturesLoader.load_features(split="test", **kwargs)
-        Z_test = features['features']
-        Y_test = features['targets']
-    except:
-        pass
+    features = ExtractedFeaturesLoader.load_features(split="test", **kwargs)
+    Z_test = features['features']
+    Y_test = features['targets']
 
     try:
         features = ExtractedFeaturesLoader.load_features(split="val", **kwargs)
         Z_val = features['features']
         Y_val = features['targets']
-    except:
-        pass
-
-    if Z_test is None:
-        # use validation instead of test
-        Z_test, Y_test = Z_val, Y_val
+    except ValueError:
+        Z_val, Y_val = None, None
 
     return (
         Z_train,
@@ -758,32 +748,13 @@ def load_train_val_test_features(path):
 
 def preprocess_labels(path, Y_train, Y_val, Y_test):
     """Applies the desired label preprocessing."""
-    stem_train_path = path.name
-    data_name = stem_train_path.split("_")[1]
-
-    if data_name == "coco":
-        Y_train = coco_labels_to_list(Y_train)
-        Y_test = coco_labels_to_list(Y_test)
-        binarizer = MultiLabelBinarizer().fit(Y_train)
-        Y_train, Y_test = binarizer.transform(Y_train), binarizer.transform(Y_test)
-
-        if Y_val is not None:
-            Y_val = coco_labels_to_list(Y_val)
-            Y_val = binarizer.transform(Y_val)
-
     return Y_train, Y_val, Y_test
-
-
-def coco_labels_to_list(arr):
-    return [row[row.nonzero()] for row in arr]
-
 
 def path_to_model(path):
     """Return model name from path."""
-    stem_train_path = path.with_suffix("").name
-    model_name = "_".join(stem_train_path.split("_")[2:])
-    return model_name
-
+    epoch = str(path).split("phase")[-1]
+    model = str(path).split("_dir/")[0]
+    return f"{model}_epoch{epoch}"
 
 ################################
 
