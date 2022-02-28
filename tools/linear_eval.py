@@ -20,8 +20,10 @@ Eg of command to run:
 To load back the results in a dataframe for plotting use:
 `pd.read_csv("<out_path>/all_metrics.csv",index_col=[0,1,2], header=[0,1])`
 
-The only function to change for different projects should be the ones under the following header:
-### PROJECT / DATA / MODEL SPECIFIC ###
+The only function to change for different projects should be:
+- preprocess_labels
+- path_to_model
+- load_train_val_test_features
 """
 try:
     from sklearnex import patch_sklearn
@@ -719,7 +721,10 @@ class LinearProbe(pl.LightningModule):
 
 ### PROJECT / DATA / MODEL SPECIFIC ###
 def load_train_val_test_features(path):
-    """Load and return train, test np array of the pretrained features for a path."""
+    """
+    Load and return train, val, test **np array** of the pretrained features and targets for a path.
+    If no validation return None for Z_val and Y_val. If using single label, that target array should be squeezed.
+    """
     kwargs = dict(input_dir=path, layer="heads", flatten_features=False,)
     features = ExtractedFeaturesLoader.load_features(split="train", **kwargs)
     Z_train = features['features']
@@ -745,10 +750,9 @@ def load_train_val_test_features(path):
         Y_test,
     )
 
-
 def preprocess_labels(path, Y_train, Y_val, Y_test):
     """Applies the desired label preprocessing."""
-    return Y_train, Y_val, Y_test
+    return Y_train.squeeze(), Y_val.squeeze(), Y_test.squeeze()
 
 def path_to_model(path):
     """Return model name from path."""
