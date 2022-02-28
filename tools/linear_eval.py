@@ -72,6 +72,7 @@ from sklearn.svm import LinearSVC
 from sklearn.utils import _safe_indexing, indexable
 from sklearn.utils.multiclass import type_of_target
 from sklearn.utils.validation import _num_samples
+from sklearn.utils.class_weight import compute_class_weight
 from torch.utils.data import DataLoader, Dataset
 import time
 from datetime import timedelta
@@ -624,10 +625,9 @@ class LinearProbe(pl.LightningModule):
         self.train_dataset = train_dataset
 
         Y = self.train_dataset.Y
-        if Y.ndim == 1:
-            Y = np.expand_dims(Y, 1)
 
         if self.train_dataset.is_multiclass_tgt:
+            breakpoint()
             out_size = len(np.unique(Y))
             if cfg.is_balance_loss:
                 weight = torch.from_numpy(
@@ -638,6 +638,9 @@ class LinearProbe(pl.LightningModule):
             self.criterion = nn.CrossEntropyLoss(weight=weight)
 
         elif self.train_dataset.is_binary_tgt:
+            if Y.ndim == 1:
+                Y = np.expand_dims(Y, 1)
+
             out_size = Y.shape[1]
             if cfg.is_balance_loss:
                 n_pos = Y.sum(0)
