@@ -28,7 +28,7 @@ The only function to change for different projects should be:
 try:
     from sklearnex import patch_sklearn
 
-    patch_sklearn(["SVC", "DBSCAN"])
+    patch_sklearn(["LinearSVC", "LogisticRegression"])
 except:
     # tries to speedup sklearn if possible (has to be before import sklearn)
     pass
@@ -505,7 +505,7 @@ def predict(trainer, dataset, is_sklearn):
         if dataset.is_binary_tgt:
             Yhat = (Yhat_score > 0.5).astype(int)
         elif dataset.is_multiclass_tgt:
-            Yhat = Yhat_score.argmax(dim=1)
+            Yhat = Yhat_score.argmax(axis=1)
 
     return Yhat, Yhat_score, Y
 
@@ -581,7 +581,6 @@ def get_sklearn_clf(cfg, seed):
         C=cfg.C,
         class_weight="balanced" if cfg.is_balance_loss else None,
         random_state=seed,
-        verbose=1,
         tol=1e-3,
     )
 
@@ -627,7 +626,6 @@ class LinearProbe(pl.LightningModule):
         Y = self.train_dataset.Y
 
         if self.train_dataset.is_multiclass_tgt:
-            breakpoint()
             out_size = len(np.unique(Y))
             if cfg.is_balance_loss:
                 weight = torch.from_numpy(
