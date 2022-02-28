@@ -25,7 +25,7 @@ config:
     TEST:
       DATA_SOURCES: [ disk_folder ]
       DATASET_NAMES: [ imagenet1k_folder ]
-      DATA_PATHS: [ "./data/imagenet256/train" ]
+      DATA_PATHS: [ "./data/imagenet256/val" ]
       BATCHSIZE_PER_REPLICA: 128
       TRANSFORMS:
         - name: Resize
