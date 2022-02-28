@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    simclr_dir \
+    simclr_long_dir \
     config=pretrain/simclr/simclr_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \
