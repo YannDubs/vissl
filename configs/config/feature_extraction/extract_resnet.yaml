@@ -6,6 +6,7 @@ config:
     TRAIN:
       DATA_SOURCES: [ disk_folder ]
       DATASET_NAMES: [ imagenet1k_folder ]
+      LABEL_SOURCES: [disk_folder]
       DATA_PATHS: [ "./data/imagenet256/train" ]
       LABEL_TYPE: "standard"
       BATCHSIZE_PER_REPLICA: 128
@@ -27,6 +28,7 @@ config:
       DATASET_NAMES: [ imagenet1k_folder ]
       DATA_PATHS: [ "./data/imagenet256/val" ]
       LABEL_TYPE: "standard"
+      LABEL_SOURCES: [disk_folder]
       BATCHSIZE_PER_REPLICA: 128
       TRANSFORMS:
         - name: Resize

@@ -43,7 +43,7 @@ def convert_to_attrdict(
         sys.argv = cmdline_args
         cli_conf = OmegaConf.from_cli(cmdline_args)
 
-        # merge the command line args with config
+        # merge the comqmand line args with config
         cfg = OmegaConf.merge(cfg, cli_conf)
 
     # convert the config to AttrDict
