@@ -607,7 +607,6 @@ config:
       #           ["res5", ["AvgPool2d", [[6, 6], 1, 0]]],
       #       ]
       LINEAR_EVAL_FEAT_POOL_OPS_MAP: []
-      IS_FLOAT16: False
     # ----------------------------------------------------------------------------------- #
     # GRADIENT CLIPPING. Used by Dosovitskiy et al. in their  Vision
     # Transformer paper.

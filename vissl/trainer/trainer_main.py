@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+import contextlib
 import gc
 import itertools
 import logging
@@ -14,6 +15,7 @@ from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import torch
+from classy_vision.tasks.classification_task import AmpType
 import torch.distributed as dist
 from classy_vision.generic.distributed_util import (
     barrier,
@@ -655,6 +657,12 @@ class SelfSupervisionTrainer(object):
         split_name: str,
         output_folder: str,
     ):
+        torch_amp_context = (
+            torch.cuda.amp.autocast()
+            if task.amp_type == AmpType.PYTORCH
+            else contextlib.suppress()
+        )
+
         task.model.eval()
         logging.info("Model set to eval mode during feature extraction...")
         dist_rank = torch.distributed.get_rank()
@@ -677,9 +685,8 @@ class SelfSupervisionTrainer(object):
                     "inds": torch.cat(sample["data_idx"]).cpu().numpy(),
                 }
                 with torch.no_grad():
-                    features = task.model(input_sample["input"])
-                    if self.cfg.MODEL.FEATURE_EVAL_SETTINGS.IS_FLOAT16:
-                        breakpoint()  # ensure that you are using half precision (maybe autocoast, or just call .half())
+                    with torch_amp_context:
+                        features = task.model(input_sample["input"])
                     flat_features_list = self._flatten_features_list(features)
                     num_images = input_sample["inds"].shape[0]
                     feature_buffer_size += num_images
