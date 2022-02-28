@@ -678,6 +678,8 @@ class SelfSupervisionTrainer(object):
                 }
                 with torch.no_grad():
                     features = task.model(input_sample["input"])
+                    if self.cfg.MODEL.FEATURE_EVAL_SETTINGS.IS_FLOAT16:
+                        breakpoint()  # ensure that you are using half precision (maybe autocoast, or just call .half())
                     flat_features_list = self._flatten_features_list(features)
                     num_images = input_sample["inds"].shape[0]
                     feature_buffer_size += num_images

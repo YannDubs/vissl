@@ -53,6 +53,7 @@ config:
       FREEZE_TRUNK_ONLY: True
       EXTRACT_TRUNK_FEATURES_ONLY: True
       SHOULD_FLATTEN_FEATS: False
+      IS_FLOAT16: True
     AMP_PARAMS:
       USE_AMP: True
       AMP_TYPE: pytorch

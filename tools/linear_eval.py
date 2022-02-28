@@ -3,10 +3,10 @@ Linear classification evaluation of pretrained features. Needs the following pac
 - pytorch-lightning
 - scikit-learn
 - torch
-- torchmetrics
 - pandas
-- imbalanced-learn
-- iterative-stratification
+- (optional) scikit-learn-intelex
+- (optional) imbalanced-learn
+- (optional) iterative-stratification
 
 Eg of command to run:
 -  For hyper parameter tuning and balancing the losses:
@@ -73,6 +73,7 @@ from sklearn.utils.validation import _num_samples
 from torch.utils.data import DataLoader, Dataset
 import time
 from datetime import timedelta
+from vissl.utils.extract_features_utils import ExtractedFeaturesLoader
 
 try:
     from iterstrat.ml_stratifiers import MultilabelStratifiedShuffleSplit
@@ -720,35 +721,38 @@ class LinearProbe(pl.LightningModule):
 def load_train_val_test_features(path):
     """Load and return train, test np array of the pretrained features for a path."""
     breakpoint()
-    stem_train_path = path.name
-    data_name = stem_train_path.split("_")[1]
 
-    if data_name == "coco":
-        stem_test_path = stem_train_path.replace("train_", "val_")
-        stem_val_path = None
-    else:
-        stem_test_path = stem_train_path.replace("train_", "test_")
-        stem_val_path = stem_train_path.replace("train_", "val_")
-        if not (path.parent / stem_val_path).is_file():
-            stem_val_path = None
+    kwargs = dict(input_dir=path, layer="heads", flatten_features=False,)
+    features = ExtractedFeaturesLoader.load_features(split="train", **kwargs)
+    Z_train = features['features']
+    Y_train = features['targets']
 
-    (Z_train, _, Y_train) = torch.load(path)
-    (Z_test, _, Y_test) = torch.load(path.parent / stem_test_path)
+    Z_test, Z_val, Y_test, Y_val = None, None
+    try:
+        features = ExtractedFeaturesLoader.load_features(split="test", **kwargs)
+        Z_test = features['features']
+        Y_test = features['targets']
+    except:
+        pass
 
-    if stem_val_path is not None:
-        (Z_val, _, Y_val) = torch.load(path.parent / stem_val_path)
-        Z_val = Z_val.numpy()
-        Y_val = Y_val.numpy()
-    else:
-        Z_val, Y_val = None, None
+    try:
+        features = ExtractedFeaturesLoader.load_features(split="val", **kwargs)
+        Z_val = features['features']
+        Y_val = features['targets']
+    except:
+        pass
+
+    if Z_test is None:
+        # use validation instead of test
+        Z_test, Y_test = Z_val, Y_val
 
     return (
-        Z_train.numpy(),
-        Y_train.numpy(),
+        Z_train,
+        Y_train,
         Z_val,
         Y_val,
-        Z_test.numpy(),
-        Y_test.numpy(),
+        Z_test,
+        Y_test,
     )
 
 
@@ -799,7 +803,7 @@ if __name__ == "__main__":
         "--out-path", required=True, help="path to outputs and metrics"
     )
     general_args.add_argument(
-        "--feature-pattern", default="model_phase*.", help="glob pattern to find features."
+        "--feature-pattern", default="model_phase*", help="glob pattern to find features."
     )
     general_args.add_argument(
         "--n-runs", default=3, type=int, help="number of evaluation to do."
