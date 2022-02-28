@@ -28,14 +28,14 @@ The only function to change for different projects should be:
 try:
     from sklearnex import patch_sklearn
 
-    patch_sklearn(["LinearSVC", "LogisticRegression"])
+    patch_sklearn(["LogisticRegression"])
 except:
     # tries to speedup sklearn if possible (has to be before import sklearn)
     pass
 
 import argparse
 import logging
-import multiprocessing
+import os
 import sys
 from copy import deepcopy
 from itertools import chain
@@ -660,12 +660,36 @@ class LinearProbe(pl.LightningModule):
                 nn.BatchNorm1d(in_size, affine=False), self.probe
             )
 
+        self.num_workers = 1
+        if hasattr(os, 'sched_getaffinity'):
+            try:
+                max_num_worker_suggest = len(os.sched_getaffinity(0))
+                cpuset_checked = True
+            except Exception:
+                pass
+        if max_num_worker_suggest is None:
+            # os.cpu_count() could return Optional[int]
+            # get cpu count first and check None in order to satify mypy check
+            cpu_count = os.cpu_count()
+            if cpu_count is not None:
+                max_num_worker_suggest = cpu_count
+
+    @property
+    def max_num_workers(self):
+        max_num_workers = None
+        if hasattr(os, 'sched_getaffinity'):
+            try:
+                max_num_workers = len(os.sched_getaffinity(0))
+            except:
+                max_num_workers = os.cpu_count()
+        return max_num_workers
+
     def train_dataloader(self):
         return DataLoader(
             self.train_dataset,
             batch_size=self.hparams.batch_size,
             shuffle=True,
-            num_workers=multiprocessing.cpu_count() - 1,
+            num_workers=self.max_num_workers - 1,
             pin_memory=True,
         )
 
@@ -674,7 +698,7 @@ class LinearProbe(pl.LightningModule):
             dataset,
             batch_size=self.hparams.batch_size,
             shuffle=False,
-            num_workers=multiprocessing.cpu_count() - 1,
+            num_workers=self.max_num_workers - 1,
             pin_memory=True,
         )
 
@@ -781,7 +805,7 @@ if __name__ == "__main__":
         "--out-path", required=True, help="path to outputs and metrics"
     )
     general_args.add_argument(
-        "--feature-pattern", default="model_phase*", help="glob pattern to find features."
+        "--feature-pattern", default="model_*", help="glob pattern to find features."
     )
     general_args.add_argument(
         "--n-runs", default=3, type=int, help="number of evaluation to do."
