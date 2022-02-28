@@ -752,7 +752,9 @@ def load_train_val_test_features(path):
 
 def preprocess_labels(path, Y_train, Y_val, Y_test):
     """Applies the desired label preprocessing."""
-    return Y_train.squeeze(), Y_val.squeeze(), Y_test.squeeze()
+    if Y_val is not None:
+        Y_val = Y_val.squeeze()
+    return Y_train.squeeze(), Y_val, Y_test.squeeze()
 
 def path_to_model(path):
     """Return model name from path."""
