@@ -28,7 +28,7 @@ The only function to change for different projects should be:
 try:
     from sklearnex import patch_sklearn
 
-    patch_sklearn()
+    patch_sklearn(["SVC", "DBSCAN"])
 except:
     # tries to speedup sklearn if possible (has to be before import sklearn)
     pass
