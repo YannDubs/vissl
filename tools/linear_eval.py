@@ -414,7 +414,7 @@ def train(train_dataset, val_dataset, cfg, seed):
             limit_val_batches=0,
             fast_dev_run=False,
             enable_checkpointing=False,
-            progress_bar_refresh_rate=TQDMProgressBar(refresh_rate=30)
+            callbacks=[TQDMProgressBar(refresh_rate=30)]
         )
 
         if cfg.is_validation:
