@@ -516,10 +516,9 @@ def predict(trainer, dataset, is_sklearn):
 ##### EVALUATION ######
 def evaluate(Yhat, Yhat_score, Y):
     """Compute many useful classification metrics."""
-    breakpoint()
 
-    tgt_type = type_of_target(Y)
     # avoid slow computations if large (eg imagenet train)
+    tgt_type = type_of_target(Y)
     is_many_labels = "multilabel" in tgt_type and Y.shape[1] > 100
     is_many_classes = "multiclass" in tgt_type and len(np.unique(Y)) > 100
     is_many_samples = len(Y) > 6e4  # max is imagenet val
@@ -540,18 +539,15 @@ def evaluate(Yhat, Yhat_score, Y):
 
         if Yhat_score is not None and not is_large:
             # all of this is skipped for imagenet train because slow + memory intensive
-            breakpoint()
 
             if tgt_type == "multiclass":
                 metrics["top5_accuracy"] = top_k_accuracy_score(Y, Yhat_score, k=5)
 
-            if not is_many_classes and not is_many_labels:
-                # too slow even for imagenet val
-                metrics["auc"] = roc_auc_score(Y, Yhat_score, average="weighted", multi_class="ovr")
-
             if "multilabel" not in tgt_type:
                 # could deal with multi label but annoying and not that useful
                 metrics["log_loss"] = log_loss(Y, Yhat_score)
+
+            metrics["auc"] = roc_auc_score(Y, Yhat_score, average="weighted", multi_class="ovr")
 
     except:
         logging.exception("Skipping secondary metrics which failed with error:")
