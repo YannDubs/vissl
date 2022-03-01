@@ -516,6 +516,12 @@ def predict(trainer, dataset, is_sklearn):
 ##### EVALUATION ######
 def evaluate(Yhat, Yhat_score, Y):
     """Compute many useful classification metrics."""
+    tgt_type = type_of_target(Y)
+    # avoid slow computations if large
+    is_many_labels = "multilabel" in tgt_type and Y.shape[1] > 100
+    is_many_classes = "multiclass" in tgt_type and len(np.unique(Y)) > 100
+    is_many_samples = len(Yhat) > 1e5
+    is_large = is_many_labels and is_many_classes and is_many_samples
 
     clf_report = pd.DataFrame(classification_report(Y, Yhat, output_dict=True, zero_division=0)).T
 
@@ -531,18 +537,18 @@ def evaluate(Yhat, Yhat_score, Y):
                 metrics[f"weighted_{name}"] = metric
 
         if Yhat_score is not None:
-            tgt_type = type_of_target(Y)
 
             if tgt_type == "multiclass":
+                # will be slow on large data but you want that on imagenet
                 metrics["top5_accuracy"] = top_k_accuracy_score(Y, Yhat_score, k=5)
+
+            if not is_large:
+                # too slow for imagenet
+                metrics["auc"] = roc_auc_score(Y, Yhat_score, average="weighted", multi_class="ovr")
 
             if "multilabel" not in tgt_type:
                 # could deal with multi label but annoying and not that useful
                 metrics["log_loss"] = log_loss(Y, Yhat_score)
-
-            if "multiclass" not in tgt_type:
-                # skip multi class because can be slow if classes++ (eg imagenet)
-                metrics["auc"] = roc_auc_score(Y, Yhat_score, average="weighted", multi_class="ovr")
 
     except:
         logging.exception("Skipping secondary metrics which failed with error:")
@@ -660,20 +666,6 @@ class LinearProbe(pl.LightningModule):
             self.probe = nn.Sequential(
                 nn.BatchNorm1d(in_size, affine=False), self.probe
             )
-
-        self.num_workers = 1
-        if hasattr(os, 'sched_getaffinity'):
-            try:
-                max_num_worker_suggest = len(os.sched_getaffinity(0))
-                cpuset_checked = True
-            except Exception:
-                pass
-        if max_num_worker_suggest is None:
-            # os.cpu_count() could return Optional[int]
-            # get cpu count first and check None in order to satify mypy check
-            cpu_count = os.cpu_count()
-            if cpu_count is not None:
-                max_num_worker_suggest = cpu_count
 
     @property
     def max_num_workers(self):
