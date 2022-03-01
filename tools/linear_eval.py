@@ -44,6 +44,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks.progress.tqdm_progress import TQDMProgressBar
 import torch
 import torch.nn as nn
 from scipy.stats import loguniform
@@ -176,7 +177,7 @@ def main(cfg):
                 trainer = train(train_dataset, val_dataset, cfg, seed)
                 logging.info(f"Done training + tuning. Time: {str(timedelta(seconds=time.time() - start)).split('.')[0]}.")
 
-                eval_datasets = dict(train=train_dataset, test=test_dataset)
+                eval_datasets = dict(test=test_dataset, train=train_dataset)
                 for name, dataset in eval_datasets.items():
                     metrics_split, _ = init_level_(
                         "split", name, metrics_seed, dir_size
@@ -406,12 +407,14 @@ def train(train_dataset, val_dataset, cfg, seed):
         pl.seed_everything(seed)
         trainer_kwargs = dict(
             max_epochs=cfg.curr_n_epoch,
-            log_every_n_steps=200,
+            log_every_n_steps=100,
             gpus=cfg.n_gpus,
             precision=16,
             enable_progress_bar=True,
             limit_val_batches=0,
             fast_dev_run=False,
+            enable_checkpointing=False,
+            progress_bar_refresh_rate=TQDMProgressBar(refresh_rate=30)
         )
 
         if cfg.is_validation:
@@ -666,14 +669,11 @@ class LinearProbe(pl.LightningModule):
                 nn.BatchNorm1d(in_size, affine=False), self.probe
             )
 
-    @property
-    def max_num_workers(self):
-        max_num_workers = None
-        if hasattr(os, 'sched_getaffinity'):
-            try:
-                max_num_workers = len(os.sched_getaffinity(0))
-            except:
-                max_num_workers = os.cpu_count()
+    def get_max_num_workers(self):
+        try:
+            max_num_workers = len(os.sched_getaffinity(0))
+        except:
+            max_num_workers = os.cpu_count()
         return max_num_workers
 
     def train_dataloader(self):
