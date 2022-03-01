@@ -669,7 +669,8 @@ class LinearProbe(pl.LightningModule):
                 nn.BatchNorm1d(in_size, affine=False), self.probe
             )
 
-    def get_max_num_workers(self):
+    @property
+    def max_num_workers(self):
         try:
             max_num_workers = len(os.sched_getaffinity(0))
         except:
