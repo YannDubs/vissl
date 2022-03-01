@@ -59,7 +59,7 @@ config:
         ],
         [
           [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
-          [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, ${config.LOSS.cntr_issl_loss.buffer_params.embedding_dim} ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
         ],
       ]
     NON_TRAINABLE_PARAMS: ["heads.0.0.norm.bias","heads.1.1.clf.1.bias"]  # corresponds to the bias of the last BN layers
@@ -79,7 +79,7 @@ config:
     simple_cntr_issl_loss:
       temperature: 0.1
       buffer_params:
-        embedding_dim: 2048
+        embedding_dim: ${config.LOSS.cntr_issl_loss.buffer_params.embedding_dim}
   OPTIMIZER:
     name: sgd
     use_larc: True

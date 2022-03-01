@@ -133,6 +133,9 @@ class SimpleCntrISSLCriterion(nn.Module):
         # then classification loss. In reality W is the output of the projector.
         z_pred, W = embedding
 
+        z_pred = nn.functional.normalize(z_pred, dim=1, p=2)
+        W = nn.functional.normalize(W, dim=1, p=2)
+
         assert z_pred.ndim == 2
         assert z_pred.shape[1] == int(self.buffer_params.embedding_dim)
 
