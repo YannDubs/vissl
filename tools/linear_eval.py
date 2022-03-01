@@ -536,13 +536,14 @@ def evaluate(Yhat, Yhat_score, Y):
             if tgt_type == "multiclass":
                 metrics["top5_accuracy"] = top_k_accuracy_score(Y, Yhat_score, k=5)
 
-            metrics["auc"] = roc_auc_score(
-                Y, Yhat_score, average="weighted", multi_class="ovr"
-            )
-
             if "multilabel" not in tgt_type:
                 # could deal with multi label but annoying and not that useful
                 metrics["log_loss"] = log_loss(Y, Yhat_score)
+
+            if "multiclass" not in tgt_type:
+                # skip multi class because can be slow if classes++ (eg imagenet)
+                metrics["auc"] = roc_auc_score(Y, Yhat_score, average="weighted", multi_class="ovr")
+
     except:
         logging.exception("Skipping secondary metrics which failed with error:")
 
