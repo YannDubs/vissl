@@ -2,9 +2,8 @@
 
 ./dev/launch_slurm.sh \
     simplecntr_dir \
-    config=pretrain/cntr/cntr_resnet \
+    config=pretrain/cntr/cntr128_resnet \
     config.LOSS.name=simple_cntr_issl_loss \
-    config.LOSS.simple_cntr_issl_loss.buffer_params.embedding_dim=128 \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
