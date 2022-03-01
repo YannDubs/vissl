@@ -516,12 +516,14 @@ def predict(trainer, dataset, is_sklearn):
 ##### EVALUATION ######
 def evaluate(Yhat, Yhat_score, Y):
     """Compute many useful classification metrics."""
+    breakpoint()
+
     tgt_type = type_of_target(Y)
-    # avoid slow computations if large
+    # avoid slow computations if large (eg imagenet train)
     is_many_labels = "multilabel" in tgt_type and Y.shape[1] > 100
     is_many_classes = "multiclass" in tgt_type and len(np.unique(Y)) > 100
-    is_many_samples = len(Yhat) > 1e5
-    is_large = is_many_labels and is_many_classes and is_many_samples
+    is_many_samples = len(Y) > 6e4  # max is imagenet val
+    is_large = is_many_samples and (is_many_classes or is_many_labels)
 
     clf_report = pd.DataFrame(classification_report(Y, Yhat, output_dict=True, zero_division=0)).T
 
@@ -536,14 +538,15 @@ def evaluate(Yhat, Yhat_score, Y):
                 # support will be none because average is weighted
                 metrics[f"weighted_{name}"] = metric
 
-        if Yhat_score is not None:
+        if Yhat_score is not None and not is_large:
+            # all of this is skipped for imagenet train because slow + memory intensive
+            breakpoint()
 
             if tgt_type == "multiclass":
-                # will be slow on large data but you want that on imagenet
                 metrics["top5_accuracy"] = top_k_accuracy_score(Y, Yhat_score, k=5)
 
-            if not is_large:
-                # too slow for imagenet
+            if not is_many_classes and not is_many_labels:
+                # too slow even for imagenet val
                 metrics["auc"] = roc_auc_score(Y, Yhat_score, average="weighted", multi_class="ovr")
 
             if "multilabel" not in tgt_type:
