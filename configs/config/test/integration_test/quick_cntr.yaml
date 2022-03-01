@@ -76,6 +76,10 @@ config:
       temperature: 0.1
       buffer_params:
         embedding_dim: 2048
+    simple_cntr_issl_loss:
+      temperature: 0.1
+      buffer_params:
+        embedding_dim: 2048
   OPTIMIZER:
     name: sgd
     use_larc: True
