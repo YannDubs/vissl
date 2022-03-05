@@ -429,7 +429,7 @@ def train(train_dataset, val_dataset, cfg, seed):
                 elif param == "batch_size":
                     param_space["batch_size"] = [int(2 ** i) for i in range(6, 10)]
                 elif param == "weight_decay":
-                    param_space["weight_decay"] = loguniform(1e-8, 1e-4)
+                    param_space["weight_decay"] = loguniform(1e-8, 1e-5)
 
             param_list = list(
                 ParameterSampler(
@@ -725,9 +725,12 @@ class LinearProbe(pl.LightningModule):
         return self(x).cpu().numpy(), y.cpu().numpy()
 
     def configure_optimizers(self):
+        # standard linear lr scaling
+        linear_lr = self.hparams.lr * self.hparams.batch_size / 256
+
         optimizer = torch.optim.SGD(
             self.probe.parameters(),
-            lr=self.hparams.lr,
+            lr=linear_lr,
             weight_decay=self.hparams.weight_decay,
             momentum=0.9,
         )
@@ -860,7 +863,7 @@ if __name__ == "__main__":
 
     torch_args.add_argument(
         "--n-epochs",
-        default=[50, 200], # should be 100 to make sure converge
+        default=[100, 500],
         nargs="+",
         type=int,
         help="Number of total epochs to run. There should be one value per training size.",
