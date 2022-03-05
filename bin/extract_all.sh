@@ -6,3 +6,4 @@ bin/extract_features.sh cntr_dir
 bin/extract_features.sh slfdstl_dir
 bin/extract_features.sh simplecntr_dir
 bin/extract_features.sh simplecntr128_dir
+bin/extract_features.sh simplecntr512_dir

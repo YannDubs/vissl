@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    simplecntr128_dir \
+    simplecntr512_dir \
     config=pretrain/cntr/cntr512_resnet \
     config.LOSS.name=simple_cntr_issl_loss \
     +config/server=remote \

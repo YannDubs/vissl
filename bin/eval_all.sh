@@ -7,3 +7,4 @@ python tools/linear_eval.py --feature-path slfdstl_dir/features --out-path slfds
 
 python tools/linear_eval.py --feature-path simplecntr128_dir/features --out-path simplecntr128_dir/eval
 python tools/linear_eval.py --feature-path simplecntr_dir/features --out-path simplecntr_dir/eval
+python tools/linear_eval.py --feature-path simplecntr512_dir/features --out-path simplecntr512_dir/eval
