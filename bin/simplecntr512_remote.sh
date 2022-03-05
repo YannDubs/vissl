@@ -2,7 +2,7 @@
 
 ./dev/launch_slurm.sh \
     simplecntr128_dir \
-    config=pretrain/cntr/cntr128_resnet \
+    config=pretrain/cntr/cntr512_resnet \
     config.LOSS.name=simple_cntr_issl_loss \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \

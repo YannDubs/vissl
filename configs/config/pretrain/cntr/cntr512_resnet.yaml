@@ -60,7 +60,7 @@ config:
     HEAD:
       PARAMS: [
         [
-          [ "mlp", { "dims": [ 2048, 128 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
         ],
         [
           [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
@@ -80,11 +80,11 @@ config:
       cntr_issl_loss:
         temperature: 0.1
         buffer_params:
-          embedding_dim: 128
+          embedding_dim: 512
       simple_cntr_issl_loss:
         temperature: 0.1
         buffer_params:
-          embedding_dim: 128
+          embedding_dim: 512
   OPTIMIZER:
       name: sgd
       use_zero: False
@@ -132,7 +132,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "cntr128"
+    NAME: "cntr512"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480

@@ -360,6 +360,8 @@ def multilabel_train_test_split(
 
 def train(train_dataset, val_dataset, cfg, seed):
     """Train linear probe."""
+    is_balance_val = cfg.is_balance_loss or cfg.balance_data_mode is not None
+
     if cfg.is_sklearn:
         clf = get_sklearn_clf(cfg, seed)
 
@@ -384,7 +386,7 @@ def train(train_dataset, val_dataset, cfg, seed):
             clf = RandomizedSearchCV(
                 clf,
                 param_space,
-                scoring=make_scorer(accuracy, is_balance=cfg.is_balance_loss),
+                scoring=make_scorer(accuracy, is_balance=is_balance_val),
                 # MultiOutputClassifier already uses parallel
                 n_jobs=None if train_dataset.is_multilabel_tgt else -1,
                 cv=PredefinedSplit(
@@ -448,7 +450,7 @@ def train(train_dataset, val_dataset, cfg, seed):
                 Yhat_val, _, Y_val = predict(trainer, val_dataset, is_sklearn=False)
                 curr_metric = accuracy(Y_val, Yhat_val, is_balance=cfg.is_balance_loss)
                 logging.info(
-                    f"Temporary validation metric: {curr_metric} for {sampled_params}."
+                    f"Temporary validation metric: {curr_metric} for {sampled_params} on balance={is_balance_val}."
                 )
 
                 if curr_metric > best_metric:
@@ -870,7 +872,8 @@ if __name__ == "__main__":
         help="optionally add a batchnorm layer before the linear classifier if not tuning over.",
     )
     torch_args.add_argument(
-        "--lr", default=0.3, type=float, help="learning rate for the model if not tuning over."
+        "--lr", default=0.3, type=float, help="learning rate for the model if not tuning over." 
+                                              "This is lr for batch_size 256"
     )
     torch_args.add_argument("--batch-size", default=256, type=int, help="batch size if not tuning over.")
     torch_args.add_argument(
