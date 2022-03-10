@@ -55,11 +55,11 @@ config:
     HEAD:
       PARAMS: [
         [
-          [ "batchnorm", { "dim": 2048 } ], # identity
+          [ "mlp", { "dims": [ 2048, 128 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
         ],
         [
           [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
-          [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 128 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
         ],
       ]
     NON_TRAINABLE_PARAMS: ["heads.0.0.norm.bias","heads.1.1.clf.1.bias"]  # corresponds to the bias of the last BN layers

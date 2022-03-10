@@ -72,7 +72,7 @@ class SlfdstlISSLLoss(ClassyLoss):
 class SlfdstlISSLCriterion(nn.Module):
 
     def __init__(self,
-                 n_Mx : int = 50000,
+                 n_Mx : int = 16384,
                  temperature_assign : float = 0.5,
                  temperature_pred : float = 1,
                  num_crops : int = 2,
@@ -129,7 +129,7 @@ class SlfdstlISSLCriterion(nn.Module):
             p_M = self.gather_marginal(p_M)  # avg marginal across all gpus
 
             if self.ema_weight_prior is not None:
-                is_ema  = self.num_iteration > 5000
+                is_ema = self.num_iteration > 5000
                 if is_ema:
                     # first epoch you update the running mean
                     _ = self.running_means[i_p](p_M)
@@ -169,6 +169,13 @@ class SlfdstlISSLCriterion(nn.Module):
             fit_pM_Unif = fit_pM_Unif / self.ema_weight_marginal
 
         loss = CE_pMlz_qMlza + self.beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
+
+        if self.num_iteration % 100 == 0:
+            logging.info(f"Entropy: {H_M.mean()}")
+            logging.info(f"Distil: {CE_pMlz_qMlza.mean()}")
+            logging.info(f"Inv + det: {CE_pMlz_pMlza.mean()}")
+            H_Mlz=Categorical(probs=torch.cat(all_p_Mlz, dim=0).detach()).entropy().mean()
+            logging.info(f"H[M|Z]: {H_Mlz}")
 
         return loss
 
