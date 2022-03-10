@@ -77,12 +77,12 @@ class SlfdstlISSLCriterion(nn.Module):
                  temperature_pred : float = 1,
                  num_crops : int = 2,
                  crops_for_assign : list[int] = [0,1],
-                 beta_H_MlZ : float = 1.0,
-                 beta_pM_unif: float = 1.7,
+                 beta_H_MlZ : float = 0.5,
+                 beta_pM_unif: float = 2,
                  ema_weight_marginal : float = 0.7,
                 ):
         super(SlfdstlISSLCriterion, self).__init__()
-        assert beta_H_MlZ >= 1
+
 
         self.n_Mx = n_Mx
         self.temperature_assign = temperature_assign
@@ -92,6 +92,7 @@ class SlfdstlISSLCriterion(nn.Module):
         self.beta_pM_unif = beta_pM_unif
         self.beta_H_MlZ = beta_H_MlZ
         self.ema_weight_marginal = ema_weight_marginal
+        self.register_buffer("num_iteration", torch.zeros(1, dtype=int))
 
         if self.ema_weight_marginal is not None:
             # initialize running means with uniform
@@ -101,6 +102,8 @@ class SlfdstlISSLCriterion(nn.Module):
                                                 for _ in range(len(self.crops_for_assign))])
 
     def forward(self, output: List[torch.Tensor]):
+        self.num_iteration += 1
+
         logits_assign, logits_predict = output
         logits_assign = logits_assign.float() / self.temperature_assign
 
@@ -125,8 +128,13 @@ class SlfdstlISSLCriterion(nn.Module):
             p_M = p_Mlz.mean(0, keepdim=True)
             p_M = self.gather_marginal(p_M)  # avg marginal across all gpus
 
-            if self.ema_weight_marginal is not None:
-                p_M = self.running_means[i_p](p_M)
+            if self.ema_weight_prior is not None:
+                is_ema  = self.num_iteration > 5000
+                if is_ema:
+                    # first epoch you update the running mean
+                    _ = self.running_means[i_p](p_M)
+                else:
+                    p_M = self.running_means[i_p](p_M)
 
             # D[\hat{p}(M) || Unif(\calM)]. shape: []
             # for unif prior same as maximizing entropy. Could be computed once per GPU, but fast so ok
@@ -134,14 +142,11 @@ class SlfdstlISSLCriterion(nn.Module):
             #############################
 
             ##### Ensure invariance and determinism of assignement #####
-            if self.beta_H_MlZ > 1:
-                for i_log_p, log_p_Mlza in enumerate(all_log_p_Mlz):
-                    if i_p == i_log_p:
-                        continue
-                    CE_pMlz_pMlza = CE_pMlz_pMlza - (p_Mlz * log_p_Mlza).sum(-1).mean(0)
-                    n_CE_pp += 1
-            else:
-                n_CE_pp = 1
+            for i_log_p, log_p_Mlza in enumerate(all_log_p_Mlz):
+                if i_p == i_log_p:
+                    continue
+                CE_pMlz_pMlza = CE_pMlz_pMlza - (p_Mlz * log_p_Mlza).sum(-1)
+                n_CE_pp += 1
             #########################
 
             for i_q, log_q_Mlza in enumerate(all_log_q_Mlz):
@@ -159,12 +164,11 @@ class SlfdstlISSLCriterion(nn.Module):
         CE_pMlz_pMlza /= n_CE_pp
 
         fit_pM_Unif = - H_M  # want to max entropy
-        if self.ema_weight_marginal is not None:
+        if self.ema_weight_marginal is not None and is_ema:
             # try to balance the scaling in gradients due to running mean
             fit_pM_Unif = fit_pM_Unif / self.ema_weight_marginal
 
-        delta_H_MlZ = self.beta_H_MlZ - 1  # the first beta is due to KL -> CE
-        loss = CE_pMlz_qMlza + self.beta_pM_unif * fit_pM_Unif + delta_H_MlZ * CE_pMlz_pMlza
+        loss = CE_pMlz_qMlza + self.beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
 
         return loss
 

@@ -18,19 +18,18 @@ config:
       LOG_PARAMS: False
       LOG_PARAMS_GRADIENTS: False
   DATA:
-    NUM_DATALOADER_WORKERS: 8
+    NUM_DATALOADER_WORKERS: 6
     TRAIN:
-      DATA_SOURCES: [ disk_folder ]
-      DATASET_NAMES: [ imagenet1k_folder ]
-      DATA_PATHS: [ "./data/imagenet256/train" ]
+      DATA_SOURCES: [disk_folder]
+      DATASET_NAMES: [imagenet1k_folder]
+      DATA_PATHS: ["./data/imagenet256/train"]
       BATCHSIZE_PER_REPLICA: 96
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
-        - name: ImgPilToMultiCrop
-          total_num_crops: 6
-          size_crops: [ 160, 96 ]
-          num_crops: [ 2, 4 ]
-          crop_scales: [ [ 0.14, 1 ], [ 0.05, 0.14 ] ]  # imagenet
+        - name: ImgReplicatePil
+          num_times: 2
+        - name: RandomResizedCrop
+          size: 224
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
@@ -43,7 +42,7 @@ config:
         - name: Normalize
           mean: [0.485, 0.456, 0.406]
           std: [0.229, 0.224, 0.225]
-      COLLATE_FUNCTION: multicrop_collator
+      COLLATE_FUNCTION: simclr_collator
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
       COPY_DESTINATION_DIR: /tmp/imagenet1k/
@@ -53,24 +52,22 @@ config:
   METERS:
     name: ""
   MODEL:
-    MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
     TRUNK:
       NAME: resnet
+      OUT_FEATURE_KEYS: ["flatten","flatten"]
       RESNETS:
         DEPTH: 50
     HEAD:
       PARAMS: [
-        # both heads are the same and are linear (note no activation !!)
-        # use  256 and 16384 to keep same parameters as other methods (which use 2048 * 2048)
         [
-          [ "batchnorm", { "dim": 2048 } ], # when using sklearn downstream features will be normalized
-          [ "mlp", { "dims": [ 2048, 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True} ], # that's a low rank linear layer
+          [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
         ],
         [
-          [ "batchnorm", { "dim": 2048 } ], # when using sklearn downstream features will be normalized
-          [ "mlp", { "dims": [ 2048, 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True } ], # that's a low rank linear layer
-        ],
+          [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+        ]
       ]
+    NON_TRAINABLE_PARAMS: ["heads.0.0.norm.bias","heads.1.1.clf.1.bias"]  # corresponds to the BN of the last BN layers
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
@@ -79,18 +76,18 @@ config:
       USE_AMP: True
       AMP_TYPE: "pytorch"  # apex | pytorch
   LOSS:
-    name: slfdstl_issl_loss
-    slfdstl_issl_loss:
-      n_Mx: 16384  # automatically inferred from model HEAD settings
-      temperature_assign: 0.5
-      temperature_pred: 1
-      num_crops: 2 # automatically inferred from data transforms
-      crops_for_assign: [ 0, 1 ]
-      beta_pM_unif: 2
-      beta_H_MlZ: 0.5
-      ema_weight_marginal: 0.7
+      name: cntr_issl_loss # can use simple_cntr_issl_loss
+      cntr_issl_loss:
+        temperature: 0.1
+        buffer_params:
+          embedding_dim: 2048
+      simple_cntr_issl_loss:
+        temperature: 0.1
+        buffer_params:
+          embedding_dim: 2048
   OPTIMIZER:
       name: sgd
+      use_zero: False
       use_larc: True
       larc_config:
         clip: False
@@ -100,7 +97,7 @@ config:
       momentum: 0.9
       nesterov: False
       num_epochs: 100
-      #num_epochs: 400
+      # num_epochs: 400
       regularize_bn: True
       regularize_bias: True
       param_schedulers:
@@ -112,18 +109,18 @@ config:
           name: composite
           schedulers:
             - name: linear
-              start_value: 0.3
+              start_value: 0.6
               end_value: 4.8
             - name: cosine
               start_value: 4.8
-              end_value: 0.0048
+              end_value: 0.0000
           update_interval: step
           interval_scaling: [rescaled, fixed]
           lengths: [0.1, 0.9]                 # 100ep
-          #lengths: [0.025, 0.975]           # 400ep
+          # lengths: [0.025, 0.975]           # 400ep
   DISTRIBUTED:
     BACKEND: nccl
-    NUM_NODES: 2    # gives batch size of 20
+    NUM_NODES: 2
     NUM_PROC_PER_NODE: 4
     INIT_METHOD: tcp
     NCCL_DEBUG: True
@@ -135,7 +132,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "slfdstl"
+    NAME: "cntr2048"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480
