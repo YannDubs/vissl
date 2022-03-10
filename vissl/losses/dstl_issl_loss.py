@@ -134,10 +134,10 @@ class DstlISSLCriterion(nn.Module):
             if self.ema_weight_marginal is not None:
                 is_ema = self.num_iteration > 5000
                 if is_ema:
-                    # first epoch you update the running mean
-                    _ = self.running_means[i_p](p_M)
-                else:
                     p_M = self.running_means[i_p](p_M)
+                else:
+                    # first few steps you update the running mean
+                    _ = self.running_means[i_p](p_M)
 
             # D[\hat{p}(M) || Unif(\calM)]. shape: []
             # for unif prior same as maximizing entropy. Could be computed once per GPU, but fast so ok
