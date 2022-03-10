@@ -39,13 +39,14 @@ class DstlISSLLoss(ClassyLoss):
 
         self.loss_config = loss_config
         self.dstl_criterion = DstlISSLCriterion(
-            self.loss_config.n_Mx,
-            self.loss_config.temperature_assign,
-            self.loss_config.temperature_pred,
-            self.loss_config.num_crops,
-            self.loss_config.crops_for_assign,
-            self.loss_config.beta_pM_unif,
-            self.loss_config.ema_weight_marginal,
+            n_Mx = self.loss_config.n_Mx,
+            temperature_assign = self.loss_config.temperature_assign,
+            temperature_pred = self.loss_config.temperature_pred,
+            num_crops = self.loss_config.num_crops,
+            crops_for_assign = self.loss_config.crops_for_assign,
+            beta_H_MlZ = self.loss_config.beta_H_MlZ,
+            beta_pM_unif = self.loss_config.beta_pM_unif,
+            ema_weight_marginal = self.loss_config.ema_weight_marginal,
         )
 
     @classmethod
@@ -172,13 +173,7 @@ class DstlISSLCriterion(nn.Module):
 
         loss = CE_pMlz_qMlza + self.beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
 
-        if self.num_iteration % 100 == 0 and self.dist_rank == 0:
-            logging.info(f"beta_pM_unif: {self.beta_pM_unif}")
-            logging.info(f"beta_H_MlZ: {self.beta_H_MlZ}")
-            logging.info(f"kl: {fit_pM_Unif.mean()}")
-            logging.info(f"loss: {loss.mean()}")
-            logging.info(f"shape: {loss.shape}")
-
+        if self.num_iteration % 200 == 0 and self.dist_rank == 0:
             logging.info(f"Entropy: {H_M.mean()}")
             logging.info(f"Distil: {CE_pMlz_qMlza.mean()}")
             logging.info(f"Inv + det: {CE_pMlz_pMlza.mean()}")

@@ -990,8 +990,8 @@ config:
         temperature_pred: 1
         num_crops: 2 # automatically inferred from data transforms
         crops_for_assign: [0, 1]
-        beta_pM_unif: 1.7
-        beta_H_MlZ: 1.0
+        beta_pM_unif: 2.0
+        beta_H_MlZ: 0.5
         ema_weight_marginal: 0.7
 
     # ----------------------------------------------------------------------------------- #

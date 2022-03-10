@@ -38,7 +38,7 @@ class CntrISSLLoss(ClassyLoss):
         self.temperature = self.loss_config.temperature
         self.buffer_params = self.loss_config.buffer_params
         self.info_criterion = CntrISSLCriterion(
-            self.buffer_params, self.temperature
+            buffer_params=self.buffer_params, temperature=self.temperature
         )
 
     @classmethod
