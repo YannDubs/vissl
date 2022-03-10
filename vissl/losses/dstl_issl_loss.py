@@ -12,6 +12,7 @@ import numpy as np
 import torch
 from torch.distributions import Categorical
 from classy_vision.losses import ClassyLoss, register_loss
+from classy_vision.generic.distributed_util import get_rank
 from torch import nn
 from vissl.config import AttrDict
 from vissl.utils.distributed_utils import gather_from_all
@@ -92,6 +93,7 @@ class DstlISSLCriterion(nn.Module):
         self.beta_pM_unif = beta_pM_unif
         self.beta_H_MlZ = beta_H_MlZ
         self.ema_weight_marginal = ema_weight_marginal
+        self.dist_rank = get_rank()
         self.register_buffer("num_iteration", torch.zeros(1, dtype=int))
 
         if self.ema_weight_marginal is not None:
@@ -170,7 +172,7 @@ class DstlISSLCriterion(nn.Module):
 
         loss = CE_pMlz_qMlza + self.beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
 
-        if self.num_iteration % 100 == 0:
+        if self.num_iteration % 200 == 0 and self.dist_rank == 0:
             logging.info(f"Entropy: {H_M.mean()}")
             logging.info(f"Distil: {CE_pMlz_qMlza.mean()}")
             logging.info(f"Inv + det: {CE_pMlz_pMlza.mean()}")
