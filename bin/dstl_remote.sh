@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    slfdstl_dir \
+    dstl_dir \
     config=pretrain/slfdstl/slfdstl_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \

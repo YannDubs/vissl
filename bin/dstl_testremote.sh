@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    test_cntr_dir \
-    config=pretrain/cntr/cntr_resnet \
+    test_dstl_dir \
+    config=pretrain/slfdstl/slfdstl_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=2 \
@@ -11,7 +11,8 @@
     config.SLURM.TIME_HOURS=1 \
     config.SLURM.PARTITION=interactive \
     config.SLURM.ADDITIONAL_PARAMETERS.qos=nopreemption \
-    #config.LOG_FREQUENCY=50 \
-    #config.OPTIMIZER.num_epochs=7 \
-    #config.DATA.TRAIN.DATA_LIMIT=3000
+#    config.DATA.TRAIN.DATA_LIMIT=10000
+#    config.LOG_FREQUENCY=50 \
+#    config.OPTIMIZER.num_epochs=7 \
+
 
