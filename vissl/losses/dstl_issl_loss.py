@@ -128,7 +128,7 @@ class DstlISSLCriterion(nn.Module):
             p_M = p_Mlz.mean(0, keepdim=True)
             p_M = self.gather_marginal(p_M)  # avg marginal across all gpus
 
-            if self.ema_weight_marginalr is not None:
+            if self.ema_weight_marginal is not None:
                 is_ema = self.num_iteration > 5000
                 if is_ema:
                     # first epoch you update the running mean
