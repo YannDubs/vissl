@@ -174,10 +174,10 @@ class DstlISSLCriterion(nn.Module):
             logging.info(f"Entropy: {H_M.mean()}")
             logging.info(f"Distil: {CE_pMlz_qMlza.mean()}")
             logging.info(f"Inv + det: {CE_pMlz_pMlza.mean()}")
-            H_Mlz=Categorical(probs=torch.cat(all_p_Mlz, dim=0).detach()).entropy().mean()
+            H_Mlz = Categorical(probs=torch.cat(all_p_Mlz, dim=0).detach()).entropy().mean()
             logging.info(f"H[M|Z]: {H_Mlz}")
 
-        return loss
+        return loss.mean()
 
     def __repr__(self):
         repr_dict = {
