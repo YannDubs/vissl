@@ -135,7 +135,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dstl"
+    NAME: "dstlema"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480
