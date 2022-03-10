@@ -2,7 +2,7 @@
 
 ./dev/launch_slurm.sh \
     test_dstl_dir \
-    config=pretrain/slfdstl/slfdstl_resnet \
+    config=pretrain/dstl/dstl_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=2 \

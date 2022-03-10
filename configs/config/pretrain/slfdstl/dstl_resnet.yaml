@@ -79,8 +79,8 @@ config:
       USE_AMP: True
       AMP_TYPE: "pytorch"  # apex | pytorch
   LOSS:
-    name: slfdstl_issl_loss
-    slfdstl_issl_loss:
+    name: dstl_issl_loss
+    dstl_issl_loss:
       n_Mx: 16384  # automatically inferred from model HEAD settings
       temperature_assign: 0.5
       temperature_pred: 1
@@ -135,7 +135,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "slfdstl"
+    NAME: "dstl"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480

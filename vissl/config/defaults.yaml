@@ -982,9 +982,9 @@ config:
         effective_batch_size: 4096    # automatically inferred
 
       # ----------------------------------------------------------------------------------- #
-      # Slfdstl ISSL
+      # Dstl ISSL
       # ----------------------------------------------------------------------------------- #
-      slfdstl_issl_loss:
+      dstl_issl_loss:
         n_Mx : 50000  # automatically inferred from model HEAD settings
         temperature_assign: 0.5
         temperature_pred: 1

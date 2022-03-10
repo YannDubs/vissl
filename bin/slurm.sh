@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=eval_slfdstl
+#SBATCH --job-name=eval_dstl
 
 #SBATCH --partition=t4v2,rtx6000
 
@@ -21,4 +21,4 @@ source ~/.bashrc
 conda activate probing
 
 # put your command here
-python tools/linear_eval.py --feature-path slfdstl_dir/features --out-path slfdstl_dir/eval
+python tools/linear_eval.py --feature-path dstl_dir/features --out-path dstl_dir/eval

@@ -17,8 +17,8 @@ from vissl.config import AttrDict
 from vissl.utils.distributed_utils import gather_from_all
 
 
-@register_loss("slfdstl_issl_loss")
-class SlfdstlISSLLoss(ClassyLoss):
+@register_loss("dstl_issl_loss")
+class DstlISSLLoss(ClassyLoss):
     """
     This is the contrastive loss which was proposed in ISSL <IRL> paper.
     See the paper for the details on the loss.
@@ -34,10 +34,10 @@ class SlfdstlISSLLoss(ClassyLoss):
     """
 
     def __init__(self, loss_config: AttrDict, device: str = "gpu"):
-        super(SlfdstlISSLLoss, self).__init__()
+        super(DstlISSLLoss, self).__init__()
 
         self.loss_config = loss_config
-        self.slfdstl_criterion = SlfdstlISSLCriterion(
+        self.dstl_criterion = DstlISSLCriterion(
             self.loss_config.n_Mx,
             self.loss_config.temperature_assign,
             self.loss_config.temperature_pred,
@@ -50,26 +50,26 @@ class SlfdstlISSLLoss(ClassyLoss):
     @classmethod
     def from_config(cls, loss_config: AttrDict):
         """
-        Instantiates SlfdstlISSLLoss from configuration.
+        Instantiates DstlISSLLoss from configuration.
 
         Args:
             loss_config: configuration for the loss
 
         Returns:
-            SlfdstlISSLLoss instance.
+            DstlISSLLoss instance.
         """
         return cls(loss_config)
 
     def forward(self, output, target):
-        loss = self.slfdstl_criterion(output)
+        loss = self.dstl_criterion(output)
         return loss
 
     def __repr__(self):
-        repr_dict = {"name": self._get_name(), "slfdstl_criterion": self.slfdstl_criterion}
+        repr_dict = {"name": self._get_name(), "dstl_criterion": self.dstl_criterion}
         return pprint.pformat(repr_dict, indent=2)
 
 
-class SlfdstlISSLCriterion(nn.Module):
+class DstlISSLCriterion(nn.Module):
 
     def __init__(self,
                  n_Mx : int = 16384,
@@ -81,7 +81,7 @@ class SlfdstlISSLCriterion(nn.Module):
                  beta_pM_unif: float = 2,
                  ema_weight_marginal : float = 0.7,
                 ):
-        super(SlfdstlISSLCriterion, self).__init__()
+        super(DstlISSLCriterion, self).__init__()
 
 
         self.n_Mx = n_Mx
