@@ -129,8 +129,8 @@ class CntrISSLCriterion(nn.Module):
         # divide by temperature => get logits
         logits = torch.mm(z_pred, W_buffer.t()) / T
 
-        # Step 3: get predicted log proba for the positives. Shape example: 64 x 64
-        log_q = logits.log_softmax(-1)[:, :batch_size]
+        # Step 3: get predicted log proba for the positives on the correct rank. Shape example: 64 x 64
+        log_q = logits.log_softmax(-1)[:, batch_size*self.dist_rank : batch_size*(self.dist_rank+1)]
 
         # Step 4: get cross entropy, by giving p=0.5 to both positives. Shape example: 64
         # => - sum( p log q) = - sum(log q) / 2
