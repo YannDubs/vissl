@@ -63,11 +63,11 @@ config:
         # both heads are the same and are linear (note no activation !!)
         # use  256 and 16384 to keep same parameters as other methods (which use 2048 * 2048)
         [  # that's a low rank linear layer
-          [ "mlp", { "dims": [ 2048, 256 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False} ]
+          [ "mlp", { "dims": [ 2048, 256 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False} ],
           [ "mlp", { "dims": [ 256, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
         ],
         [
-          [ "mlp", { "dims": [ 2048, 256 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ]
+          [ "mlp", { "dims": [ 2048, 256 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
           [ "mlp", { "dims": [ 256, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
