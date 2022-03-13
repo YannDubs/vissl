@@ -11,12 +11,13 @@ config:
     PERF_STATS:
       MONITOR_PERF_STATS: True
   DATA:
-    NUM_DATALOADER_WORKERS: 5
+    NUM_DATALOADER_WORKERS: 8
     TRAIN:
       DATA_SOURCES: [disk_folder]
       LABEL_SOURCES: [disk_folder]
       DATASET_NAMES: [imagenet1k_folder]
-      BATCHSIZE_PER_REPLICA: 32
+      DATA_PATHS: [ "./data/imagenet256/train" ]
+      BATCHSIZE_PER_REPLICA: 96
       TRANSFORMS:
         - name: RandomResizedCrop
           size: 224
@@ -32,7 +33,8 @@ config:
       DATA_SOURCES: [disk_folder]
       LABEL_SOURCES: [disk_folder]
       DATASET_NAMES: [imagenet1k_folder]
-      BATCHSIZE_PER_REPLICA: 32
+      DATA_PATHS: [ "./data/imagenet256/val" ]
+      BATCHSIZE_PER_REPLICA: 128
       TRANSFORMS:
         - name: Resize
           size: 256
@@ -118,3 +120,9 @@ config:
     DIR: "."
     AUTO_RESUME: True
     CHECKPOINT_FREQUENCY: 1
+
+  SLURM:
+    NAME: "eval"
+    MEM_GB: 96 #  3 (gpu per node) * 32
+    USE_SLURM: True
+    TIME_HOURS: 24

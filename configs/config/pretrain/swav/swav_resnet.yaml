@@ -69,6 +69,7 @@ config:
       # Configuration for flatten_parameters = False
       ['_fsdp_wrapped_module.heads.0._fsdp_wrapped_module.prototypes0._fsdp_wrapped_module.weight', 313]
     ]
+    # DIFFERENCE WITH ORIGINAL IS THAT WE ARE USING PYTORCH AMP AND SYNC BN AS THIS recommended in newwer version of torch
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
