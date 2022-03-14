@@ -423,13 +423,13 @@ def train(train_dataset, val_dataset, cfg, seed):
             param_space = dict()
             for param in cfg.torch_validate_param:
                 if param == "lr":
-                    param_space["lr"] = loguniform(3e-2, 1)
+                    param_space["lr"] = loguniform(5e-2, 1)
                 elif param == "is_batchnorm":
                     param_space["is_batchnorm"] = [True, False]
                 elif param == "batch_size":
                     param_space["batch_size"] = [int(2 ** i) for i in range(6, 10)]
                 elif param == "weight_decay":
-                    param_space["weight_decay"] = loguniform(1e-8, 1e-5)
+                    param_space["weight_decay"] = loguniform(1e-7, 1e-5)
 
             param_list = list(
                 ParameterSampler(
@@ -887,7 +887,7 @@ if __name__ == "__main__":
     )
     torch_args.add_argument(
         "--torch-validate-param",
-        default=["lr"],
+        default=["lr", "weight_decay"],
         nargs="+",
         choices=["lr", "batch_size", "weight_decay", "is_batchnorm"],
         help="Parameters to validate over if using validation set.",

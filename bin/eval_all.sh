@@ -16,4 +16,3 @@ python tools/linear_eval.py --feature-path dstl_dir/features --out-path dstl_dir
 python tools/linear_eval.py --feature-path dstl_dir/features --out-path dstl_dir/evalw5 --weight-decay 5e-6
 
 python tools/linear_eval.py --feature-path dstlema_dir/features --out-path dstlema_dir/evalw3l01 --weight-decay 3e-6 --lr 0.1
-python tools/linear_eval.py --feature-path swav_dir/features --out-path swav_dir/evalw3l01 --weight-decay 3e-6 --lr 0.1
