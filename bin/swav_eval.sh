@@ -4,7 +4,7 @@ base_dir=swav_dir
 
 ./dev/launch_slurm.sh \
     $base_dir/evalvissl \
-    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_8gpu_transfer_in1k_linear
+    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_8gpu_transfer_in1k_linear \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=3 \
