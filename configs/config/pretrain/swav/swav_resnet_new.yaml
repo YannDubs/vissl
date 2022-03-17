@@ -68,10 +68,11 @@ config:
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: apex # pytorch
-      GROUP_SIZE: 8 # -1
+      GROUP_SIZE: -1
     AMP_PARAMS:
       USE_AMP: True
-      AMP_TYPE: {"opt_level": "O1"} # "pytorch"
+      AMP_ARGS: {"opt_level": "O1"}
+      AMP_TYPE: "apex"  # apex | pytorch
   LOSS:
     name: swav_loss
     swav_loss:
