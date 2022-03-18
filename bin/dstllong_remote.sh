@@ -4,7 +4,7 @@
     dstllong_dir \
     config=pretrain/dstl/dstl_long_resnet \
     +config/server=remote \
-    config.DISTRIBUTED.NUM_NODES=2 \
+    config.DISTRIBUTED.NUM_NODES=4 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
 #    config.SLURM.PARTITION=interactive \
 #    config.SLURM.ADDITIONAL_PARAMETERS.qos=nopreemption \

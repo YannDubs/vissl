@@ -123,7 +123,7 @@ config:
           lengths: [0.025, 0.975]           # 400ep
   DISTRIBUTED:
     BACKEND: nccl
-    NUM_NODES: 2    # gives batch size of 20
+    NUM_NODES: 4
     NUM_PROC_PER_NODE: 4
     INIT_METHOD: tcp
     NCCL_DEBUG: True
@@ -138,6 +138,4 @@ config:
     NAME: "dstllong"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
-    TIME_HOURS: 480
-dstl_long_resnet:
-  yaml:
+    TIME_HOURS: 960
