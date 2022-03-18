@@ -58,16 +58,16 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
-        AVG_POOL_KERNEL_SIZE: 6
+        AVG_POOL_KERNEL_SIZE: null
     HEAD:
       PARAMS: [
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 8192, 1024, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 12800, 512, 4096, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 4608, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
@@ -139,3 +139,5 @@ config:
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480
+dstl_long_resnet:
+  yaml:
