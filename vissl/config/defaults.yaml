@@ -642,6 +642,7 @@ config:
         # use this so we set the default as 2.
         LAYER4_STRIDE: 2
         OUT_FEAT_KEYS: null
+        AVG_POOL_KERNEL_SIZE: -1
 
       # ------------------------------------------------------------- #
       # SimCLR-v2 ResNet params that includes selective kernel

@@ -131,6 +131,14 @@ class ResNeXt(nn.Module):
             Bottleneck, dim_inner * 8, n4, stride=safe_stride
         )
 
+        k_size = self.trunk_config.AVG_POOL_KERNEL_SIZE
+        if k_size == -1:
+            pass
+        elif k_size is None:
+            model_avgpool = torch.nn.Identity()
+        else:
+            model_avgpool = torch.nn.AvgPool2d([k_size, k_size], 1)
+
         # we mapped the layers of resnet model into feature blocks to facilitate
         # feature extraction at various layers of the model. The layers for which
         # to extract features is controlled by requested_feat_keys argument in the

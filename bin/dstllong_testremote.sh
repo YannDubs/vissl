@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    test_dstlema_dir \
-    config=pretrain/dstl/dstlema_resnet \
+    test_dstllong_dir \
+    config=pretrain/dstl/dstllong_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=2 \
