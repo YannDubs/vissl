@@ -139,13 +139,18 @@ class ResNeXt(nn.Module):
         else:
             model_avgpool = torch.nn.AvgPool2d([k_size, k_size], 1)
 
-        Z_dim_old_new = self.trunk_config.Z_DIM_OLD_NEW
-        if Z_dim_old_new is not None:
-            resizer = nn.Sequential(
-                torch.nn.Linear(Z_dim_old_new[0], Z_dim_old_new[1]),
-                torch.nn.BatchNorm2d(Z_dim_old_new[1]),
-                torch.nn.ReLU(inplace=True)
-            )
+        Z_dim_old_tmp_new = self.trunk_config.Z_DIM_OLD_TMP_NEW
+        if Z_dim_old_tmp_new is not None:
+            conv1 = nn.Conv2d(Z_dim_old_tmp_new[0], Z_dim_old_tmp_new[1], kernel_size=1, bias=False)
+            conv2 = nn.Conv2d(Z_dim_old_tmp_new[1], Z_dim_old_tmp_new[2], kernel_size=1, bias=False)
+            bn = torch.nn.BatchNorm2d(Z_dim_old_tmp_new[2])
+
+            nn.init.kaiming_normal_(conv1.weight, mode="fan_out", nonlinearity="relu")
+            nn.init.kaiming_normal_(conv2.weight, mode="fan_out", nonlinearity="relu")
+            nn.init.constant_(bn.weight, 1)
+            nn.init.constant_(bn.bias, 0)
+
+            resizer = nn.Sequential( conv1, conv2, bn, torch.nn.ReLU(inplace=True) )
         else:
             resizer = torch.nn.Identity()
 
