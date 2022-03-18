@@ -643,6 +643,7 @@ config:
         LAYER4_STRIDE: 2
         OUT_FEAT_KEYS: null
         AVG_POOL_KERNEL_SIZE: -1
+        Z_DIM_OLD_NEW: null
 
       # ------------------------------------------------------------- #
       # SimCLR-v2 ResNet params that includes selective kernel

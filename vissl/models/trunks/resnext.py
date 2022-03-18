@@ -139,6 +139,16 @@ class ResNeXt(nn.Module):
         else:
             model_avgpool = torch.nn.AvgPool2d([k_size, k_size], 1)
 
+        Z_dim_old_new = self.trunk_config.Z_DIM_OLD_NEW
+        if Z_dim_old_new is not None:
+            resizer = nn.Sequential(
+                torch.nn.Linear(Z_dim_old_new[0], Z_dim_old_new[1]),
+                torch.nn.BatchNorm2d(Z_dim_old_new[1]),
+                torch.nn.ReLU(inplace=True)
+            )
+        else:
+            resizer = torch.nn.Identity()
+
         # we mapped the layers of resnet model into feature blocks to facilitate
         # feature extraction at various layers of the model. The layers for which
         # to extract features is controlled by requested_feat_keys argument in the
@@ -153,6 +163,7 @@ class ResNeXt(nn.Module):
                 ("layer2", model_layer2),
                 ("layer3", model_layer3),
                 ("layer4", model_layer4),
+                ("resizer", resizer),
                 ("avgpool", model_avgpool),
                 ("flatten", Flatten(1)),
             ]
@@ -167,6 +178,7 @@ class ResNeXt(nn.Module):
             "res3": "layer2",
             "res4": "layer3",
             "res5": "layer4",
+            "resizer": "resizer",
             "res5avg": "avgpool",
             "flatten": "flatten",
         }
