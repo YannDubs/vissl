@@ -8,15 +8,10 @@ import logging
 import pprint
 import torch.nn.functional as F
 
-import numpy as np
 import torch
-from torch.distributions import Categorical
 from classy_vision.losses import ClassyLoss, register_loss
-from classy_vision.generic.distributed_util import get_rank
-from torch import nn
 from vissl.config import AttrDict
-from vissl.utils.distributed_utils import gather_from_all
-from dstl_issl_loss import DstlISSLLoss, DstlISSLCriterion
+from .dstl_issl_loss import DstlISSLLoss, DstlISSLCriterion
 
 
 @register_loss("dissl_reg_loss")
