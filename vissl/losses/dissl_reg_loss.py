@@ -34,16 +34,24 @@ class DsslRegCriterion(DstlISSLCriterion):
     def __init__(self, beta_reg, **kwargs):
         super().__init__(**kwargs)
         self.beta_reg = beta_reg
+        self.distance = torch.nn.SmoothL1Loss(reduction="sum")
 
     def forward(self, output: list[torch.Tensor]):
-        breakpoint()
-
         discriminative = super().forward(output[1:])
 
-        Z = output[0]
-        inv_reg = discriminative
+        batch_size = output[1].shape[0] // len(self.crops_for_assign)
+        n_crops_for_reg = output[0].shape[0] // batch_size
+        all_Z = output[0].chunk(n_crops_for_reg)
 
-        return discriminative + self.beta_reg * inv_reg.mean()
+        n_reg = 0
+        inv_reg = 0
+        for i, Z in enumerate(all_Z):
+            for Z_aug in all_Z[i+1:]:
+                n_reg += 1
+                # sum over dimension but mean over batch
+                inv_reg = inv_reg + self.distance(Z, Z_aug) / batch_size
+        inv_reg = inv_reg / n_reg
+        return discriminative + self.beta_reg * inv_reg
 
     def __repr__(self):
         repr_dict = {

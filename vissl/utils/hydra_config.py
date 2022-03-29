@@ -380,7 +380,7 @@ def infer_losses_config(cfg):
         cfg.DATA.TRAIN.COLLATE_FUNCTION = "multicrop_collator"
 
     if "dissl_reg_loss" in cfg.LOSS.name:
-        assert len(cfg.MODEL.MULTI_RES_SPLIT_CROPS) == 2  # run for assign and one for pred
+        assert len(cfg.MODEL.MULTI_RES_SPLIT_CROPS) == 3  # one for reg, one for assign and one for pred
         cfg.LOSS.dissl_reg_loss.n_Mx = cfg.MODEL.HEAD.PARAMS[1][-1][1]["dims"][-1]
         cfg.LOSS.dissl_reg_loss.num_crops = total_num_crops or cfg.LOSS.dissl_reg_loss.num_crops
         cfg.DATA.TRAIN.COLLATE_FUNCTION = "multicrop_collator"
