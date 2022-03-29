@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    dstlzdim_dir \
-    config=pretrain/dstl/dstl_zdimpp_resnet \
+    dstlzdimpp_dir \
+    config=pretrain/dstl/dstl_zdim_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
