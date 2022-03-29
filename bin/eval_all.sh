@@ -24,3 +24,7 @@ python tools/linear_eval.py --feature-path dstlrank_dir/features --out-path dstl
 python tools/linear_eval.py --feature-path dstlrank_dir/features --out-path dstlrank_dir/evalw3 --weight-decay 3e-6 --lr 0.3
 
 python tools/linear_eval.py --feature-path dstlasym_dir/features --out-path dstlasym_dir/evalw3l01 --weight-decay 3e-6 --lr 0.1
+
+
+python tools/linear_eval.py --feature-path dstllong_dir/features --out-path dstllong_dir/evalw5l03 --weight-decay 5e-6 --lr 0.3
+python tools/linear_eval.py --feature-path dstllong_dir/features --out-path dstllong_dir/eval

@@ -830,7 +830,7 @@ if __name__ == "__main__":
     )
     data_args.add_argument(
         "--train-sizes",
-        default=[-1, 0.01],
+        default=[-1],#[-1, 0.01],
         nargs="+",
         type=float,
         help="Sizes of the training set to evaluate for. Percentage if <= 1 else size. "
@@ -873,7 +873,7 @@ if __name__ == "__main__":
 
     torch_args.add_argument(
         "--n-epochs",
-        default=[100, 500],
+        default=[100], #[100, 500],
         nargs="+",
         type=int,
         help="Number of total epochs to run. There should be one value per training size.",

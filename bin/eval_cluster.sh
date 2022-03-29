@@ -25,11 +25,12 @@ bin/extract_features.sh "$dir"
 # LINEAR EVAL
 conda activate probing
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalw3l03 --weight-decay 3e-6 --lr 0.3 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalw5l03 --weight-decay 5e-6 --lr 0.3 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalw7l03 --weight-decay 7e-6 --lr 0.3 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalw3l03 --weight-decay 3e-6 --lr 0.3 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalw3l003 --weight-decay 3e-6 --lr 0.03 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalw3l1 --weight-decay 3e-6 --lr 1 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalw3l01 --weight-decay 3e-6 --lr 0.1 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l03_b2048 --weight-decay 3e-6 --lr 0.3 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w5_l03_b2048 --weight-decay 5e-6 --lr 0.3 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w7_l03_b2048 --weight-decay 7e-6 --lr 0.3 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l03_b2048 --weight-decay 3e-6 --lr 0.3 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l003_b2048 --weight-decay 5e-6 --lr 0.03 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l1_b2048 --weight-decay 5e-6 --lr 1 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l1_b2048 --weight-decay 5e-6 --lr 3 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l01_b2048 --weight-decay 5e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar
 EOT
