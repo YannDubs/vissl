@@ -35,7 +35,7 @@ class DsslRegCriterion(DstlISSLCriterion):
         super().__init__(**kwargs)
         self.beta_reg = beta_reg
 
-    def forward(self, output: List[torch.Tensor]):
+    def forward(self, output: list[torch.Tensor]):
         breakpoint()
 
         discriminative = super().forward(output[1:])

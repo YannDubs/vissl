@@ -53,7 +53,7 @@ config:
   METERS:
     name: ""
   MODEL:
-    MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
+    MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
     TRUNK:
       NAME: resnet
       RESNETS:
