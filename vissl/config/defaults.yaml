@@ -1008,7 +1008,7 @@ config:
       beta_pM_unif: 2.0
       beta_H_MlZ: 0.5
       ema_weight_marginal: 0.7
-      beta_reg: 1e-3
+      beta_reg: 1e-5
 
     # ----------------------------------------------------------------------------------- #
     # Multi-crop version of SimCLR InfoNCE LOSS (supports multicrop augmentation proposed
