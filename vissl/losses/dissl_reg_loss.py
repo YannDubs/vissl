@@ -10,16 +10,13 @@ import torch.nn.functional as F
 
 import torch
 from classy_vision.losses import ClassyLoss, register_loss
-from vissl.config import AttrDict
 from .dstl_issl_loss import DstlISSLLoss, DstlISSLCriterion
-
 
 @register_loss("dissl_reg_loss")
 class DisslRegLoss(DstlISSLLoss):
-    def __init__(self, loss_config: AttrDict, device: str = "gpu"):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        self.loss_config = loss_config
         self.dstl_criterion = DsslRegCriterion(
             n_Mx = self.loss_config.n_Mx,
             temperature_assign = self.loss_config.temperature_assign,
