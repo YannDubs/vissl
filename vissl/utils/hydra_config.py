@@ -379,6 +379,12 @@ def infer_losses_config(cfg):
         cfg.LOSS.dstl_issl_loss.num_crops = total_num_crops or cfg.LOSS.dstl_issl_loss.num_crops
         cfg.DATA.TRAIN.COLLATE_FUNCTION = "multicrop_collator"
 
+    if "dissl_reg_loss" in cfg.LOSS.name:
+        assert len(cfg.MODEL.MULTI_RES_SPLIT_CROPS) == 2  # run for assign and one for pred
+        cfg.LOSS.dstl_issl_loss.n_Mx = cfg.MODEL.HEAD.PARAMS[1][-1][1]["dims"][-1]
+        cfg.LOSS.dstl_issl_loss.num_crops = total_num_crops or cfg.LOSS.dstl_issl_loss.num_crops
+        cfg.DATA.TRAIN.COLLATE_FUNCTION = "multicrop_collator"
+
     # bce_logits_multiple_output_single_target
     if cfg.LOSS.name == "bce_logits_multiple_output_single_target":
         world_size = cfg.DISTRIBUTED.NUM_NODES * cfg.DISTRIBUTED.NUM_PROC_PER_NODE

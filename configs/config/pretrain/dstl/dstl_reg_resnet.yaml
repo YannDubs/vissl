@@ -81,7 +81,7 @@ config:
       USE_AMP: True
       AMP_TYPE: "pytorch"  # apex | pytorch
   LOSS:
-    name: dstl_issl_loss
+    name: dissl_reg_loss
     dissl_reg_loss:
       n_Mx: 16384  # automatically inferred from model HEAD settings
       temperature_assign: 0.5
