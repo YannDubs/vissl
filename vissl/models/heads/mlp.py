@@ -112,6 +112,10 @@ class MLP(nn.Module):
         return out
 
 
+@register_model_head("identity")
+class Identity(nn.Identity):
+    ...
+
 
 @register_model_head("batchnorm")
 class Batchnorm(nn.Module):

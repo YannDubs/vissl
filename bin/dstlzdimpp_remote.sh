@@ -2,7 +2,7 @@
 
 ./dev/launch_slurm.sh \
     dstlzdimpp_dir \
-    config=pretrain/dstl/dstl_zdim_resnet \
+    config=pretrain/dstl/dstl_zdimpp_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
