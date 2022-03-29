@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    swavnew_dir \
+    swav_dir \
     config=pretrain/swav/swav_resnet_new \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \

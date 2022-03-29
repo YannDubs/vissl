@@ -12,6 +12,9 @@ python tools/linear_eval.py --feature-path simplecntr_dir/features --out-path si
 python tools/linear_eval.py --feature-path simplecntr512_dir/features --out-path simplecntr512_dir/eval
 python tools/linear_eval.py --feature-path cntr128_dir/features --out-path cntr128_dir/eval
 
+python tools/linear_eval.py --feature-path dstlzdim_dir/features --out-path dstlzdim_dir/eval
+python tools/linear_eval.py --feature-path dstlasym_dir/features --out-path dstlasym_dir/eval
+
 
 python tools/linear_eval.py --feature-path dstl_dir/features --out-path dstl_dir/evalw3l01 --weight-decay 3e-6 --lr 0.1
 python tools/linear_eval.py --feature-path dstl_dir/features --out-path dstl_dir/evalw5 --weight-decay 5e-6
@@ -19,3 +22,5 @@ python tools/linear_eval.py --feature-path dstl_dir/features --out-path dstl_dir
 python tools/linear_eval.py --feature-path dstlema_dir/features --out-path dstlema_dir/evalw3l01 --weight-decay 3e-6 --lr 0.1
 python tools/linear_eval.py --feature-path dstlrank_dir/features --out-path dstlrank_dir/evalw3l01 --weight-decay 3e-6 --lr 0.1
 python tools/linear_eval.py --feature-path dstlrank_dir/features --out-path dstlrank_dir/evalw3 --weight-decay 3e-6 --lr 0.3
+
+python tools/linear_eval.py --feature-path dstlasym_dir/features --out-path dstlasym_dir/evalw3l01 --weight-decay 3e-6 --lr 0.1

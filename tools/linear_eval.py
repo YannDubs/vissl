@@ -393,7 +393,7 @@ def train(train_dataset, val_dataset, cfg, seed):
                     [-1] * len(train_dataset.Z) + [0] * len(val_dataset.Z)
                 ),
                 n_iter=cfg.n_hyper_param,
-                verbose=1,
+                verbose=0 if cfg.is_no_progress_bar else 1,
                 random_state=seed,
             )
         else:
@@ -412,11 +412,11 @@ def train(train_dataset, val_dataset, cfg, seed):
             log_every_n_steps=100,
             gpus=cfg.n_gpus,
             precision=16,
-            enable_progress_bar=True,
+            enable_progress_bar=not cfg.is_no_progress_bar,
             limit_val_batches=0,
             fast_dev_run=False,
             enable_checkpointing=False,
-            callbacks=[TQDMProgressBar(refresh_rate=30)]
+            callbacks=[TQDMProgressBar(refresh_rate=300)]
         )
 
         if cfg.is_validation:
@@ -838,6 +838,12 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
         help="Whether to use sklearn instead of pytorch logistic regression.",
+    )
+    train_args.add_argument(
+        "--is-no-progress-bar",
+        default=False,
+        action="store_true",
+        help="Whether to disable progressbar.",
     )
     train_args.add_argument(
         "--is-balance-loss",
