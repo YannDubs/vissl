@@ -174,7 +174,7 @@ class DstlISSLCriterion(nn.Module):
         loss = CE_pMlz_qMlza + self.beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
 
         if self.num_iteration % 200 == 0 and self.dist_rank == 0:
-            logging.info(f"Entropy: {H_M.mean()}")
+            logging.info(f"H[M]: {H_M.mean()}")
             logging.info(f"Distil: {CE_pMlz_qMlza.mean()}")
             logging.info(f"Inv + det: {CE_pMlz_pMlza.mean()}")
             H_Mlz = Categorical(probs=torch.cat(all_p_Mlz, dim=0).detach()).entropy().mean()
