@@ -29,8 +29,7 @@ python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eva
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w5_l03_b2048 --weight-decay 5e-6 --lr 0.3 --batch-size 2048 --is-no-progress-bar
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w7_l03_b2048 --weight-decay 7e-6 --lr 0.3 --batch-size 2048 --is-no-progress-bar
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l03_b2048 --weight-decay 3e-6 --lr 0.3 --batch-size 2048 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l003_b2048 --weight-decay 5e-6 --lr 0.03 --batch-size 2048 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l1_b2048 --weight-decay 5e-6 --lr 1 --batch-size 2048 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l1_b2048 --weight-decay 5e-6 --lr 3 --batch-size 2048 --is-no-progress-bar
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3_l01_b2048 --weight-decay 5e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w5_l003_b2048 --weight-decay 5e-6 --lr 0.03 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w5_l1_b2048 --weight-decay 5e-6 --lr 1 --batch-size 2048 --is-no-progress-bar
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w5_l01_b2048 --weight-decay 5e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar
 EOT

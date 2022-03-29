@@ -408,12 +408,12 @@ def train(train_dataset, val_dataset, cfg, seed):
     else:
         callbacks = []
         if not cfg.is_no_progress_bar:
-            callbacks += [TQDMProgressBar(refresh_rate=2000)]
+            callbacks += [TQDMProgressBar(refresh_rate=600)]
 
         pl.seed_everything(seed)
         trainer_kwargs = dict(
             max_epochs=cfg.curr_n_epoch,
-            log_every_n_steps=2000,
+            log_every_n_steps=600,
             gpus=cfg.n_gpus,
             precision=16,
             enable_progress_bar=not cfg.is_no_progress_bar,
