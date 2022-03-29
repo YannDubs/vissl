@@ -46,6 +46,9 @@ class DsslRegCriterion(DstlISSLCriterion):
         n_reg = 0
         inv_reg = 0
         for i, Z in enumerate(all_Z):
+            if i not in self.crops_for_assign:
+                continue  # only compare to the assignment ones (decreases compute)
+
             for Z_aug in all_Z[i+1:]:
                 n_reg += 1
                 # sum over dimension but mean over batch
