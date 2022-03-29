@@ -983,32 +983,32 @@ config:
         embedding_dim: 2048
         effective_batch_size: 4096    # automatically inferred
 
-      # ----------------------------------------------------------------------------------- #
-      # Dstl ISSL
-      # ----------------------------------------------------------------------------------- #
-      dstl_issl_loss:
-        n_Mx : 50000  # automatically inferred from model HEAD settings
-        temperature_assign: 0.5
-        temperature_pred: 1
-        num_crops: 2 # automatically inferred from data transforms
-        crops_for_assign: [0, 1]
-        beta_pM_unif: 2.0
-        beta_H_MlZ: 0.5
-        ema_weight_marginal: 0.7
+    # ----------------------------------------------------------------------------------- #
+    # Dstl ISSL
+    # ----------------------------------------------------------------------------------- #
+    dstl_issl_loss:
+      n_Mx : 50000  # automatically inferred from model HEAD settings
+      temperature_assign: 0.5
+      temperature_pred: 1
+      num_crops: 2 # automatically inferred from data transforms
+      crops_for_assign: [0, 1]
+      beta_pM_unif: 2.0
+      beta_H_MlZ: 0.5
+      ema_weight_marginal: 0.7
 
-      # ----------------------------------------------------------------------------------- #
-      # Regularized DISSL
-      # ----------------------------------------------------------------------------------- #
-      dissl_reg_loss:
-        n_Mx: 50000  # automatically inferred from model HEAD settings
-        temperature_assign: 0.5
-        temperature_pred: 1
-        num_crops: 2 # automatically inferred from data transforms
-        crops_for_assign: [ 0, 1 ]
-        beta_pM_unif: 2.0
-        beta_H_MlZ: 0.5
-        ema_weight_marginal: 0.7
-        beta_reg: 1e-3
+    # ----------------------------------------------------------------------------------- #
+    # Regularized DISSL
+    # ----------------------------------------------------------------------------------- #
+    dissl_reg_loss:
+      n_Mx: 50000  # automatically inferred from model HEAD settings
+      temperature_assign: 0.5
+      temperature_pred: 1
+      num_crops: 2 # automatically inferred from data transforms
+      crops_for_assign: [ 0, 1 ]
+      beta_pM_unif: 2.0
+      beta_H_MlZ: 0.5
+      ema_weight_marginal: 0.7
+      beta_reg: 1e-3
 
     # ----------------------------------------------------------------------------------- #
     # Multi-crop version of SimCLR InfoNCE LOSS (supports multicrop augmentation proposed
