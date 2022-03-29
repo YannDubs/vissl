@@ -53,7 +53,9 @@ class DsslRegCriterion(DstlISSLCriterion):
                 n_reg += 1
                 # sum over dimension but mean over batch
                 inv_reg = inv_reg + self.distance(Z, Z_aug) / batch_size
+
         inv_reg = inv_reg / n_reg
+
         return discriminative + self.beta_reg * inv_reg
 
     def __repr__(self):
