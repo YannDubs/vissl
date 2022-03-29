@@ -56,6 +56,9 @@ class DsslRegCriterion(DstlISSLCriterion):
 
         inv_reg = inv_reg / n_reg
 
+        if self.num_iteration % 200 == 0 and self.dist_rank == 0:
+            logging.info(f"Reg: {inv_reg}")
+
         return discriminative + self.beta_reg * inv_reg
 
     def __repr__(self):
