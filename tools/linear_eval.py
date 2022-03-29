@@ -810,7 +810,7 @@ if __name__ == "__main__":
         "--feature-pattern", default="model_*", help="glob pattern to find features."
     )
     general_args.add_argument(
-        "--n-runs", default=3, type=int, help="number of evaluation to do."
+        "--n-runs", default=1, type=int, help="number of evaluation to do."
     )
 
     data_args.add_argument(

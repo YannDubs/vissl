@@ -6,7 +6,7 @@ echo "Evaluating" "$1"
 
 sbatch <<EOT
 #!/usr/bin/env bash
-#SBATCH --job-name=eval
+#SBATCH --job-name=eval_"$dir"
 #SBATCH --partition=p100,t4v1,t4v2,rtx6000
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
