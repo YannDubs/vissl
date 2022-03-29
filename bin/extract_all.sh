@@ -14,4 +14,4 @@ bin/extract_features.sh cntr128_dir
 
 bin/extract_features.sh dstlasym_dir
 bin/extract_features.sh dstlzdim_dir
-bin/extract_features.sh dstlzdim_dir
+bin/extract_features.sh dstllong_dir

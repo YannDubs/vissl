@@ -7,10 +7,11 @@ echo "Evaluating" "$1"
 sbatch <<EOT
 #!/usr/bin/env bash
 #SBATCH --job-name=eval_"$dir"
-#SBATCH --partition=t4v2,rtx6000
+#SBATCH --partition=interactive
 #SBATCH --gres=gpu:1
-#SBATCH --qos=normal
+#SBATCH --qos=nopreemption
 #SBATCH --cpus-per-task=12
+#SBATCH --time=00:20:00
 #SBATCH --mem=32G
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
@@ -19,8 +20,8 @@ sbatch <<EOT
 source ~/.bashrc
 
 # EXTRACT FEATURES
-conda activate vissl
-bin/extract_features.sh "$dir"
+#conda activate vissl
+#bin/extract_features.sh "$dir"
 
 # LINEAR EVAL
 conda activate probing

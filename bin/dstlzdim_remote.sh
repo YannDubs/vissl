@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    dstlzdim_dir \
+    dstlzdim2_dir \
     config=pretrain/dstl/dstl_zdim_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \
