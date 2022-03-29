@@ -31,10 +31,9 @@ class DisslRegLoss(DstlISSLLoss):
 
 class DsslRegCriterion(DstlISSLCriterion):
 
-    def __init__(self, beta_reg, **kwargs):
+    def __init__(self, beta_reg=0.1, **kwargs):
         super().__init__(**kwargs)
         self.beta_reg = beta_reg
-        self.distance = torch.nn.SmoothL1Loss(reduction="sum")
 
     def forward(self, output: list[torch.Tensor]):
         discriminative = super().forward(output[1:])
@@ -51,8 +50,7 @@ class DsslRegCriterion(DstlISSLCriterion):
 
             for Z_aug in all_Z[i+1:]:
                 n_reg += 1
-                # sum over dimension but mean over batch
-                inv_reg = inv_reg + self.distance(Z, Z_aug) / batch_size
+                inv_reg = inv_reg + rel_distance(Z, Z_aug).mean()
 
         inv_reg = inv_reg / n_reg
 
@@ -75,3 +73,19 @@ class DsslRegCriterion(DstlISSLCriterion):
             "beta_reg" : self.beta_reg
         }
         return pprint.pformat(repr_dict, indent=2)
+
+def rel_distance(x1, x2, **kwargs):
+    """
+    Return the relative distance of positive examples compaired to negative.
+    ~0 means that positives are essentially the same compared to negatives.
+    ~1 means that positives and negatives are essentially indistinguishable.
+    """
+    batch_size = x1.shape[0]
+    dist = torch.cdist(x1, x2, **kwargs)
+    dist_no_diag = dist * (1 - torch.eye(*dist.size(), out=torch.empty_like(dist)))
+    dist_neg_row = dist_no_diag.sum(0) / (batch_size - 1)
+    dist_neg_col = dist_no_diag.sum(1) / (batch_size - 1)
+    dist_neg = (dist_neg_row + dist_neg_col) / 2
+    dist_pos = dist.diag()
+    dist_rel = dist_pos / dist_neg
+    return dist_rel
