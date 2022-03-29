@@ -10,7 +10,7 @@ sbatch <<EOT
 #SBATCH --partition=t4v2,rtx6000
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
-#SBATCH --cpus-per-task=12
+#SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err

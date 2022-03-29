@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    swav_dir \
-    config=pretrain/swav/swav_resnet \
+    swavold_dir \
+    config=pretrain/swav/swav_resnet_old \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=2 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
