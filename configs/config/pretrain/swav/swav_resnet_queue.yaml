@@ -53,46 +53,37 @@ config:
   METERS:
     name: ""
   MODEL:
-    MULTI_RES_SPLIT_CROPS: [ [ 0, null ], [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
     TRUNK:
       NAME: resnet
       RESNETS:
         DEPTH: 50
     HEAD:
       PARAMS: [
-        [
-          [ "identity", { } ],
-        ],
-        # the first is the teacher
-        [
-          [ "mlp", { "dims": [ 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
-          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
-        ],
-        [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
-          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
-        ],
+        ["swav_head", {"dims": [2048, 2048, 128], "use_bn": True, "num_clusters": [3000]}],
       ]
+    TEMP_FROZEN_PARAMS_ITER_MAP: [
+      ['module.heads.0.prototypes0.weight', 313],
+    ]
+    # DIFFERENCE WITH ORIGINAL IS THAT WE ARE USING PYTORCH AMP AND SYNC BN AS THIS recommended in newwer version of torch
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
       GROUP_SIZE: -1
     AMP_PARAMS:
       USE_AMP: True
-      AMP_TYPE: "pytorch"  # apex | pytorch
+      AMP_TYPE: pytorch
   LOSS:
-    name: dissl_reg_loss
-    dissl_reg_loss:
-      n_Mx: 16384  # automatically inferred from model HEAD settings
-      temperature_assign: 0.5
-      temperature_pred: 1
-      num_crops: 2 # automatically inferred from data transforms
-      crops_for_assign: [ 0, 1 ]
-      beta_pM_unif: 1.9
-      beta_H_MlZ: 0.5
-      ema_weight_marginal: 0.7
-      beta_reg: 1
-
+    name: swav_loss
+    swav_loss:
+      temperature: 0.1
+      use_double_precision: False
+      normalize_last_layer: True
+      num_iters: 3
+      epsilon: 0.05
+      crops_for_assign: [0, 1]
+      queue:
+        queue_length: 3840
+        start_iter: 75075
   OPTIMIZER:
       name: sgd
       use_larc: True
@@ -139,7 +130,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dstlreg"
+    NAME: "swav"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480
