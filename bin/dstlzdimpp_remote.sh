@@ -4,8 +4,8 @@
     dstlzdimpp_dir \
     config=pretrain/dstl/dstl_zdimpp_resnet \
     +config/server=remote \
-    config.DISTRIBUTED.NUM_NODES=2 \
-    config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
+    config.DISTRIBUTED.NUM_NODES=1 \
+    config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \
 #    config.SLURM.PARTITION=interactive \
 #    config.SLURM.ADDITIONAL_PARAMETERS.qos=nopreemption \
 #    config.SLURM.TIME_HOURS=0 \

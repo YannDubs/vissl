@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    dstlreg_dir \
-    config=pretrain/dstl/dstl_reg_resnet \
+    dstl_relreg_zdim_dir \
+    config=pretrain/dstl/dstl_relreg_zdim_resnet \
     +config/server=remote \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \
@@ -16,6 +16,4 @@
 #    config.DATA.TRAIN.DATA_LIMIT=10000
 #    config.LOG_FREQUENCY=50 \
 #    config.OPTIMIZER.num_epochs=7 \
-
-# THaT WAS NOT RELATIVE REG BUT HUBER
 

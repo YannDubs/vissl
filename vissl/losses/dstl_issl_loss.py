@@ -80,7 +80,7 @@ class DstlISSLCriterion(nn.Module):
                  num_crops : int = 2,
                  crops_for_assign : list[int] = [0,1],
                  beta_H_MlZ : float = 0.5,
-                 beta_pM_unif: float = 2,
+                 beta_pM_unif: float = 1.9,
                  ema_weight_marginal : float = 0.7,
                 ):
         super(DstlISSLCriterion, self).__init__()

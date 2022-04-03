@@ -31,9 +31,10 @@ class DisslRegLoss(DstlISSLLoss):
 
 class DsslRegCriterion(DstlISSLCriterion):
 
-    def __init__(self, beta_reg=0.1, **kwargs):
+    def __init__(self, beta_reg=0.1, is_rel_reg=True, **kwargs):
         super().__init__(**kwargs)
         self.beta_reg = beta_reg
+        self.is_rel_reg = is_rel_reg
 
     def forward(self, output: list[torch.Tensor]):
         discriminative = super().forward(output[1:])
@@ -50,12 +51,16 @@ class DsslRegCriterion(DstlISSLCriterion):
 
             for Z_aug in all_Z[i+1:]:
                 n_reg += 1
-                inv_reg = inv_reg + rel_distance(Z, Z_aug).mean()
+                if self.is_rel_reg:
+                    inv_reg = inv_reg + rel_distance(Z, Z_aug).mean()
+                else:
+                    inv_reg = inv_reg + F.smooth_l1_loss(Z, Z_aug, reduction="mean")
 
         inv_reg = inv_reg / n_reg
 
         if self.num_iteration % 200 == 0 and self.dist_rank == 0:
-            logging.info(f"Reg: {inv_reg}")
+            sffx = "Rel." if self.is_rel_reg else "Huber"
+            logging.info(f"{sffx} Reg.: {inv_reg}")
 
         return discriminative + self.beta_reg * inv_reg
 

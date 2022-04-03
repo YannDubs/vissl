@@ -58,6 +58,7 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
+        Z_DIM_OLD_TMP_NEW: [ 2048, 512, 8192 ]
     HEAD:
       PARAMS: [
         [
@@ -65,11 +66,13 @@ config:
         ],
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 8192, 512], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ], # low rank linear
+          [ "mlp", { "dims": [ 512, 2048, 2048], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ], # actual MLP block
+          [ "mlp", { "dims": [ 2048, 512], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ], # low rank linear
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
@@ -92,6 +95,7 @@ config:
       beta_H_MlZ: 0.5
       ema_weight_marginal: 0.7
       beta_reg: 0.1
+      is_rel_reg: True
 
   OPTIMIZER:
       name: sgd
@@ -139,7 +143,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dstlreg"
+    NAME: "dstl_relreg_zdim"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480
