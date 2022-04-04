@@ -193,7 +193,7 @@ def main(cfg):
                     if name != "train" and Yhat_score is not None:
                         # don't save proba for train because can be large and not useful (?)
                         to_save["Yhat_score"] = Yhat_score
-                    np.savez(predictions_path, **to_save)
+                    #np.savez(predictions_path, **to_save) # don't save (memory ++)
 
                     logging.info(
                         f"Evaluating {name} and saving report to {report_path}."
