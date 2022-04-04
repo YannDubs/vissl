@@ -27,11 +27,12 @@ class DisslRegLoss(DstlISSLLoss):
             beta_pM_unif = self.loss_config.beta_pM_unif,
             ema_weight_marginal = self.loss_config.ema_weight_marginal,
             beta_reg=self.loss_config.beta_reg,
+            is_rel_reg=self.loss_config.is_rel_reg,
         )
 
 class DsslRegCriterion(DstlISSLCriterion):
 
-    def __init__(self, beta_reg=0.1, is_rel_reg=True, **kwargs):
+    def __init__(self, beta_reg=0.1, is_rel_reg=False, **kwargs):
         super().__init__(**kwargs)
         self.beta_reg = beta_reg
         self.is_rel_reg = is_rel_reg
@@ -92,5 +93,5 @@ def rel_distance(x1, x2, **kwargs):
     dist_neg_col = dist_no_diag.sum(1) / (batch_size - 1)
     dist_neg = (dist_neg_row + dist_neg_col) / 2
     dist_pos = dist.diag()
-    dist_rel = dist_pos / dist_neg
+    dist_rel = dist_pos / (dist_neg + 1e-5)
     return dist_rel
