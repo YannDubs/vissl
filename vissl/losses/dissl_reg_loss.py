@@ -76,7 +76,8 @@ class DsslRegCriterion(DstlISSLCriterion):
             "beta_pM_unif": self.beta_pM_unif,
             "beta_H_MlZ": self.beta_H_MlZ,
             "ema_weight_marginal": self.ema_weight_marginal,
-            "beta_reg" : self.beta_reg
+            "beta_reg" : self.beta_reg,
+            "is_rel_reg": self.is_rel_reg
         }
         return pprint.pformat(repr_dict, indent=2)
 
