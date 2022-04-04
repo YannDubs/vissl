@@ -58,20 +58,20 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
-        Z_DIM_OLD_TMP_NEW: [ 2048, 512, 2048 ]
+        Z_DIM_OLD_TMP_NEW: [ 2048, 512, 4096 ]
         #Z_DIM_OLD_TMP_NEW: [ 2048, 512, 8192 ] # TODO uncomment if not getting nan
     HEAD:
       PARAMS: [
         # the first is the teacher
         # TODO put back 8192. Just want to check whether the low rank approx give the nans
         [
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ], # low rank linear
+          [ "mlp", { "dims": [ 4096, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ], # low rank linear
           [ "mlp", { "dims": [ 512, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ], # actual MLP block
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ], # low rank linear
+          [ "mlp", { "dims": [ 4096, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ], # low rank linear
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 4096, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
@@ -139,7 +139,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dstl_zdimnew"
+    NAME: "dstl_zdim4k"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 480
