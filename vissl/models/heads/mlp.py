@@ -5,6 +5,7 @@
 
 from typing import List
 
+import math
 import torch
 import torch.nn as nn
 from vissl.config import AttrDict
@@ -42,6 +43,7 @@ class MLP(nn.Module):
         use_dropout: bool = False,
         use_bias: bool = True,
         skip_last_layer_relu_bn: bool = True,
+        is_JL_init : bool=False,
     ):
         """
         Args:
@@ -81,15 +83,19 @@ class MLP(nn.Module):
         self.clf = nn.Sequential(*layers)
         # we use the default normal or uniform initialization for the layers
         # and allow users to scale the initialization.
-        self.scale_weights(model_config)
+        self.scale_weights(model_config, is_JL_init)
 
-    def scale_weights(self, model_config):
+    def scale_weights(self, model_config, is_JL_init):
         params_multiplier = model_config.HEAD.PARAMS_MULTIPLIER
         for m in self.modules():
             if isinstance(m, nn.Linear):
                 m.weight.data *= params_multiplier
                 if m.bias is not None:
                     m.bias.data *= params_multiplier
+
+                if is_JL_init:
+                    # Initialization for low dimension projection => johnson lindenstrauss lemma.
+                    torch.nn.init.normal_(m.weight, std=1 / math.sqrt(m.weight.shape[0]))
 
     def forward(self, batch: torch.Tensor):
         """

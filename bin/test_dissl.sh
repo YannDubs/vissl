@@ -8,11 +8,12 @@ python3 tools/run_distributed_engines.py \
     config.DATA.TRAIN.DATASET_NAMES=[imagenet1k_folder] \
     config.DATA.TRAIN.DATA_SOURCES=[disk_folder] \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
-    config=pretrain/dstl/dstl_asym_resnet \
+    config=pretrain/dstl/dissl \
     config.CHECKPOINT.DIR="./test_dissl/checkpoints/" \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=2 \
     config.SLURM.USE_SLURM=False \
-    config.DATA.TRAIN.DATA_LIMIT=10000 \
-    config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=96 \
-    config.OPTIMIZER.num_epochs=3
+    config.DATA.TRAIN.DATA_LIMIT=100000 \
+    config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=384 \
+    config.DATA.NUM_DATALOADER_WORKERS=60 \
+    config.OPTIMIZER.num_epochs=2

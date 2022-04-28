@@ -65,11 +65,12 @@ config:
         ],
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
-          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
+          [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": True } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
@@ -141,7 +142,9 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dstlreg"
+    NAME: "dissl_reg"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
-    TIME_HOURS: 480
+    TIME_HOURS: 120
+    #NUM_CPU_PER_PROC: 64 # for sphinx
+    #MEM_GB: 250 # for sphinx

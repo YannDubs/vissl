@@ -7,6 +7,8 @@ from __future__ import annotations
 import logging
 import pprint
 import torch.nn.functional as F
+import operator
+from functools import reduce
 
 import torch
 from classy_vision.losses import ClassyLoss, register_loss
@@ -27,17 +29,25 @@ class DisslRegLoss(DstlISSLLoss):
             beta_pM_unif = self.loss_config.beta_pM_unif,
             ema_weight_marginal = self.loss_config.ema_weight_marginal,
             beta_reg=self.loss_config.beta_reg,
-            is_rel_reg=self.loss_config.is_rel_reg,
+            mode=self.loss_config.mode,
+            z_dim=self.loss_config.z_dim,
         )
 
 class DsslRegCriterion(DstlISSLCriterion):
 
-    def __init__(self, beta_reg=0.1, is_rel_reg=False, **kwargs):
+    def __init__(self, beta_reg=0.1, mode=False, z_dim=None, **kwargs):
         super().__init__(**kwargs)
         self.beta_reg = beta_reg
-        self.is_rel_reg = is_rel_reg
+        self.mode = mode
+        self.z_dim = z_dim
 
-    def forward(self, output: list[torch.Tensor]):
+        if self.mode == "etf":
+            self.regularizer = ETFRegularizer(self.z_dim)
+        elif self.mode == "effdim":
+            self.regularizer = EffdimRegularizer(self.z_dim)
+
+
+    def forward(self, output):
         discriminative = super().forward(output[1:])
 
         batch_size = output[1].shape[0] // len(self.crops_for_assign)
@@ -52,16 +62,17 @@ class DsslRegCriterion(DstlISSLCriterion):
 
             for Z_aug in all_Z[i+1:]:
                 n_reg += 1
-                if self.is_rel_reg:
-                    inv_reg = inv_reg + rel_distance(Z, Z_aug).mean()
-                else:
+                if self.mode == "huber":
                     inv_reg = inv_reg + F.smooth_l1_loss(Z, Z_aug, reduction="mean")
+                elif self.mode == "etf":
+                    inv_reg = inv_reg + self.regularizer(Z, Z_aug)
+                elif self.mode == "effdim":
+                    inv_reg = inv_reg + self.regularizer(Z, Z_aug)
 
         inv_reg = inv_reg / n_reg
 
         if self.num_iteration % 200 == 0 and self.dist_rank == 0:
-            sffx = "Rel." if self.is_rel_reg else "Huber"
-            logging.info(f"{sffx} Reg.: {inv_reg}")
+            logging.info(f"{self.mode} Reg.: {inv_reg}")
 
         return discriminative + self.beta_reg * inv_reg
 
@@ -77,22 +88,90 @@ class DsslRegCriterion(DstlISSLCriterion):
             "beta_H_MlZ": self.beta_H_MlZ,
             "ema_weight_marginal": self.ema_weight_marginal,
             "beta_reg" : self.beta_reg,
-            "is_rel_reg": self.is_rel_reg
+            "mode": self.mode,
+            "z_dim": self.z_dim
         }
         return pprint.pformat(repr_dict, indent=2)
 
-def rel_distance(x1, x2, **kwargs):
+class ETFRegularizer(torch.nn.Module):
+    """Increases effective dimensionality by each dimension independent.
+
+    Parameters
+    ---------
+    z_dim : list or int
+        Shape of representation.
     """
-    Return the relative distance of positive examples compaired to negative.
-    ~0 means that positives are essentially the same compared to negatives.
-    ~1 means that positives and negatives are essentially indistinguishable.
+
+    def __init__(
+        self,
+        z_dim,
+        is_exact_etf=True,
+    ) :
+        super().__init__()
+        self.is_exact_etf = is_exact_etf
+        self.z_dim = z_dim
+        self.bn = torch.nn.BatchNorm1d(self.z_dim, affine=False)
+
+    def get_etf_rep(self, z):
+        return F.normalize(self.bn(z), dim=-1, p=2)
+
+    def forward(self, zx, za):
+        z_dim = zx.shape[1]
+
+        zx = self.get_etf_rep(zx)
+        za = self.get_etf_rep(za)
+
+        MtM = zx @ za.T
+        if self.is_exact_etf:
+            pos_loss = (MtM.diagonal() - 1).pow(2).mean()  # want it to be 1
+            neg_loss = (1 / z_dim + MtM.masked_select(~eye_like(MtM).bool())).pow(2).mean()  # want it to be - 1 /dim
+        else:
+            pos_loss = - MtM.diagonal().mean()  # directly maximize
+            neg_loss = MtM.masked_select(~eye_like(MtM).bool()).mean()  # directly minimize
+
+        return pos_loss + neg_loss
+
+
+class EffdimRegularizer(torch.nn.Module):
+    """Increases effective dimensionality by each dimension independent.
+
+    Parameters
+    ---------
+    z_dim : int
+        Shape of representation.
+
+    is_use_unit : bool, optional
+        Whether to normalize before dot prod.
     """
-    batch_size = x1.shape[0]
-    dist = torch.cdist(x1, x2, **kwargs)
-    dist_no_diag = dist * (1 - torch.eye(*dist.size(), out=torch.empty_like(dist)))
-    dist_neg_row = dist_no_diag.sum(0) / (batch_size - 1)
-    dist_neg_col = dist_no_diag.sum(1) / (batch_size - 1)
-    dist_neg = (dist_neg_row + dist_neg_col) / 2
-    dist_pos = dist.diag()
-    dist_rel = dist_pos / (dist_neg + 1e-5)
-    return dist_rel
+
+    def __init__(
+        self,
+        z_dim,
+        is_use_unit=True,
+    ) -> None:
+        super().__init__()
+        self.corr_coef_bn = torch.nn.BatchNorm1d(z_dim, affine=False)
+        self.is_use_unit = is_use_unit
+
+    def forward(self, z_x, z_a) :
+
+        batch_size, dim = z_x.shape
+
+        z_x = self.corr_coef_bn(z_x)
+        z_a = self.corr_coef_bn(z_a)
+
+        if self.is_use_unit:
+            z_x = F.normalize(z_x, dim=0, p=2)
+            z_a = F.normalize(z_a, dim=0, p=2)
+
+        corr_coeff = (z_x.T @ z_a) / batch_size
+
+        pos_loss = (corr_coeff.diagonal() - 1).pow(2).mean()
+        neg_loss = corr_coeff.masked_select(~eye_like(corr_coeff).bool()).view(dim, dim - 1).pow(2).mean()
+
+        return pos_loss + neg_loss
+
+
+def eye_like(x):
+    """Return an identity like `x`."""
+    return torch.eye(*x.size(), out=torch.empty_like(x))

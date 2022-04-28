@@ -7,6 +7,8 @@ import logging
 from enum import Enum
 from typing import List
 
+import math
+import einops
 import torch
 import torch.nn as nn
 import torchvision.models as models
@@ -141,16 +143,13 @@ class ResNeXt(nn.Module):
 
         Z_dim_old_tmp_new = self.trunk_config.Z_DIM_OLD_TMP_NEW
         if Z_dim_old_tmp_new is not None:
-            conv1 = nn.Conv2d(Z_dim_old_tmp_new[0], Z_dim_old_tmp_new[1], kernel_size=1, bias=False)
-            conv2 = nn.Conv2d(Z_dim_old_tmp_new[1], Z_dim_old_tmp_new[2], kernel_size=1, bias=False)
-            bn = torch.nn.BatchNorm2d(Z_dim_old_tmp_new[2])
 
-            nn.init.kaiming_normal_(conv1.weight, mode="fan_out", nonlinearity="relu")
-            nn.init.kaiming_normal_(conv2.weight, mode="fan_out", nonlinearity="relu")
-            nn.init.constant_(bn.weight, 1)
-            nn.init.constant_(bn.bias, 0)
+            old_nchan, tmp_nchan, new_nchan = Z_dim_old_tmp_new
+            assert old_nchan % old_nchan == 0
+            resizer = BottleneckExpand(old_nchan,
+                                       tmp_nchan,
+                                       expansion=new_nchan // old_nchan)
 
-            resizer = nn.Sequential( conv1, conv2, bn, torch.nn.ReLU(inplace=True) )
         else:
             resizer = torch.nn.Identity()
 
@@ -216,3 +215,128 @@ class ResNeXt(nn.Module):
                 checkpointing_splits=self.num_checkpointing_splits,
             )
         return out
+
+class BottleneckExpand(nn.Module):
+
+    def __init__(
+            self,
+            in_channels,
+            hidden_channels,
+            expansion=8,
+            norm_layer=None,
+            is_residual=True
+    ):
+        super().__init__()
+        if norm_layer is None:
+            norm_layer = nn.BatchNorm2d
+        self.expansion = expansion
+        self.is_residual = is_residual
+        out_channels = in_channels * self.expansion
+        self.conv1 = nn.Conv2d(in_channels, hidden_channels, kernel_size=1, bias=False)
+        self.bn1 = norm_layer(hidden_channels)
+        self.conv2 = nn.Conv2d(hidden_channels, hidden_channels, kernel_size=3, bias=False, padding=1)
+        self.bn2 = norm_layer(hidden_channels)
+        self.conv3 = nn.Conv2d(hidden_channels, out_channels, kernel_size=1, bias=False)
+        self.bn3 = norm_layer(out_channels)
+        self.relu = nn.ReLU(inplace=True)
+
+        self.reset_parameters()
+
+    def forward(self, x):
+        identity = x
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.relu(out)
+
+        out = self.conv3(out)
+        out = self.bn3(out)
+
+        if self.is_residual:
+            identity = einops.repeat(identity, 'b c h w -> b (tile c) h w', tile=self.expansion)
+            out += identity
+
+        out = self.relu(out)
+
+        return out
+
+    def reset_parameters(self) :
+        weights_init(self)
+
+
+def weights_init(module):
+    """Initialize a module and all its descendents.
+
+    Parameters
+    ----------
+    module : nn.Module
+       module to initialize.
+    """
+    init_std_modules(module)  # in case you gave a standard module
+
+    # loop over direct children (not grand children)
+    for m in module.children():
+
+        if init_std_modules(m):
+            pass
+        elif hasattr(m, "reset_parameters"):
+            # if has a specific reset
+            # Imp: don't go in grand children because you might have specific weights you don't want to reset
+            m.reset_parameters()
+        else:
+            weights_init(m)  # go to grand children
+
+def init_std_modules(module):
+    """Initialize standard layers and return whether was initialized."""
+    # all standard layers
+    if isinstance(module, nn.modules.conv._ConvNd):
+        variance_scaling_(module.weight)
+        try:
+            nn.init.zeros_(module.bias)
+        except AttributeError:
+            pass
+
+    elif isinstance(module, nn.Linear):
+        nn.init.trunc_normal_(module.weight, std=0.02)
+        try:
+            nn.init.zeros_(module.bias)
+        except AttributeError: # no bias
+            pass
+
+    elif isinstance(module, nn.modules.batchnorm._NormBase):
+        if module.affine:
+            nn.init.ones_(module.weight)
+            nn.init.zeros_(module.bias)
+
+    else:
+        return False
+
+    return True
+
+# taken from https://github.com/rwightman/pytorch-image-models/blob/d5ed58d623be27aada78035d2a19e2854f8b6437/timm/models/layers/weight_init.py
+def variance_scaling_(tensor, scale=1.0, mode='fan_in', distribution='truncated_normal'):
+    """Initialization by scaling the variance."""
+    fan_in, fan_out = nn.init._calculate_fan_in_and_fan_out(tensor)
+    if mode == 'fan_in':
+        denom = fan_in
+    elif mode == 'fan_out':
+        denom = fan_out
+    elif mode == 'fan_avg':
+        denom = (fan_in + fan_out) / 2
+
+    variance = scale / denom
+
+    if distribution == "truncated_normal":
+        # constant is stddev of standard normal truncated to (-2, 2)
+        nn.init.trunc_normal_(tensor, std=math.sqrt(variance) / .87962566103423978)
+    elif distribution == "normal":
+        tensor.normal_(std=math.sqrt(variance))
+    elif distribution == "uniform":
+        bound = math.sqrt(3 * variance)
+        tensor.uniform_(-bound, bound)
+    else:
+        raise ValueError(f"invalid distribution {distribution}")

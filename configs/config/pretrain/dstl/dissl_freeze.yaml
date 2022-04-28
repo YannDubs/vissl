@@ -53,26 +53,32 @@ config:
   METERS:
     name: ""
   MODEL:
-    MULTI_RES_SPLIT_CROPS: [ [ 0, null ], [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
+    MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
     TRUNK:
       NAME: resnet
       RESNETS:
         DEPTH: 50
     HEAD:
       PARAMS: [
-        [
-          [ "identity", { } ],
-        ],
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init":True } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init":True } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
+    TEMP_FROZEN_PARAMS_ITER_MAP: [
+      [ 'module.heads.0.1.clf.0.weight', 1565 ],
+      [ 'module.heads.0.1.clf.0.bias', 1565 ],
+      [ 'module.heads.0.2.clf.0.weight', 313 ],
+      [ 'module.heads.0.2.clf.0.bias', 313 ],
+      [ 'module.heads.1.1.clf.0.weight', 1565 ],
+      [ 'module.heads.1.1.clf.0.bias', 1565 ],
+    ]
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
@@ -81,10 +87,9 @@ config:
       USE_AMP: True
       AMP_TYPE: "pytorch"  # apex | pytorch
   LOSS:
-    name: dissl_reg_loss
-    dissl_reg_loss:
+    name: dstl_issl_loss
+    dstl_issl_loss:
       n_Mx: 16384  # automatically inferred from model HEAD settings
-      z_dim: 2048  # automatically inferred from model HEAD settings
       temperature_assign: 0.5
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
@@ -92,9 +97,6 @@ config:
       beta_pM_unif: 1.9
       beta_H_MlZ: 0.5
       ema_weight_marginal: 0.7
-      beta_reg: 0.1
-      mode: etf
-
   OPTIMIZER:
       name: sgd
       use_larc: True
@@ -141,7 +143,9 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dstlreg"
+    NAME: "dissl_freeze"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
-    TIME_HOURS: 480
+    TIME_HOURS: 120
+    #NUM_CPU_PER_PROC: 64 # for sphinx
+    #MEM_GB: 250 # for sphinx
