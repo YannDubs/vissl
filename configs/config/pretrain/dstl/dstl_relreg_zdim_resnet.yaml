@@ -95,7 +95,7 @@ config:
       beta_H_MlZ: 0.5
       ema_weight_marginal: 0.7
       beta_reg: 0.1
-      is_rel_reg: False
+      is_rel_reg: False # ????? WHY
 
   OPTIMIZER:
       name: sgd

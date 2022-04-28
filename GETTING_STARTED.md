@@ -1,3 +1,8 @@
+# VISSL YANN
+
+use `environment.yml` run test dissl.
+
+
 # Quick Start with VISSL
 
 We provide a quick overview for training SimCLR self-supervised model on 1-gpu with VISSL.
