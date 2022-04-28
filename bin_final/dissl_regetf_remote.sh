@@ -12,6 +12,8 @@
     config.SLURM.PORT_ID=40054 \
     config.SLURM.NAME=dissl_regetf \
     config.SLURM.MEM_GB=128 \
+    config.SLURM.NUM_CPU_PER_PROC=4 \
+    config.DATA.NUM_DATALOADER_WORKERS=4 \
 #    config.SLURM.PARTITION=interactive \
 #    config.SLURM.ADDITIONAL_PARAMETERS.qos=nopreemption \
 #    config.SLURM.TIME_HOURS=0 \

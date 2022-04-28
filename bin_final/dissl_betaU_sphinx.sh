@@ -9,7 +9,7 @@
     config.DISTRIBUTED.NUM_PROC_PER_NODE=2 \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=384 \
-    config.DATA.NUM_DATALOADER_WORKERS=48 \
+    config.DATA.NUM_DATALOADER_WORKERS=31 \
     config.SLURM.PORT_ID=40051 \
     config.SLURM.NAME=dissl_betaU \
     config.SLURM.MEM_GB=250 \
