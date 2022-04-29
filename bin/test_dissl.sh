@@ -9,7 +9,7 @@ python3 tools/run_distributed_engines.py \
     config.DATA.TRAIN.DATA_SOURCES=[disk_folder] \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
     config=pretrain/dstl/dissl \
-    config.CHECKPOINT.DIR="./test_dissl/checkpoints/" \
+    config.CHECKPOINT.DIR="./test_dissl/checkpoints" \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=2 \
     config.SLURM.USE_SLURM=False \
