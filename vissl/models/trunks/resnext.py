@@ -266,6 +266,9 @@ class BottleneckExpand(nn.Module):
 
     def reset_parameters(self) :
         weights_init(self)
+        # using Johnson-Lindenstrauss lemma for initialization of the projection matrix
+        torch.nn.init.normal_(self.conv1.weight,
+                              std=1 / math.sqrt(self.conv1.weight.shape[0]))
 
 
 def weights_init(module):

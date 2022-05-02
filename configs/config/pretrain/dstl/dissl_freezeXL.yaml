@@ -58,30 +58,26 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
-        Z_DIM_OLD_TMP_NEW: [ 2048, 512, 8192 ]
     HEAD:
       PARAMS: [
-        [
-          [ "identity", { } ],
-        ],
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 8192, 1024 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
-          [ "mlp", { "dims": [ 1024, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
-          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init":True } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init":True } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init":True } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
     TEMP_FROZEN_PARAMS_ITER_MAP: [
-      [ 'module.heads.0.1.clf.0.weight', 1565 ],
-      [ 'module.heads.0.1.clf.0.bias', 1565 ],
+      [ 'module.heads.0.1.clf.0.weight', 16500 ],
+      [ 'module.heads.0.1.clf.0.bias', 16500 ],
       [ 'module.heads.0.2.clf.0.weight', 313 ],
       [ 'module.heads.0.2.clf.0.bias', 313 ],
-      [ 'module.heads.1.1.clf.0.weight', 1565 ],
-      [ 'module.heads.1.1.clf.0.bias', 1565 ],
+      [ 'module.heads.1.1.clf.0.weight', 16500 ],
+      [ 'module.heads.1.1.clf.0.bias', 16500 ],
     ]
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
@@ -101,8 +97,6 @@ config:
       beta_pM_unif: 1.9
       beta_H_MlZ: 0.5
       ema_weight_marginal: 0.7
-      beta_reg: 0.1
-      mode: etf
   OPTIMIZER:
       name: sgd
       use_larc: True
@@ -149,7 +143,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_zdimXL"
+    NAME: "dissl_freezeXL"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120

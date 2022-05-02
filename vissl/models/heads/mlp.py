@@ -44,6 +44,7 @@ class MLP(nn.Module):
         use_bias: bool = True,
         skip_last_layer_relu_bn: bool = True,
         is_JL_init : bool=False,
+        is_residual: bool=False
     ):
         """
         Args:
@@ -61,6 +62,11 @@ class MLP(nn.Module):
                 added if use_bn=True, ReLU will be added if use_relu=True
         """
         super().__init__()
+        self.is_residual = is_residual
+
+        if self.is_residual:
+            assert dims[0] == dims[-1]
+
         layers = []
         last_dim = dims[0]
         for i, dim in enumerate(dims[1:]):
@@ -93,7 +99,7 @@ class MLP(nn.Module):
                 if m.bias is not None:
                     m.bias.data *= params_multiplier
 
-                if is_JL_init:
+                if is_JL_init and (m.weight.shape[0] < m.weight.shape[1]):
                     # Initialization for low dimension projection => johnson lindenstrauss lemma.
                     torch.nn.init.normal_(m.weight, std=1 / math.sqrt(m.weight.shape[0]))
 
@@ -114,7 +120,12 @@ class MLP(nn.Module):
                 d == 1 for d in batch.shape[2:]
             ), f"MLP expected 2D input tensor or 4D tensor of shape NxCx1x1. got: {batch.shape}"
             batch = batch.reshape((batch.size(0), batch.size(1)))
+
         out = self.clf(batch)
+
+        if self.is_residual:
+            out = out + batch
+
         return out
 
 
