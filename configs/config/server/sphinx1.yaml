@@ -4,4 +4,4 @@ config:
         PARTITION: sphinx-hi
         ADDITIONAL_PARAMETERS:
             nodelist: sphinx1
-            gres: gpu:2
+            gres: gpu:8

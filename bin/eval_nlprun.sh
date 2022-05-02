@@ -5,21 +5,23 @@ mkdir -p "$dir"/eval_logs
 echo "Evaluating" "$1"
 
 sbatch <<EOT
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 #SBATCH --job-name=eval_"$dir"
-#SBATCH --partition=t4v2,rtx6000
+#SBATCH --partition=jag-hi
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=16
+#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard20
+#SBATCH --nodelist=jagupard21
 #SBATCH --mem=32G
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
 # prepare your environment here
-source ~/.bashrc
+source ~/.zshrc
 
 # EXTRACT FEATURES
-conda activate vissl
+conda activate myvissl
 bin/extract_features.sh "$dir"
 
 # LINEAR EVAL

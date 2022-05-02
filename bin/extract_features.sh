@@ -11,6 +11,8 @@ mkdir -p $OUT_DIR
 python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet \
+    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/imagenet256/train/"] \
+    config.DATA.TEST.DATA_PATHS=["./data/biggest/imagenet256/val"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \

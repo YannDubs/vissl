@@ -830,7 +830,7 @@ if __name__ == "__main__":
     )
     data_args.add_argument(
         "--train-sizes",
-        default=[-1, 0.01],
+        default=[-1],
         nargs="+",
         type=float,
         help="Sizes of the training set to evaluate for. Percentage if <= 1 else size. "
