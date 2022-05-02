@@ -22,7 +22,7 @@ source ~/.zshrc
 
 # EXTRACT FEATURES
 conda activate myvissl
-bin/extract_features.sh "$dir"
+bin/extract_features_sphinx.sh "$dir"
 
 # LINEAR EVAL
 conda activate probing

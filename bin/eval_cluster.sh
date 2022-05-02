@@ -20,7 +20,7 @@ source ~/.bashrc
 
 # EXTRACT FEATURES
 conda activate vissl
-bin/extract_features.sh "$dir"
+bin/extract_features_remote.sh "$dir"
 
 # LINEAR EVAL
 conda activate probing
