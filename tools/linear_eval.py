@@ -25,6 +25,8 @@ The only function to change for different projects should be:
 - path_to_model
 - load_train_val_test_features
 """
+
+
 try:
     from sklearnex import patch_sklearn
 
@@ -40,11 +42,13 @@ import sys
 from copy import deepcopy
 from itertools import chain
 from pathlib import Path
+import random
 
 import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks.progress.tqdm_progress import TQDMProgressBar
+from pytorch_lightning.callbacks import LearningRateMonitor
 import torch
 import torch.nn as nn
 from scipy.stats import loguniform
@@ -92,6 +96,12 @@ except ImportError:
     # only needed if you want balance train or val
     pass
 
+try:
+    from pytorch_lightning.loggers import WandbLogger
+except:
+    pass
+
+RAND_ID = random.randint(0,100000)
 METRICS_FILENAME = "all_metrics.csv"
 REPORT_FILENAME = "{split}_clf_report.csv"
 PRED_FILENAME = "{split}_predictions.npz"
@@ -102,6 +112,7 @@ logging.basicConfig(
 
 
 def main(cfg):
+    logging.info(f"RAND_ID {RAND_ID}.")
     pl.seed_everything(0)  # shouldn't be needed
     metrics_base, dir_base = dict(), cfg.out_path
     for path in list(cfg.feature_path.glob(cfg.feature_pattern)):
@@ -171,6 +182,9 @@ def main(cfg):
                 )
                 val_dataset = get_dataset(Z_val, Y_val)
                 test_dataset = get_dataset(Z_test, Y_test)
+
+                if cfg.is_monitor_test:
+                    val_dataset = test_dataset
 
                 logging.info(f"Training + tuning the linear probe.")
                 start = time.time()
@@ -406,9 +420,10 @@ def train(train_dataset, val_dataset, cfg, seed):
         return clf
 
     else:
-        callbacks = []
+        callbacks = [LearningRateMonitor()]
         if not cfg.is_no_progress_bar:
             callbacks += [TQDMProgressBar(refresh_rate=600)]
+
 
         pl.seed_everything(seed)
         trainer_kwargs = dict(
@@ -417,10 +432,16 @@ def train(train_dataset, val_dataset, cfg, seed):
             gpus=cfg.n_gpus,
             precision=16,
             enable_progress_bar=not cfg.is_no_progress_bar,
-            limit_val_batches=0,
+            limit_val_batches=1.0 if cfg.is_monitor_test else 0,
+            check_val_every_n_epoch=20,
             fast_dev_run=False,
             enable_checkpointing=False,
-            callbacks=callbacks
+            callbacks=callbacks,
+            logger=None if cfg.no_wandb else  WandbLogger(project='vissl',
+                               entity='yanndubs',
+                               config=vars(cfg),
+                               id=str(cfg.out_path).split("/")[-1] + f"_{RAND_ID}",
+                               group=str(cfg.out_path).split("/")[0])
         )
 
         if cfg.is_validation:
@@ -466,7 +487,8 @@ def train(train_dataset, val_dataset, cfg, seed):
                 f"Selected parameters after validation: {best_params}, metric: {best_metric}."
             )
         else:
-            clf = LinearProbe(train_dataset, cfg)
+
+            clf = LinearProbe(train_dataset, cfg, val_dataset=val_dataset)
             best_trainer = pl.Trainer(**trainer_kwargs)
             best_trainer.fit(clf)
 
@@ -633,10 +655,11 @@ def get_sklearn_clf(cfg, seed):
 class LinearProbe(pl.LightningModule):
     """Linear probe."""
 
-    def __init__(self, train_dataset, cfg):
+    def __init__(self, train_dataset, cfg, val_dataset=None):
         super().__init__()
         self.save_hyperparameters(cfg)
         self.train_dataset = train_dataset
+        self.val_dataset = val_dataset
 
         Y = self.train_dataset.Y
 
@@ -692,6 +715,9 @@ class LinearProbe(pl.LightningModule):
             pin_memory=True,
         )
 
+    def val_dataloader(self):
+        return self.eval_dataloader(self.val_dataset)
+
     def eval_dataloader(self, dataset):
         return DataLoader(
             dataset,
@@ -714,15 +740,33 @@ class LinearProbe(pl.LightningModule):
 
         return out
 
-    def step(self, batch):
+    def step(self, batch, mode):
         z, y = batch
-        Y_hat = self.probe(z).squeeze()
-        loss = self.criterion(Y_hat, y)
+        Y_logits = self.probe(z).squeeze()
+        loss = self.criterion(Y_logits, y)
+
+        if self.train_dataset.is_binary_tgt:
+            Y_hat = (Y_logits > 0)
+
+        elif self.train_dataset.is_multiclass_tgt:
+            Y_hat = Y_logits.argmax(dim=-1)
+
+
+        logs = dict()
+        logs["acc"] = (Y_hat.float() == y).float().mean()
+        logs["loss"] = loss
+        self.log_dict({f"{mode}/{k}": v for k, v in logs.items()})
+
         return loss
 
+    def test_step(self, batch, batch_idx):
+        return self.step(batch, "test")
+
+    def validation_step(self, batch, batch_idx):
+        return self.step(batch, "val")
+
     def training_step(self, batch, batch_idx):
-        loss = self.step(batch)
-        return loss
+        return self.step(batch, "train")
 
     def predict_step(self, batch, batch_idx):
         x, y = batch
@@ -901,6 +945,18 @@ if __name__ == "__main__":
         nargs="+",
         choices=["lr", "batch_size", "weight_decay", "is_batchnorm"],
         help="Parameters to validate over if using validation set.",
+    )
+    torch_args.add_argument(
+        "--no-wandb",
+        default=False,
+        action="store_true",
+        help="Whether not to use weights and biases.",
+    )
+    torch_args.add_argument(
+        "--is-monitor-test",
+        default=False,
+        action="store_true",
+        help="Whether to monitor test performance.",
     )
 
     sk_args.add_argument(
