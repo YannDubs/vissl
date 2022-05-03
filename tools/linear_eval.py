@@ -873,7 +873,7 @@ if __name__ == "__main__":
 
     torch_args.add_argument(
         "--n-epochs",
-        default=[100, 500],
+        default=[100],
         nargs="+",
         type=int,
         help="Number of total epochs to run. There should be one value per training size.",
