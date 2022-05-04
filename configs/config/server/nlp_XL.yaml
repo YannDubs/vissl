@@ -1,0 +1,7 @@
+# @package _global_
+config:
+    SLURM:
+        PARTITION: jag-hi
+        ADDITIONAL_PARAMETERS:
+            #nodelist: jagupard31
+            gres: gpu:a5000:4

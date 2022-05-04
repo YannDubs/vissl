@@ -11,6 +11,6 @@
     config.DATA.NUM_DATALOADER_WORKERS=9 \
     config.SLURM.PORT_ID=40081 \
     config.SLURM.NAME=test_swav_queue \
-    config.SLURM.MEM_GB=82 \
+    config.SLURM.MEM_GB=41 \
     config.SLURM.NUM_CPU_PER_PROC=10 \
     config.SLURM.TIME_HOURS=1 \
