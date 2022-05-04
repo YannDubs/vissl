@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ./dev/launch_slurm.sh \
-    swav_queue_dir \
+    swav_queue_bs_dir \
     config=pretrain/swav/swav_queue \
     +config/server=remote_large \
     config.DISTRIBUTED.NUM_NODES=2 \
