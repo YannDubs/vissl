@@ -26,6 +26,13 @@ source ~/.zshrc
 
 # LINEAR EVAL
 conda activate probing
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-6_l01_b4096 --weight-decay 1e-6 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w3e-6_l01_b4096 --weight-decay 3e-6 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-6_l01_b4096_e300 --weight-decay 1e-6 --lr 0.1 --batch-size 4096 --n-epochs 300 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-5_l01_bn_4096 --weight-decay 1e-5 --lr 0.1 --is-batchnorm --batch-size 4096 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-4_l01_bn_4096 --weight-decay 1e-4 --lr 0.1 --is-batchnorm --batch-size 4096 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-4_l01_bn_4096_e300  --weight-decay 1e-4 --lr 0.1 --is-batchnorm --n-epochs 300 --batch-size 4096 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-4_l03_bn_4096_e300  --weight-decay 1e-4 --lr 0.3 --is-batchnorm --n-epochs 300 --batch-size 4096 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
@@ -39,5 +46,4 @@ python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eva
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-4_l03_bn_b2048 --weight-decay 1e-4 --lr 0.3 --is-batchnorm --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-5_l03_b2048_e300 --weight-decay 1e-5 --lr 0.3 --batch-size 2048 --n-epochs 300 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-4_l03_b2048_e300 --weight-decay 1e-4 --lr 0.3 --batch-size 2048 --n-epochs 300 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/eval_w1e-6_l01_b4096 --weight-decay 1e-6 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
 EOT
