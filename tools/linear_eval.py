@@ -468,7 +468,7 @@ def train(train_dataset, val_dataset, cfg, seed):
                 cfg_tuning = deepcopy(cfg)
                 cfg_tuning.__dict__.update(**sampled_params)
 
-                clf = LinearProbe(train_dataset, cfg_tuning)
+                clf = Probe(train_dataset, cfg_tuning)
                 trainer = pl.Trainer(**trainer_kwargs)
                 trainer.fit(clf)
 
@@ -488,7 +488,7 @@ def train(train_dataset, val_dataset, cfg, seed):
             )
         else:
 
-            clf = LinearProbe(train_dataset, cfg, val_dataset=val_dataset)
+            clf = Probe(train_dataset, cfg, val_dataset=val_dataset)
             best_trainer = pl.Trainer(**trainer_kwargs)
             best_trainer.fit(clf)
 
@@ -652,8 +652,8 @@ def get_sklearn_clf(cfg, seed):
 ###############
 
 ##### TORCH SPECIFIC ######
-class LinearProbe(pl.LightningModule):
-    """Linear probe."""
+class Probe(pl.LightningModule):
+    """Linear or MLP probe."""
 
     def __init__(self, train_dataset, cfg, val_dataset=None):
         super().__init__()
@@ -688,12 +688,33 @@ class LinearProbe(pl.LightningModule):
             self.criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
 
         in_size = self.train_dataset.Z.shape[1]
-        self.probe = nn.Linear(in_size, out_size)
-        nn.init.trunc_normal_(self.probe.weight, std=0.02)
-        nn.init.zeros_(self.probe.bias)
+
+        if cfg.is_mlp:
+            hidden_size = 2048
+            self.probe = nn.Sequential(nn.Linear(in_size, hidden_size),
+                                       nn.BatchNorm1d(hidden_size),
+                                       nn.ReLU(inplace=True),
+                                       nn.Linear(hidden_size, hidden_size),
+                                       nn.BatchNorm1d(hidden_size),
+                                       nn.ReLU(inplace=True),
+                                       nn.Linear(in_size, out_size),
+            )
+            for module in self.modules():
+                if isinstance(module, nn.Linear):
+                    nn.init.trunc_normal_(module.weight, std=0.02)
+                    nn.init.zeros_(module.bias)
+                elif isinstance(module, nn.BatchNorm1d):
+                    nn.init.ones_(module.weight)
+                    nn.init.zeros_(module.bias)
+
+        else:
+            self.probe = nn.Linear(in_size, out_size)
+            nn.init.trunc_normal_(self.probe.weight, std=0.02)
+            nn.init.zeros_(self.probe.bias)
+
 
         if cfg.is_batchnorm:
-            # normalize features before linear layer
+            # normalize features before probe
             self.probe = nn.Sequential(
                 nn.BatchNorm1d(in_size, affine=False), self.probe
             )
@@ -927,6 +948,12 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
         help="optionally add a batchnorm layer before the linear classifier if not tuning over.",
+    )
+    torch_args.add_argument(
+        "--is-mlp",
+        default=False,
+        action="store_true",
+        help="use MLP probe instead of linear.",
     )
     torch_args.add_argument(
         "--lr", default=0.3, type=float, help="learning rate for the model if not tuning over." 
