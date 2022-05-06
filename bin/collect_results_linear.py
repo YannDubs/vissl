@@ -4,7 +4,8 @@ from pathlib import Path
 
 METRIC = "accuracy"
 DIR = Path(sys.argv[1])
-paths = list(DIR.glob("eval*/model_*/train_size_-1/seed_0/all_metrics.csv"))
+paths = list(DIR.glob("eval_*/model_*/train_size_-1/seed_0/all_metrics.csv"))
+paths += list(DIR.glob("eval/model_*/train_size_-1/seed_0/all_metrics.csv"))
 
 results = dict()
 for p in paths:
