@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 dir="$1"
-mkdir -p "$dir"/eval_logs
+mkdir -p "$dir"/evalmlp_logs
 echo "Evaluating" "$1"
 
 sbatch <<EOT
