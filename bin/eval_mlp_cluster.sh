@@ -6,14 +6,14 @@ echo "Evaluating" "$1"
 
 sbatch <<EOT
 #!/usr/bin/env bash
-#SBATCH --job-name=eval_"$dir"
+#SBATCH --job-name=evalmlp_"$dir"
 #SBATCH --partition=t4v2,rtx6000
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --output="$dir"/eval_logs/slurm-%j.out
-#SBATCH --error="$dir"/eval_logs/slurm-%j.err
+#SBATCH --output="$dir"/evalmlp_logs/slurm-%j.out
+#SBATCH --error="$dir"/evalmlp_logs/slurm-%j.err
 
 # prepare your environment here
 source ~/.bashrc
