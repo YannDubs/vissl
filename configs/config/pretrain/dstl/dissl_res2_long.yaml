@@ -71,12 +71,6 @@ config:
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
-      TEMP_FROZEN_PARAMS_ITER_MAP: [
-        [ 'module.heads.0.1.clf.0.weight', 16500 ],
-        [ 'module.heads.0.2.clf.0.weight', 313 ],
-        [ 'module.heads.0.2.clf.0.bias', 313 ],
-        [ 'module.heads.1.0.clf.0.weight', 16500 ],
-      ]
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
@@ -92,7 +86,7 @@ config:
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
       crops_for_assign: [ 0, 1 ]
-      beta_pM_unif: 1.9
+      beta_pM_unif: 1.5
       beta_H_MlZ: 0.5
       ema_weight_marginal: 0.7
   OPTIMIZER:
@@ -105,8 +99,8 @@ config:
       weight_decay: 0.000001
       momentum: 0.9
       nesterov: False
-      #num_epochs: 100
-      num_epochs: 400
+      num_epochs: 100
+      #num_epochs: 400
       regularize_bn: True
       regularize_bias: True
       param_schedulers:
@@ -125,8 +119,8 @@ config:
               end_value: 0.0048
           update_interval: step
           interval_scaling: [rescaled, fixed]
-          #lengths: [0.1, 0.9]                 # 100ep
-          lengths: [0.025, 0.975]           # 400ep
+          lengths: [0.1, 0.9]                 # 100ep
+          #lengths: [0.025, 0.975]           # 400ep
   DISTRIBUTED:
     BACKEND: nccl
     NUM_NODES: 2    # gives batch size of 20
