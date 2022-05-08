@@ -376,7 +376,12 @@ def infer_losses_config(cfg):
 
     if "dstl_issl_loss" in cfg.LOSS.name:
         assert len(cfg.MODEL.MULTI_RES_SPLIT_CROPS) == 2  # run for assign and one for pred
-        cfg.LOSS.dstl_issl_loss.n_Mx = cfg.MODEL.HEAD.PARAMS[0][-1][1]["dims"][-1]
+        teacher_head_cfg = cfg.MODEL.HEAD.PARAMS[0][-1][1]
+        if "num_clusters" in teacher_head_cfg:
+            cfg.LOSS.dstl_issl_loss.n_Mx = teacher_head_cfg["num_clusters"][-1]
+        else:
+            cfg.LOSS.dstl_issl_loss.n_Mx = teacher_head_cfg["dims"][-1]
+
         cfg.LOSS.dstl_issl_loss.num_crops = total_num_crops or cfg.LOSS.dstl_issl_loss.num_crops
         cfg.DATA.TRAIN.COLLATE_FUNCTION = "multicrop_collator"
 
