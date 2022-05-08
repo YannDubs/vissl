@@ -40,6 +40,7 @@ class SwAVPrototypesHead(nn.Module):
         normalize_feats: bool = True,
         activation_name: str = "ReLU",
         use_weight_norm_prototypes: bool = False,
+        is_no_list: bool=True,
     ):
         """
         Args:
@@ -103,6 +104,7 @@ class SwAVPrototypesHead(nn.Module):
         else:
             self.nmb_heads = 0
         self.return_embeddings = return_embeddings
+        self.is_no_list = is_no_list
 
     def forward(self, batch: torch.Tensor):
         """
@@ -111,7 +113,6 @@ class SwAVPrototypesHead(nn.Module):
         Returns:
             List(2D torch.tensor of shape N x num_clusters)
         """
-        breakpoint()
         batch = self.projection_head(batch)
 
         if self.normalize_feats:
@@ -123,6 +124,9 @@ class SwAVPrototypesHead(nn.Module):
         if self.nmb_heads > 0:
             for i in range(self.nmb_heads):
                 out.append(getattr(self, "prototypes" + str(i))(batch))
+
+        if self.is_no_list:
+            return out[0]
         return out
 
 

@@ -147,7 +147,6 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
             2. #feats = 1 and #heads > 1 -> head consists of many layers to be run sequentially.
                #outputs = 1
         """
-        breakpoint()
         # Example case: training linear classifiers on various layers
         if len(feats) == len(heads):
             output = []

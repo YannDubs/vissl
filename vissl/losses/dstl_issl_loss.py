@@ -105,7 +105,6 @@ class DstlISSLCriterion(nn.Module):
                                                 for _ in range(len(self.crops_for_assign))])
 
     def forward(self, output: List[torch.Tensor]):
-        breakpoint()
 
         self.num_iteration += 1
 

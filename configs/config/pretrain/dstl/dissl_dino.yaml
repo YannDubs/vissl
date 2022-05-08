@@ -61,7 +61,7 @@ config:
     HEAD:
       PARAMS: [
         [
-          ["swav_head", {"use_weight_norm_prototypes": True, "dims": [2048, 2048, 512], "use_bn": False, "return_embeddings": False, "activation_name": "GELU", "num_clusters": [16384]}],
+          ["swav_head", {"use_weight_norm_prototypes": True, "dims": [2048, 2048, 512], "use_bn": False, "is_no_list":True,  "return_embeddings": False, "activation_name": "GELU", "num_clusters": [16384]}],
         ],
         [ # that's a low rank linear layer
           [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": True } ],
