@@ -111,6 +111,7 @@ class SwAVPrototypesHead(nn.Module):
         Returns:
             List(2D torch.tensor of shape N x num_clusters)
         """
+        breakpoint()
         batch = self.projection_head(batch)
 
         if self.normalize_feats:
