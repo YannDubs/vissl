@@ -70,7 +70,8 @@ config:
       ]
       TEMP_FROZEN_PARAMS_ITER_MAP: [
         ['module.heads.0.0.prototypes0.weight', 313],
-        [ 'module.heads.1.0.clf.0.weight', 33 ],
+        [ 'module.heads.1.0.clf.0.weight', 313 ],
+        [ 'module.heads.1.0.clf.0.weight', 313 ],
       ]
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
