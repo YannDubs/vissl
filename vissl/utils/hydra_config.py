@@ -241,7 +241,8 @@ def get_scaled_lr_scheduler(cfg, param_schedulers, scaled_lr):
         # we check if the warmup is meaningful or not. If not, we simplify the
         # schedule.
         if has_linear_warmup:
-            resolve_linear_schedule(cfg, param_schedulers)
+            pass
+            #resolve_linear_schedule(cfg, param_schedulers)
     elif param_schedulers["name"] == "linear":
         param_schedulers["end_value"] = scaled_lr
     elif param_schedulers["name"] == "inverse_sqrt":

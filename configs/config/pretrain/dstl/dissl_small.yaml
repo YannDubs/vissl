@@ -63,12 +63,12 @@ config:
         # the first is the teacher
         [
           [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
-          [ "mlp", { "dims": [ 2048, 1024 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init":True } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init":True } ],
           [ "mlp", { "dims": [ 1024, 8192 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
         ],
         [ # that's a low rank linear layer
           [ "mlp", { "dims": [ 2048, 1024 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init":True} ],
-          [ "mlp", { "dims": [ 1024, 8192 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 512, 8192 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
     SYNC_BN_CONFIG:
@@ -112,7 +112,7 @@ config:
           name: composite
           schedulers:
             - name: linear
-              start_value: 0.3
+              start_value: 0.001
               end_value: 4.8
             - name: cosine
               start_value: 4.8

@@ -119,7 +119,7 @@ config:
           name: composite
           schedulers:
             - name: linear
-              start_value: 0.3
+              start_value: 0.001
               end_value: 4.8
             - name: cosine
               start_value: 4.8

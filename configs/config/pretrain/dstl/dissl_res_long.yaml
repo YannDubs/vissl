@@ -72,10 +72,10 @@ config:
         ],
       ]
       TEMP_FROZEN_PARAMS_ITER_MAP: [
-        [ 'module.heads.0.1.clf.0.weight', 16500 ],
+        [ 'module.heads.0.1.clf.0.weight', 3130 ],
         [ 'module.heads.0.2.clf.0.weight', 313 ],
         [ 'module.heads.0.2.clf.0.bias', 313 ],
-        [ 'module.heads.1.0.clf.0.weight', 16500 ],
+        [ 'module.heads.1.0.clf.0.weight', 3130 ],
       ]
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
@@ -118,7 +118,7 @@ config:
           name: composite
           schedulers:
             - name: linear
-              start_value: 0.3
+              start_value: 0.001
               end_value: 4.8
             - name: cosine
               start_value: 4.8
