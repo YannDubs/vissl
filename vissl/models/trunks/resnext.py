@@ -191,6 +191,10 @@ class ResNeXt(nn.Module):
         self, x: torch.Tensor, out_feat_keys: List[str] = None
     ) -> List[torch.Tensor]:
 
+        if self.trunk_config.IS_SKIP_RESIZER:
+            out_feat_keys = ["res5","flatten"]
+            breakpoint()
+
         if isinstance(x, MultiDimensionalTensor):
             out = get_tunk_forward_interpolated_outputs(
                 input_type=self.model_config.INPUT_TYPE,
@@ -214,6 +218,11 @@ class ResNeXt(nn.Module):
                 use_checkpointing=self.use_checkpointing,
                 checkpointing_splits=self.num_checkpointing_splits,
             )
+
+        if self.trunk_config.IS_SKIP_RESIZER:
+            breakpoint()
+            # flatten and concat
+
         return out
 
 class BottleneckExpand(nn.Module):

@@ -644,6 +644,7 @@ config:
         OUT_FEAT_KEYS: null
         AVG_POOL_KERNEL_SIZE: -1
         Z_DIM_OLD_TMP_NEW: null
+        IS_SKIP_RESIZER: False
 
       # ------------------------------------------------------------- #
       # SimCLR-v2 ResNet params that includes selective kernel
