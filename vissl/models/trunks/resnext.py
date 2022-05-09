@@ -193,7 +193,6 @@ class ResNeXt(nn.Module):
 
         if self.trunk_config.IS_SKIP_RESIZER:
             out_feat_keys = ["res5","flatten"]
-            breakpoint()
 
         if isinstance(x, MultiDimensionalTensor):
             out = get_tunk_forward_interpolated_outputs(
@@ -220,8 +219,10 @@ class ResNeXt(nn.Module):
             )
 
         if self.trunk_config.IS_SKIP_RESIZER:
-            breakpoint()
-            # flatten and concat
+            avgpool = self._feature_blocks["avgpool"]
+            flatten = self._feature_blocks["flatten"]
+            out[0] = flatten(avgpool(out[0]))
+            out = [torch.cat(out, dim=1)]  # shape : [bs, 2048 + 4096]
 
         return out
 

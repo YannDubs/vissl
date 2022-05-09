@@ -147,7 +147,11 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
             2. #feats = 1 and #heads > 1 -> head consists of many layers to be run sequentially.
                #outputs = 1
         """
-        breakpoint()
+        if self.model_config.TRUNK.RESNETS.IS_SKIP_RESIZER:
+            feats[0] = feats[0][:, :2048]
+            feats[1] = feats[1][:, 2048:]
+            breakpoint()
+
         # Example case: training linear classifiers on various layers
         if len(feats) == len(heads):
             output = []
