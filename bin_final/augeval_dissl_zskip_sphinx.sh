@@ -5,7 +5,7 @@ base_dir="$model_name"_dir
 
 ./dev/launch_slurm.sh \
     $base_dir/augeval \
-    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear \
+    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_zskip \
     +config/server=sphinx1 \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \
