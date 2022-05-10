@@ -12,18 +12,18 @@ sbatch <<EOT
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=16
 #SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard20
-#SBATCH --nodelist=jagupard21
+#SBATCH --nodelist=jagupard25
 #SBATCH --mem=32G
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
-#works: jagupard25,
+#works: jagupard21,
 # prepare your environment here
 source ~/.zshrc
 
 # EXTRACT FEATURES
-#conda activate myvissl
-#bin/extract_features_sphinx.sh "$dir"
+conda activate myvissl
+bin/extract_features_sphinx.sh "$dir"
 
 # LINEAR EVAL
 conda activate probing

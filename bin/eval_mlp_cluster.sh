@@ -24,6 +24,10 @@ bin/extract_features_remote.sh "$dir"
 
 # LINEAR EVAL
 conda activate probing
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b256 --weight-decay 1e-5 --lr 0.1 --batch-size 256 --is-no-progress-bar --is-monitor-test --is-mlp
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b128 --weight-decay 1e-5 --lr 0.1 --batch-size 128 --is-no-progress-bar --is-monitor-test --is-mlp
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b64 --weight-decay 1e-5 --lr 0.1 --batch-size 64 --is-no-progress-bar --is-monitor-test --is-mlp
+python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b512 --weight-decay 1e-5 --lr 0.1 --batch-size 512 --is-no-progress-bar --is-monitor-test --is-mlp
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlp
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlp
 python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-4 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlp
