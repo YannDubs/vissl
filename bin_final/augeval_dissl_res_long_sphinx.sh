@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-model_name=swav_queuelong
+model_name=dissl_res_long
 base_dir="$model_name"_dir
 
 ./dev/launch_slurm.sh \
@@ -13,7 +13,7 @@ base_dir="$model_name"_dir
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE=$base_dir/checkpoints/model_final_checkpoint_phase99.torch \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=384 \
     config.DATA.NUM_DATALOADER_WORKERS=31 \
-    config.SLURM.PORT_ID=40061 \
+    config.SLURM.PORT_ID=40092 \
     config.SLURM.NAME=augeval_"$model_name" \
     config.SLURM.MEM_GB=1000 \
     config.SLURM.NUM_CPU_PER_PROC=32 \

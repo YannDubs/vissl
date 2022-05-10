@@ -48,6 +48,7 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
+        IS_SKIP_RESIZER: False
     WEIGHTS_INIT:
       PARAMS_FILE: "specify the model weights"
       STATE_DICT_KEY_NAME: classy_state_dict

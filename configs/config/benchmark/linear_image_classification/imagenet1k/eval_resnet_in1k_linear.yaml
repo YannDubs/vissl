@@ -60,7 +60,6 @@ config:
       FREEZE_TRUNK_ONLY: True
       SHOULD_FLATTEN_FEATS: False
       LINEAR_EVAL_FEAT_POOL_OPS_MAP: [
-        ["res5", ["AvgPool2d", [[6, 6], 1, 0]]],
         ["res5avg", ["Identity", []]],
         ["res5avg", ["Identity", []]],
       ]
@@ -68,9 +67,9 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
+        IS_SKIP_RESIZER: False
     HEAD:
       PARAMS: [
-        ["eval_mlp", {"in_channels": 2048, "dims": [8192, 1000]}],
         ["eval_mlp", {"in_channels": 2048, "dims": [2048, 1000]}],
         ["mlp", {"dims": [2048, 1000]}],
       ]
@@ -81,6 +80,10 @@ config:
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
+      GROUP_SIZE: -1
+    AMP_PARAMS:
+      USE_AMP: True
+      AMP_TYPE: pytorch
   LOSS:
     name: cross_entropy_multiple_output_single_target
     cross_entropy_multiple_output_single_target:
@@ -118,7 +121,7 @@ config:
     CHECKPOINT_FREQUENCY: 1
 
   SLURM:
-    NAME: "eval"
+    NAME: "eval_linear"
     MEM_GB: 96 #  3 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 24
