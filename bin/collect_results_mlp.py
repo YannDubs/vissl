@@ -13,5 +13,5 @@ for p in paths:
 
 all_results = pd.concat(results).droplevel(1)
 print(all_results)
-all_results.to_csv(DIR/"all_results.csv")
+all_results.to_csv(DIR/"all_results_mlp.csv")
 

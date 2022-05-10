@@ -707,6 +707,21 @@ class Probe(pl.LightningModule):
                     nn.init.ones_(module.weight)
                     nn.init.zeros_(module.bias)
 
+        elif cfg.is_mlpS:
+            hidden_size = 2048
+            self.probe = nn.Sequential(nn.Linear(in_size, hidden_size),
+                                       nn.BatchNorm1d(hidden_size),
+                                       nn.ReLU(inplace=True),
+                                       nn.Linear(in_size, out_size),
+            )
+            for module in self.modules():
+                if isinstance(module, nn.Linear):
+                    nn.init.trunc_normal_(module.weight, std=0.02)
+                    nn.init.zeros_(module.bias)
+                elif isinstance(module, nn.BatchNorm1d):
+                    nn.init.ones_(module.weight)
+                    nn.init.zeros_(module.bias)
+
         else:
             self.probe = nn.Linear(in_size, out_size)
             nn.init.trunc_normal_(self.probe.weight, std=0.02)
@@ -951,6 +966,12 @@ if __name__ == "__main__":
     )
     torch_args.add_argument(
         "--is-mlp",
+        default=False,
+        action="store_true",
+        help="use MLP probe instead of linear.",
+    )
+    torch_args.add_argument(
+        "--is-mlpS",
         default=False,
         action="store_true",
         help="use MLP probe instead of linear.",
