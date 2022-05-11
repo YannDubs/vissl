@@ -6,7 +6,7 @@
     +config/server=remote_large \
     config.DISTRIBUTED.NUM_NODES=2 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
-    config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
+    config.DATA.TRAIN.DATA_PATHS=["./data/imagenet256/train"] \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=196 \
     config.DATA.NUM_DATALOADER_WORKERS=9 \
     config.SLURM.PORT_ID=40046 \
