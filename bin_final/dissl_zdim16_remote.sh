@@ -9,7 +9,7 @@
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=196 \
     config.DATA.NUM_DATALOADER_WORKERS=9 \
-    config.SLURM.PORT_ID=40046 \
+    config.SLURM.PORT_ID=40047 \
     config.SLURM.NAME=dissl_zdim16 \
     config.SLURM.MEM_GB=166 \
     config.SLURM.NUM_CPU_PER_PROC=10 \
