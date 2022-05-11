@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 dir="$1"
+sffx="$2"
 mkdir -p "$dir"/eval_logs
-echo "Evaluating" "$1"
+echo "Evaluating" "$dir" "$sffx"
 
 sbatch <<EOT
 #!/usr/bin/env zsh
-#SBATCH --job-name=eval_"$dir"
+#SBATCH --job-name=eval_"$dir""$sffx"
 #SBATCH --partition=jag-hi
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
@@ -22,7 +23,7 @@ source ~/.zshrc
 
 # EXTRACT FEATURES
 conda activate myvissl
-bin/extract_features_sphinx.sh "$dir"
+bin/extract_features_sphinx.sh "$dir" "$sffx"
 
 # LINEAR EVAL
 conda activate probing

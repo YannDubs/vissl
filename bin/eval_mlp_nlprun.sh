@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
 dir="$1"
+sffx="$2"
 mkdir -p "$dir"/evalmlp_logs
-echo "Evaluating" "$1"
+echo "Evaluating" "$dir" "$sffx"
 
 sbatch <<EOT
 #!/usr/bin/env zsh
-#SBATCH --job-name=evalmlp_"$dir"
+#SBATCH --job-name=evalmlp_"$dir""$sffx"
 #SBATCH --partition=jag-hi
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=16
-#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard20
-#SBATCH --nodelist=jagupard25
+#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard20,jagupard30,jagupard31
 #SBATCH --mem=32G
 #SBATCH --output="$dir"/evalmlp_logs/slurm-%j.out
 #SBATCH --error="$dir"/evalmlp_logs/slurm-%j.err
@@ -23,7 +23,7 @@ source ~/.zshrc
 
 # EXTRACT FEATURES
 conda activate myvissl
-bin/extract_features_sphinx.sh "$dir"
+bin/extract_features_sphinx.sh "$dir" "$sffx"
 
 # LINEAR EVAL
 conda activate probing

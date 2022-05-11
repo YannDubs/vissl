@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 
 dir="$1"
+sffx="$2"
 mkdir -p "$dir"/eval_logs
-echo "Evaluating" "$1"
+echo "Evaluating" "$dir" "$sffx"
 
 sbatch <<EOT
 #!/usr/bin/env bash
-#SBATCH --job-name=eval_"$dir"
+#SBATCH --job-name=eval_"$dir""$sffx"
 #SBATCH --partition=t4v2,rtx6000
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
@@ -20,7 +21,7 @@ source ~/.bashrc
 
 # EXTRACT FEATURES
 conda activate vissl
-bin/extract_features_remote.sh "$dir"
+bin/extract_features_remote.sh "$dir" "$sffx"
 
 # LINEAR EVAL
 conda activate probing
