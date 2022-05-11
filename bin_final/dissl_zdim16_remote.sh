@@ -3,7 +3,7 @@
 ./dev/launch_slurm.sh \
     dissl_zdim16_dir \
     config=pretrain/dstl/dissl_zdim16 \
-    +config/server=sphinx1 \
+    +config/server=remote_large \
     config.DISTRIBUTED.NUM_NODES=2 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \

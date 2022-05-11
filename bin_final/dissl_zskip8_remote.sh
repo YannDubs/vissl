@@ -4,7 +4,7 @@
 ./dev/launch_slurm.sh \
     dissl_zskip8_dir \
     config=pretrain/dstl/dissl_zskip8 \
-    +config/server=sphinx1 \
+    +config/server=remote_large \
     config.DISTRIBUTED.NUM_NODES=2 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
