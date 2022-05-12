@@ -3,7 +3,7 @@
 python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=pretrain/swav/swav_queuelong \
-    config.CHECKPOINT.DIR="./test_swavqueue;ong/checkpoints" \
+    config.CHECKPOINT.DIR="./test_swavqueuelong/checkpoints" \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
     config.SLURM.USE_SLURM=False \
