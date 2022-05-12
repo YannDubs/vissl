@@ -2,7 +2,7 @@
 
 python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
-    config=pretrain/swav/swav_nomulti \
+    config=pretrain/swav/swav_queue \
     config.CHECKPOINT.DIR="./test_simclrnormult/checkpoints" \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
