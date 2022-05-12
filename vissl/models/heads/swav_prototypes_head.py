@@ -40,7 +40,7 @@ class SwAVPrototypesHead(nn.Module):
         normalize_feats: bool = True,
         activation_name: str = "ReLU",
         use_weight_norm_prototypes: bool = False,
-        is_no_list: bool=True,
+        is_no_list: bool=False,
     ):
         """
         Args:
