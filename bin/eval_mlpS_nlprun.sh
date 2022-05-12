@@ -22,21 +22,21 @@ sbatch <<EOT
 source ~/.zshrc
 
 # EXTRACT FEATURES
-#conda activate myvissl
-#bin/extract_features_sphinx.sh "$dir" "$sffx"
+conda activate myvissl
+bin/extract_features_sphinx.sh "$dir" "$sffx"
 
 # LINEAR EVAL
 conda activate probing
-#python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b256 --weight-decay 1e-5 --lr 0.1 --batch-size 256 --is-no-progress-bar --is-monitor-test --is-mlpS
-#python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b128 --weight-decay 1e-5 --lr 0.1 --batch-size 128 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b64 --weight-decay 1e-5 --lr 0.1 --batch-size 64 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b512 --weight-decay 1e-5 --lr 0.1 --batch-size 512 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-4 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-3 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l03_b2048 --weight-decay 1e-5 --lr 0.3 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-5_l003_b2048 --weight-decay 1e-5 --lr 0.03 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-4 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
-python tools/linear_eval.py --feature-path "$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-3 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b512 --weight-decay 1e-5 --lr 0.1 --batch-size 512 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-4 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-3 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-5_l03_b2048 --weight-decay 1e-5 --lr 0.3 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-5_l003_b2048 --weight-decay 1e-5 --lr 0.03 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-4 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+python tools/linear_eval.py --feature-path /scr/biggest/yanndubs/"$dir"/features --out-path "$dir"/evalmlp_w1e-4_l01_b2048 --weight-decay 1e-3 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test --is-mlpS
+
+rm -rf /scr/biggest/yanndubs/"$dir"/features
+
 EOT

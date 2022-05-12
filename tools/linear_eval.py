@@ -14,6 +14,7 @@ Eg of command to run:
 -  Standard (eg Imagenet) with standard eval head:
 `python eval_pretrained_features.py --feature-path <feature_dir> --out-path <out_dir>`
 -  Sklearn head (slow if multi label++):
+-  Sklearn head (slow if multi label++):
 `python eval_pretrained_features.py --feature-path <feature_dir> --out-path <out_dir> --is-sklearn`
 
 
@@ -98,6 +99,11 @@ except ImportError:
 
 try:
     from pytorch_lightning.loggers import WandbLogger
+except:
+    pass
+
+try:
+    from pl_bolts.optimizers.lars import LARS
 except:
     pass
 
@@ -812,12 +818,20 @@ class Probe(pl.LightningModule):
         # standard linear lr scaling
         linear_lr = self.hparams.lr * self.hparams.batch_size / 256
 
-        optimizer = torch.optim.SGD(
-            self.probe.parameters(),
-            lr=linear_lr,
-            weight_decay=self.hparams.weight_decay,
-            momentum=0.9,
-        )
+        if self.hparams.is_lars:
+            optimizer = LARS(
+                self.probe.parameters(),
+                lr=linear_lr,
+                weight_decay=self.hparams.weight_decay,
+                momentum=0.9,
+            )
+        else:
+            optimizer = torch.optim.SGD(
+                self.probe.parameters(),
+                lr=linear_lr,
+                weight_decay=self.hparams.weight_decay,
+                momentum=0.9,
+            )
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
             optimizer, self.hparams.curr_n_epoch, eta_min=0
         )
@@ -866,7 +880,7 @@ def preprocess_labels(path, Y_train, Y_val, Y_test):
 def path_to_model(path):
     """Return model name from path."""
     epoch = str(path).split("phase")[-1]
-    model = str(path).split("_dir/")[0]
+    model = str(path).split("_dir/")[0].split("/")[-1]
     return f"{model}_epoch{epoch}"
 
 ################################
@@ -1005,6 +1019,12 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
         help="Whether to monitor test performance.",
+    )
+    torch_args.add_argument(
+        "--is-lars",
+        default=False,
+        action="store_true",
+        help="Whether to use the LARS optimizer, which can be helpful in large batch settings.",
     )
 
     sk_args.add_argument(
