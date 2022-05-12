@@ -73,7 +73,7 @@ config:
     name: moco_loss
     moco_loss:
       embedding_dim: 128
-      queue_size: 65536
+      queue_size: 65280
       momentum: 0.999
       temperature: 0.2
   OPTIMIZER:
