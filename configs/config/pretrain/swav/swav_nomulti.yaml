@@ -25,10 +25,11 @@ config:
       BATCHSIZE_PER_REPLICA: 96
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
-        - name: ImgReplicatePil
-          num_times: 2
-        - name: RandomResizedCrop
-          size: 224
+        - name: ImgPilToMultiCrop
+          total_num_crops: 2
+          size_crops: [ 224 ]
+          num_crops: [ 2 ]
+          crop_scales: [ [ 0.08, 1 ] ]
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
@@ -41,7 +42,7 @@ config:
         - name: Normalize
           mean: [0.485, 0.456, 0.406]
           std: [0.229, 0.224, 0.225]
-      COLLATE_FUNCTION: simclr_collator
+      COLLATE_FUNCTION: multicrop_collator
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
       COPY_DESTINATION_DIR: /tmp/imagenet1k/
@@ -51,6 +52,7 @@ config:
   METERS:
     name: ""
   MODEL:
+    MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
     TRUNK:
       NAME: resnet
       RESNETS:
