@@ -123,5 +123,5 @@ config:
   CHECKPOINT:
     DIR: "."
     AUTO_RESUME: True
-    CHECKPOINT_FREQUENCY: 1 # checkpoint every 10 epoc
+    CHECKPOINT_FREQUENCY: 5 # checkpoint every 10 epoc
     OVERWRITE_EXISTING: true

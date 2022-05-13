@@ -11,6 +11,7 @@ Supports SLURM as an option. Set config.SLURM.USE_SLURM=true to use slurm.
 
 import sys
 from typing import Any, List
+import warnings
 
 from vissl.utils.distributed_launcher import (
     launch_distributed,
@@ -29,6 +30,7 @@ def hydra_main(overrides: List[Any]):
 
     ######################################################################################
 
+    warnings.filterwarnings("ignore")
     print(f"####### overrides: {overrides}")
     cfg = compose_hydra_configuration(overrides)
     args, config = convert_to_attrdict(cfg)

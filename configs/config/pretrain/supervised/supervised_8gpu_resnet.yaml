@@ -3,7 +3,7 @@ config:
   CHECKPOINT:
     DIR: "checkpoints"
     AUTO_RESUME: True
-    CHECKPOINT_FREQUENCY: 1
+    CHECKPOINT_FREQUENCY: 5
   DATA:
     NUM_DATALOADER_WORKERS: 5
     TRAIN:

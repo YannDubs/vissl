@@ -1320,7 +1320,7 @@ config:
     # For deciding whether to checkpointing, we
     # always count the number of training phases train_phase_idx and checkpoint. However,
     # the checkpoint file has number phase_idx.
-    CHECKPOINT_FREQUENCY: 1
+    CHECKPOINT_FREQUENCY: 5
     # if we want to checkpoint model at various iterations as well and not just phase
     # Example:
     #   CHECKPOINT_ITER_FREQUENCY = 100 -> checkpoint after every 100 iterations

@@ -4,7 +4,7 @@ model=swav_nomulti
 
 ./dev/launch_slurm.sh \
     "$model"_dir \
-    config=pretrain/moco/"$model" \
+    config=pretrain/swav/"$model" \
     +config/server=sphinx1 \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \

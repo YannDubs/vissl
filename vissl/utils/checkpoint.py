@@ -125,7 +125,7 @@ class CheckpointWriter:
 
     def get_old_checkpoint_names(self):
         # keep one last
-        return [f"model_{self.mode}{i}.torch" for i in range(self.mode_num - 1)]
+        return [f"model_{self.mode}{i}.torch" for i in range(self.mode_num - 6)]
 
     def get_checkpoint_shard_name(self, rank: int):
         if self.is_final_train_phase:

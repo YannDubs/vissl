@@ -43,7 +43,7 @@ mkdir -p "$CHECKPOINT_DIR"
 ####################### launch script #########################################
 
 export PYTHONPATH="$EXP_ROOT_DIR/:$PYTHONPATH"
-python -u "tools/run_distributed_engines.py" \
+python -W ignore -u "tools/run_distributed_engines.py" \
   "${CFG[@]}" \
   hydra.run.dir="." \
   config.SLURM.USE_SLURM=true \
