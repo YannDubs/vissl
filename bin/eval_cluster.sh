@@ -43,7 +43,8 @@ python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path 
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b4096 --weight-decay 1e-6 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-6_l01_b4096 --weight-decay 3e-6 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_b4096 --weight-decay 1e-5 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-5_l01_b4096 --weight-decay 1e-5 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-5_l01_b4096 --weight-decay 3e-5 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-4_l01_b4096 --weight-decay 1e-4 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-7_l01_b4096 --weight-decay 1e-7 --lr 0.1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l03_b4096 --weight-decay 1e-6 --lr 0.3 --batch-size 4096 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l1_b4096 --weight-decay 1e-6 --lr 1 --batch-size 4096 --is-no-progress-bar --is-monitor-test
