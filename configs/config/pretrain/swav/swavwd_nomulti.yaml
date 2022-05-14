@@ -91,7 +91,7 @@ config:
       clip: False
       trust_coefficient: 0.001
       eps: 0.00000001
-    weight_decay: 0.000001
+    weight_decay: 0.0001
     momentum: 0.9
     nesterov: False
     num_epochs: 100
@@ -130,7 +130,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "swav_nomulti"
+    NAME: "swavwd_nomulti"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
