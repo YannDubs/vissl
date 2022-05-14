@@ -426,7 +426,10 @@ def train(train_dataset, val_dataset, cfg, seed):
         return clf
 
     else:
-        callbacks = [LearningRateMonitor()]
+        callbacks = []
+        if not cfg.no_wandb:
+            callbacks += [LearningRateMonitor()]
+
         if not cfg.is_no_progress_bar:
             callbacks += [TQDMProgressBar(refresh_rate=600)]
 
