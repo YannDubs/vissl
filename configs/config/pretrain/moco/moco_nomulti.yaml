@@ -73,7 +73,7 @@ config:
     name: moco_loss
     moco_loss:
       embedding_dim: 128
-      queue_size: 64512
+      queue_size: 15360 # in the apper they say 16K doesn't lose much and mose is issue computationally
       momentum: 0.999
       temperature: 0.2
   OPTIMIZER:
