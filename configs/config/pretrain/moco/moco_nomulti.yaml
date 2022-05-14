@@ -68,12 +68,12 @@ config:
       GROUP_SIZE: -1
     AMP_PARAMS:
       USE_AMP: True
-      AMP_TYPE: "pytorch"  # apex | pytorch
+      AMP_TYPE: pytorch
   LOSS:
     name: moco_loss
     moco_loss:
       embedding_dim: 128
-      queue_size: 15360 # in the apper they say 16K doesn't lose much and mose is issue computationally
+      queue_size: 16128 # in the apper they say 16K doesn't lose much and mose is issue computationally
       momentum: 0.999
       temperature: 0.2
   OPTIMIZER:
