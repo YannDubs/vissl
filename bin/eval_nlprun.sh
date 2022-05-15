@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ps -p $$
+
 dir="$1"
 sffx="$2"
 mkdir -p "$dir"/eval_logs
@@ -19,13 +19,16 @@ sbatch <<EOT
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
-echo \$0
+echo ps -p \$\$
 
 # prepare your environment here
 source ~/.zshrc
 
+echo ps -p \$\$
+
+if [ -z "\$BASH" ] ;then echo "Not running with bash"; fi
+
 # EXTRACT FEATURES
-echo \$0
 echo "Feature directory : $feature_dir"
 is_already_features=\$( python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk63*'))) > 0)" )
 echo "is_already_features: \$is_already_features"
@@ -35,6 +38,8 @@ then
     echo "Features already present."
 else
     echo "featurizing."
+    echo \$(which python)
+    echo \$(which -p conda)
     conda activate myvissl
     echo \$(which -p conda)
     bin/extract_features_sphinx.sh "$dir" "$sffx"
