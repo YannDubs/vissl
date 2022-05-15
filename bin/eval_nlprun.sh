@@ -36,11 +36,8 @@ then
 else
     echo "featurizing."
     conda activate myvissl
-    echo $(which python)
-    echo $(which conda)
-    which -p conda
-    echo $(which -p conda)
-    echo $(which python)
+    which python
+    \$(which -p conda)
     bin/extract_features_sphinx.sh "$dir" "$sffx"
 fi
 
