@@ -19,15 +19,15 @@ sbatch <<EOT
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
-ps -p $$
+echo \$0
 
 # prepare your environment here
 source ~/.zshrc
 
 # EXTRACT FEATURES
-ps -p $$
-echo "Feature directory : $feature_dir"
-is_already_features=$( python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk63*'))) > 0)" )
+echo \$0
+echo "Feature directory : \$feature_dir"
+is_already_features=\$( python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk63*'))) > 0)" )
 echo "is_already_features: $is_already_features"
 
 if [[ "$is_already_features" == "True" ]]
@@ -36,7 +36,6 @@ then
 else
     echo "featurizing."
     conda activate myvissl
-    which python
     \$(which -p conda)
     bin/extract_features_sphinx.sh "$dir" "$sffx"
 fi
