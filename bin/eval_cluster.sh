@@ -33,7 +33,7 @@ then
 else
     echo "featurizing."
     conda activate vissl
-    bin/extract_features_sphinx.sh "$dir" "$sffx"
+    bin/extract_features_remote.sh "$dir" "$sffx"
 fi
 
 # LINEAR EVAL

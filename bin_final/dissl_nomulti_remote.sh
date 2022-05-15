@@ -4,7 +4,7 @@ model=dissl_nomulti
 
 ./dev/launch_slurm.sh \
     "$model"_dir \
-    config=pretrain/cntr/"$model" \
+    config=pretrain/dstl/"$model" \
     +config/server=remote_large \
     config.DISTRIBUTED.NUM_NODES=2 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
