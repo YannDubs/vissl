@@ -19,7 +19,6 @@ sbatch <<EOT
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
-sleep 6000
 
 # prepare your environment here
 source ~/.zshrc
