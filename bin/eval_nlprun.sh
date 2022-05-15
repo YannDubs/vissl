@@ -22,7 +22,7 @@ sbatch <<EOT
 
 # prepare your environment here
 source ~/.zshrc
-
+echo \$(which -p conda)
 
 # EXTRACT FEATURES
 echo "Feature directory : $feature_dir"
@@ -34,12 +34,7 @@ then
     echo "Features already present."
 else
     echo "featurizing."
-    echo \$(which python)
-    echo \$(which -p conda)
-    echo \$(which -p conda)
-    conda activate myvissl
-    echo \$(which python)
-    echo \$(which -p conda)
+    conda activate vissl
     bin/extract_features_sphinx.sh "$dir" "$sffx"
 fi
 
