@@ -26,9 +26,9 @@ source ~/.zshrc
 
 # EXTRACT FEATURES
 echo \$0
-echo "Feature directory : \$feature_dir"
+echo "Feature directory : $feature_dir"
 is_already_features=\$( python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk63*'))) > 0)" )
-echo "is_already_features: $is_already_features"
+echo "is_already_features: \$is_already_features"
 
 if [[ "$is_already_features" == "True" ]]
 then
