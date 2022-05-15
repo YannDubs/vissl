@@ -19,14 +19,10 @@ sbatch <<EOT
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
-echo ps -p \$\$
 
 # prepare your environment here
 source ~/.zshrc
 
-echo ps -p \$\$
-
-if [ -z "\$BASH" ] ;then echo "Not running with bash"; fi
 
 # EXTRACT FEATURES
 echo "Feature directory : $feature_dir"
@@ -40,7 +36,9 @@ else
     echo "featurizing."
     echo \$(which python)
     echo \$(which -p conda)
+    echo \$(which -p conda)
     conda activate myvissl
+    echo \$(which python)
     echo \$(which -p conda)
     bin/extract_features_sphinx.sh "$dir" "$sffx"
 fi
