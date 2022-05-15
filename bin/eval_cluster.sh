@@ -20,22 +20,24 @@ sbatch <<EOT
 
 # prepare your environment here
 source ~/.bashrc
+echo \$(which conda)
 
 # EXTRACT FEATURES
-echo "Feature directory : $feature_dir "
-is_already_features=$(python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk63*'))) > 0)")
-echo "is_already_features: $is_already_features"
+echo "Feature directory : $feature_dir"
+is_already_features=\$( python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk63*'))) > 0)" )
+echo "is_already_features: \$is_already_features"
 
-if [ "$is_already_features" == "True" ];
+if [[ "$is_already_features" == "True" ]]
 then
     echo "Features already present."
 else
     echo "featurizing."
     conda activate vissl
-    bin/extract_features_remote.sh "$dir" "$sffx"
+    bin/extract_features_sphinx.sh "$dir" "$sffx"
 fi
 
 # LINEAR EVAL
+echo "Linear eval."
 conda activate probing
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-6_l01_b2048 --weight-decay 3e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
@@ -55,5 +57,8 @@ python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path 
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-4_l01_bn_2048 --weight-decay 1e-4 --lr 0.1 --is-batchnorm --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval --is-no-progress-bar --is-monitor-test
 
-#rm -rf "$feature_dir"
+if [[ -f "$dir"/eval ]]; then
+    rm -rf "$feature_dir"
+fi
+
 EOT

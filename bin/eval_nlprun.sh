@@ -59,6 +59,8 @@ python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path 
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_bn_2048 --weight-decay 1e-5 --lr 0.1 --is-batchnorm --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval --is-no-progress-bar --is-monitor-test
 
-rm -rf "$feature_dir"
+if [[ -f "$dir"/eval ]]; then
+    rm -rf "$feature_dir"
+fi
 
 EOT
