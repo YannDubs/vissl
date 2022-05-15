@@ -7,6 +7,7 @@ Linear classification evaluation of pretrained features. Needs the following pac
 - (optional) scikit-learn-intelex
 - (optional) imbalanced-learn
 - (optional) iterative-stratification
+- (optional) lightning-bolts
 
 Eg of command to run:
 -  For hyper parameter tuning and balancing the losses:

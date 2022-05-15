@@ -21,7 +21,7 @@ sbatch <<EOT
 
 
 # prepare your environment here
-source ~/.zshrc
+source ~/.zshrc_nojuice
 echo \$(which -p conda)
 
 # EXTRACT FEATURES
