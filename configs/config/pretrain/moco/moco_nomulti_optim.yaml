@@ -73,42 +73,24 @@ config:
     name: moco_loss
     moco_loss:
       embedding_dim: 128
-      queue_size: 16384 # in the apper they say 16K doesn't lose much and mose is issue computationally
+      queue_size: 32768 # in the apper they say 16K doesn't lose much and mose is issue computationally
       momentum: 0.999
       temperature: 0.2
   OPTIMIZER:
     name: sgd
-    use_zero: False
-    use_larc: True
-    larc_config:
-      clip: False
-      trust_coefficient: 0.001
-      eps: 0.00000001
-    weight_decay: 0.000001
+    use_larc: False
+    weight_decay: 0.0001
     momentum: 0.9
-    nesterov: False
-    num_epochs: 100
-    # num_epochs: 400
+    nesterov: True
+    num_epochs: 200
     regularize_bn: True
     regularize_bias: True
     param_schedulers:
       lr:
-        auto_lr_scaling:
-          auto_scale: true
-          base_value: 0.3
-          base_lr_batch_size: 256
-        name: composite
-        schedulers:
-          - name: linear
-            start_value: 0.001
-            end_value: 4.8
-          - name: cosine
-            start_value: 4.8
-            end_value: 0.0000
-        update_interval: step
-        interval_scaling: [rescaled, fixed]
-        lengths: [0.1, 0.9]                 # 100ep
-        # lengths: [0.025, 0.975]           # 400ep
+        name: multistep
+        values: [ 0.03, 0.003, 0.0003 ]
+        milestones: [ 60, 80 ]
+        update_interval: epoch
   DISTRIBUTED:
     BACKEND: nccl
     NUM_NODES: 2    # gives batch size of 20
@@ -123,7 +105,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "moco_nomulti"
+    NAME: "moco_nomulti_optim"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
