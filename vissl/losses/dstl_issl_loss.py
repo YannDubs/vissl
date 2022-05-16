@@ -82,6 +82,7 @@ class DstlISSLCriterion(nn.Module):
                  beta_H_MlZ : float = 0.5,
                  beta_pM_unif: float = 1.9,
                  ema_weight_marginal : float = 0.7,
+                 warmup_beta_unif_iter: int = None  # haven't tried but might be worth
                 ):
         super(DstlISSLCriterion, self).__init__()
 
@@ -94,8 +95,12 @@ class DstlISSLCriterion(nn.Module):
         self.beta_pM_unif = beta_pM_unif
         self.beta_H_MlZ = beta_H_MlZ
         self.ema_weight_marginal = ema_weight_marginal
+        self.warmup_beta_unif_iter = warmup_beta_unif_iter
         self.dist_rank = get_rank()
         self.register_buffer("num_iteration", torch.zeros(1, dtype=int))
+
+        if self.beta_pM_unif >= self.beta_H_MlZ + 1:
+            logging.info(f"Theory suggests beta_pM_unif >= beta_H_MlZ + 1, which doesn't currently hold {beta_pM_unif} < {beta_H_MlZ + 1}.")
 
         if self.ema_weight_marginal is not None:
             # initialize running means with uniform
@@ -172,7 +177,16 @@ class DstlISSLCriterion(nn.Module):
             # try to balance the scaling in gradients due to running mean
             fit_pM_Unif = fit_pM_Unif / self.ema_weight_marginal
 
-        loss = CE_pMlz_qMlza + self.beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
+        if self.warmup_beta_unif_iter is not None and self.num_iteration < self.warmup_beta_unif_iter:
+            start_beta = self.beta_H_MlZ + 1
+            final_beta = self.beta_pM_unif
+            warming_factor = (1 + self.num_iteration) / self.warmup_beta_unif_iter
+            beta_pM_unif = start_beta + (final_beta - start_beta) * warming_factor
+        else:
+            beta_pM_unif = self.beta_pM_unif
+
+
+        loss = CE_pMlz_qMlza + beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
 
         if self.num_iteration % 200 == 0 and self.dist_rank == 0:
             logging.info(f"H[M]: {H_M.mean()}")

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-
+#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard17,jagupard20,jagupard30,jagupard31
 dir="$1"
 sffx="$2"
 mkdir -p "$dir"/eval_logs
@@ -14,8 +14,8 @@ sbatch <<EOT
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=16
-#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard17,jagupard20,jagupard30,jagupard31
-#SBATCH --mem=32G
+#SBATCH --mem=64G
+#SBATCH --nodelist=jagupard29
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
