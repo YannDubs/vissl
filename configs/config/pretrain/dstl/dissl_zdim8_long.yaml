@@ -72,13 +72,6 @@ config:
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
-      TEMP_FROZEN_PARAMS_ITER_MAP: [
-        [ 'module.heads.0.1.clf.0.weight', 919 ],
-        [ 'module.heads.0.1.clf.2.weight', 919 ],
-        [ 'module.heads.0.3.clf.0.weight', 313 ],
-        [ 'module.heads.0.3.clf.0.bias', 313 ],
-        [ 'module.heads.1.0.clf.0.weight', 919 ],
-      ]
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
