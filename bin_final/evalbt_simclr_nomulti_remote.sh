@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-model_name=swav_queue_bs
+model_name=simclr_nomulti
 base_dir="$model_name"_dir
 
 ./dev/launch_slurm.sh \
-    $base_dir/augevalsim \
-    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_simsiam \
+    $base_dir/augevalbt \
+    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_barlow \
     +config/server=remote_large \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
@@ -13,7 +13,7 @@ base_dir="$model_name"_dir
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE=$base_dir/checkpoints/model_final_checkpoint_phase99.torch \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=768 \
     config.DATA.NUM_DATALOADER_WORKERS=9 \
-    config.SLURM.PORT_ID=40091 \
+    config.SLURM.PORT_ID=40034 \
     config.SLURM.NAME=augeval_"$model_name" \
     config.SLURM.MEM_GB=166 \
     config.SLURM.NUM_CPU_PER_PROC=10 \
