@@ -71,8 +71,8 @@ config:
         Z_DIM_OLD_TMP_NEW: [ 2048, 512, 8192 ]
     HEAD:
       PARAMS: [
-        ["eval_mlp", {"in_channels": 2048, "dims": [2048, 1000]}],
-        ["mlp", {"dims": [2048, 1000]}],
+        ["eval_mlp", {"in_channels": 8192, "dims": [8192, 1000]}],
+        ["mlp", {"dims": [8192, 1000]}],
       ]
     WEIGHTS_INIT:
       PARAMS_FILE: "specify the model weights"
