@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+model_name=dissl_zdim8_nomult
+base_dir="$model_name"_dir
+
+./dev/launch_slurm.sh \
+    $base_dir/augevalsim \
+    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_simsiam \
+    +config/server=remote_large \
+    config.DISTRIBUTED.NUM_NODES=1 \
+    config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
+    config.DATA.TRAIN.DATA_PATHS=["./data/imagenet256/train"] \
+    config.MODEL.WEIGHTS_INIT.PARAMS_FILE=$base_dir/checkpoints/model_final_checkpoint_phase99.torch \
+    config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=1024 \
+    config.DATA.NUM_DATALOADER_WORKERS=6 \
+    config.SLURM.PORT_ID=40093 \
+    config.SLURM.NAME=augeval_"$model_name" \
+    config.SLURM.MEM_GB=166 \
+    config.SLURM.NUM_CPU_PER_PROC=10 \
+    config.SLURM.TIME_HOURS=120 \
