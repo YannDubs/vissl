@@ -4,7 +4,7 @@ model_name=swav_queue_bs
 base_dir="$model_name"_dir
 
 ./dev/launch_slurm.sh \
-    $base_dir/augeval \
+    $base_dir/evalsim \
     config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_simsiam \
     +config/server=remote_large \
     config.DISTRIBUTED.NUM_NODES=1 \
