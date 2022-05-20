@@ -5,7 +5,7 @@ model=swav_nomulti_long
 ./dev/launch_slurm.sh \
     "$model"_dir \
     config=pretrain/swav/"$model" \
-    +config/server=sphinx1 \
+    +config/server=sphinx1_std \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
