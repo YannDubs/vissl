@@ -16,7 +16,7 @@ sbatch <<EOT
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard15,jagupard16,jagupard17,jagupard18,jagupard19,jagupard20,jagupard30,jagupard31
+#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard15,jagupard16,jagupard17,jagupard18,jagupard19,jagupard20,jagupard28,jagupard30,jagupard31
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
