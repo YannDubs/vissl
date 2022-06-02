@@ -47,6 +47,8 @@ class DstlISSLLoss(ClassyLoss):
             beta_H_MlZ = self.loss_config.beta_H_MlZ,
             beta_pM_unif = self.loss_config.beta_pM_unif,
             ema_weight_marginal = self.loss_config.ema_weight_marginal,
+            warmup_teacher_iter = self.loss_config.warmup_teacher_iter,
+            warmup_beta_unif_iter = self.loss_config.warmup_beta_unif_iter
         )
 
     @classmethod
@@ -82,7 +84,8 @@ class DstlISSLCriterion(nn.Module):
                  beta_H_MlZ : float = 0.5,
                  beta_pM_unif: float = 1.9,
                  ema_weight_marginal : float = 0.7,
-                 warmup_beta_unif_iter: int = None  # haven't tried but might be worth
+                 warmup_beta_unif_iter: int = None,  # haven't tried but might be worth
+                 warmup_teacher_iter: int= None
                 ):
         super(DstlISSLCriterion, self).__init__()
 
@@ -96,6 +99,7 @@ class DstlISSLCriterion(nn.Module):
         self.beta_H_MlZ = beta_H_MlZ
         self.ema_weight_marginal = ema_weight_marginal
         self.warmup_beta_unif_iter = warmup_beta_unif_iter
+        self.warmup_teacher_iter = warmup_teacher_iter
         self.dist_rank = get_rank()
         self.register_buffer("num_iteration", torch.zeros(1, dtype=int))
 
@@ -185,6 +189,9 @@ class DstlISSLCriterion(nn.Module):
         else:
             beta_pM_unif = self.beta_pM_unif
 
+        if self.warmup_teacher_iter is not None and self.num_iteration < self.warmup_teacher_iter:
+            warming_factor = (1 + self.num_iteration) / self.warmup_teacher_iter
+            CE_pMlz_pMlza = CE_pMlz_pMlza * warming_factor
 
         loss = CE_pMlz_qMlza + beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
 
