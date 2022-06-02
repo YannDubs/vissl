@@ -178,7 +178,7 @@ class DstlISSLCriterion(nn.Module):
             fit_pM_Unif = fit_pM_Unif / self.ema_weight_marginal
 
         if self.warmup_beta_unif_iter is not None and self.num_iteration < self.warmup_beta_unif_iter:
-            start_beta = self.beta_H_MlZ + 1
+            start_beta = self.beta_H_MlZ
             final_beta = self.beta_pM_unif
             warming_factor = (1 + self.num_iteration) / self.warmup_beta_unif_iter
             beta_pM_unif = start_beta + (final_beta - start_beta) * warming_factor
