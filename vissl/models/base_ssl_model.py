@@ -64,8 +64,9 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         self.local_rank, _ = get_machine_local_and_dist_rank()
         self.trunk = self._get_trunk()
 
-        if self.model_config.AUX_TRUNK_NAME is not None:
-            self.aux_trunk = self._get_trunk(trunk_name=self.model_config.AUX_TRUNK_NAME)
+        # if self.model_config.AUX_TRUNK_NAME is not None:
+        #     self.aux_trunk = self._get_trunk(trunk_name=self.model_config.AUX_TRUNK_NAME)
+
 
         self.heads = nn.ModuleList()
         self.head_names = []
@@ -115,8 +116,8 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         if self.model_config.SINGLE_PASS_EVERY_CROP:
             idx_crops = torch.Tensor(list(range(1, 1 + len(batch)))).int()
 
-        if self.model_config.AUX_TRUNK_NAME is not None:
-            pass
+        # if self.model_config.AUX_TRUNK_NAME is not None:
+        #     pass
 
         for end_idx in idx_crops:
             feat = self.trunk(torch.cat(batch[start_idx:end_idx]), feature_names)
@@ -136,9 +137,10 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         assert isinstance(batch, (torch.Tensor, MultiDimensionalTensor)), type(batch)
         feats = self.trunk(batch, feature_names)
 
-        if self.model_config.AUX_TRUNK_NAME is not None:
-            # adding features from auxiliary trunk
-            feats += self.aux_trunk(batch, feature_names)
+        # if self.model_config.AUX_TRUNK_NAME is not None:
+        #     # adding features from auxiliary trunk
+        #     feats += self.aux_trunk(batch, feature_names)
+
         # if we are interested in evaluating the trunk only, we return the output of the trunk
         # and don't forward through the heads
         if (
