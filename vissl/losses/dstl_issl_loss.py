@@ -215,6 +215,8 @@ class DstlISSLCriterion(nn.Module):
             "beta_pM_unif": self.beta_pM_unif,
             "beta_H_MlZ": self.beta_H_MlZ,
             "ema_weight_marginal": self.ema_weight_marginal,
+            "warmup_beta_unif_iter": self.warmup_beta_unif_iter,
+            "warmup_teacher_iter": self.warmup_teacher_iter,
         }
         return pprint.pformat(repr_dict, indent=2)
 
