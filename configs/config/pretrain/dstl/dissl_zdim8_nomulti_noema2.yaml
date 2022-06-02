@@ -88,9 +88,8 @@ config:
       num_crops: 2 # automatically inferred from data transforms
       crops_for_assign: [ 0, 1 ]
       beta_pM_unif: 2.1 # 2.1
-      beta_H_MlZ: 0.5 # 0.5
+      beta_H_MlZ: 0.6 # 0.5
       ema_weight_marginal: null
-      warmup_beta_unif_iter: 3000
   OPTIMIZER:
     name: sgd
     use_zero: False
