@@ -22,11 +22,12 @@ POOL_OPS = {
 
 
 class FeatureExtractorModel(nn.Module):
-    def __init__(self, model_config: AttrDict):
+    def __init__(self, model_config: AttrDict, trunk_name=None):
         super(FeatureExtractorModel, self).__init__()
         logging.info("Creating Feature extractor trunk...")
         self.model_config = model_config
-        trunk_name = model_config["TRUNK"]["NAME"]
+        if trunk_name is None:
+            trunk_name = model_config["TRUNK"]["NAME"]
         self.base_model = get_model_trunk(trunk_name)(self.model_config, trunk_name)
         self.feature_pool_ops = self._attach_feature_pool_layers()
         self._freeze_model()
