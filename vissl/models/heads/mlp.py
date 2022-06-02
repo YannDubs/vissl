@@ -8,6 +8,7 @@ from typing import List
 import math
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from vissl.config import AttrDict
 from vissl.models.heads import register_model_head
 from vissl.utils.fsdp_utils import fsdp_auto_wrap_bn, fsdp_wrapper
@@ -44,7 +45,8 @@ class MLP(nn.Module):
         use_bias: bool = True,
         skip_last_layer_relu_bn: bool = True,
         is_JL_init : bool=False,
-        is_residual: bool=False
+        is_residual: bool=False,
+        is_cosine: bool=False
     ):
         """
         Args:
@@ -63,6 +65,7 @@ class MLP(nn.Module):
         """
         super().__init__()
         self.is_residual = is_residual
+        self.is_cosine = is_cosine
 
         if self.is_residual:
             assert dims[0] == dims[-1]
@@ -70,7 +73,10 @@ class MLP(nn.Module):
         layers = []
         last_dim = dims[0]
         for i, dim in enumerate(dims[1:]):
-            layers.append(nn.Linear(last_dim, dim, bias=use_bias))
+
+            Model = CosineLayer if self.is_cosine else nn.Linear
+            layers.append(Model(last_dim, dim, bias=use_bias))
+
             if i == len(dims) - 2 and skip_last_layer_relu_bn:
                 break
             if use_bn:
@@ -128,6 +134,25 @@ class MLP(nn.Module):
 
         return out
 
+
+class CosineLayer(nn.Module):
+    """Cosine similarity between inputs and weights."""
+    def __init__(self, in_dim, out_dim, bias=False):
+        super().__init__()
+        assert not bias
+        self.linear = nn.Linear(in_dim, out_dim, bias=bias)
+        self.linear = nn.utils.weight_norm(self.linear)
+        self.linear.weight_g.data.fill_(1)  # unit norm
+        self.linear.weight_g.requires_grad = False  # don't optimize norm
+        self._is_forward = False
+
+    def forward(self, X):
+        if not self._is_forward:
+            self.linear.weight_g.data.fill_(1) # in case vissl reinitalizes somewhere at some point
+        self._is_forward = True
+
+        unit_X = F.normalize(X, dim=-1, p=2)
+        return self.linear(unit_X)
 
 @register_model_head("identity")
 class Identity(nn.Identity):
