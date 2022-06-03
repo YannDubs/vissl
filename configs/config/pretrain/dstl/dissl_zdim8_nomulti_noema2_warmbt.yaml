@@ -91,6 +91,7 @@ config:
       beta_H_MlZ: 0.5 # 0.5
       ema_weight_marginal: null
       warmup_beta_unif_iter: 1000 # might need 3k instead
+      warmup_teacher_iter: 1000
   OPTIMIZER:
     name: sgd
     use_zero: False
@@ -138,7 +139,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_zdim8_nomulti_noema2_warmb"
+    NAME: "dissl_zdim8_nomulti_noema2_warmbt"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
