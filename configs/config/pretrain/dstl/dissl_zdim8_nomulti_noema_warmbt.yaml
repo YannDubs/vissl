@@ -69,7 +69,7 @@ config:
         ],
         [ # that's a low rank linear layer
           [ "mlp", { "dims": [ 8192, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": True } ],
-          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": False, "skip_last_layer_relu_bn": False, "is_cosine": True } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
     SYNC_BN_CONFIG:
@@ -139,7 +139,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_zdim8_nomulti_noema_cos_warmbt"
+    NAME: "dissl_zdim8_nomulti_noema_warmbt"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
