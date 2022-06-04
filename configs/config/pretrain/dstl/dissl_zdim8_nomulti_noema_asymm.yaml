@@ -54,6 +54,11 @@ config:
     name: ""
   MODEL:
     MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
+    AUX_TRUNK:
+      NAME: resnet
+      RESNETS:
+        DEPTH: 50
+        Z_DIM_OLD_TMP_NEW: null
     TRUNK:
       NAME: resnet
       RESNETS:
@@ -63,8 +68,7 @@ config:
       PARAMS: [
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
-          [ "mlp", { "dims": [ 512, 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True, "is_JL_init": True } ],
+          [ "mlp", { "dims": [ 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False,  "is_JL_init": True } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer

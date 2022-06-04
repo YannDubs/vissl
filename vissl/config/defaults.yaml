@@ -525,7 +525,6 @@ config:
     # we can optimize memory a bit by running forward pass through each crop
     # separately.
     SINGLE_PASS_EVERY_CROP: False
-    AUX_TRUNK_NAME: null
     # In case multi-resolution inputs, can run head on specific crops. By default run all heads on last
     # => return concatenation of crops[0,-1]
     MULTI_RES_SPLIT_CROPS: [ [0, null] ]
@@ -616,6 +615,14 @@ config:
       USE_GRAD_CLIP: False
       NORM_TYPE: 2 # Float, int, or 'inf'
       MAX_NORM: 1
+    # ----------------------------------------------------------------------------------- #
+    # MODEL AUX TRUNK
+    # ----------------------------------------------------------------------------------- #
+    AUX_TRUNK:
+      NAME: null
+      RESNETS:
+        Z_DIM_OLD_TMP_NEW: null
+
     # ----------------------------------------------------------------------------------- #
     # MODEL TRUNK
     # ----------------------------------------------------------------------------------- #

@@ -64,8 +64,8 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         self.local_rank, _ = get_machine_local_and_dist_rank()
         self.trunk = self._get_trunk()
 
-        # if self.model_config.AUX_TRUNK_NAME is not None:
-        #     self.aux_trunk = self._get_trunk(trunk_name=self.model_config.AUX_TRUNK_NAME)
+        if self.model_config.AUX_TRUNK.NAME is not None:
+            self.aux_trunk = self._get_trunk(trunk_name=self.model_config.AUX_TRUNK.NAME)
 
 
         self.heads = nn.ModuleList()
@@ -116,8 +116,9 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         if self.model_config.SINGLE_PASS_EVERY_CROP:
             idx_crops = torch.Tensor(list(range(1, 1 + len(batch)))).int()
 
-        # if self.model_config.AUX_TRUNK_NAME is not None:
-        #     pass
+        if self.model_config.AUX_TRUNK.NAME is not None:
+            breakpoint()
+            pass
 
         for end_idx in idx_crops:
             feat = self.trunk(torch.cat(batch[start_idx:end_idx]), feature_names)
@@ -137,9 +138,9 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         assert isinstance(batch, (torch.Tensor, MultiDimensionalTensor)), type(batch)
         feats = self.trunk(batch, feature_names)
 
-        # if self.model_config.AUX_TRUNK_NAME is not None:
-        #     # adding features from auxiliary trunk
-        #     feats += self.aux_trunk(batch, feature_names)
+        if self.model_config.AUX_TRUNK.NAME is not None:
+            # adding features from auxiliary trunk
+            feats += self.aux_trunk(batch, feature_names)
 
         # if we are interested in evaluating the trunk only, we return the output of the trunk
         # and don't forward through the heads
@@ -262,15 +263,18 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
 
         The trunks could be convnet (AlexNet, ResNe(X)t, RegNet,...etc), transformers etc.
         """
+        model_config = self.model_config
         # if we are going to evaluate trunk only we shift to feature extractor backbone
         if is_feature_extractor_model(self.model_config):
             self.eval_mode = True
-            return FeatureExtractorModel(self.model_config, trunk_name=trunk_name)
+            return FeatureExtractorModel(model_config, trunk_name=trunk_name)
         else:
             self.eval_mode = False
             if trunk_name is None:
-                trunk_name = self.model_config.TRUNK.NAME
-            return get_model_trunk(trunk_name)(self.model_config, trunk_name)
+                breakpoint()
+                trunk_name = model_config.AUX_TRUNK.NAME
+                model_config = model_config  # need to make the changes for aux
+            return get_model_trunk(trunk_name)(model_config, trunk_name)
 
     def _build_head_module(self, head_param):
         """
