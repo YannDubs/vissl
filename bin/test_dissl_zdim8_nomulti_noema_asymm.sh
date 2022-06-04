@@ -5,7 +5,7 @@ python3 tools/run_distributed_engines.py \
     config=pretrain/dstl/dissl_zdim8_nomulti_noema_asymm \
     config.DATA.TRAIN.DATASET_NAMES=[imagenet1k_folder] \
     config.DATA.TRAIN.DATA_SOURCES=[disk_folder] \
-    config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
+    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/imagenet256/train"] \
     config.CHECKPOINT.DIR="./test_dissl_zdim8_nomulti_noema_asymm/checkpoints" \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
