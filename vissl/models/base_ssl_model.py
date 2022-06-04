@@ -67,7 +67,6 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         self.trunk = self._get_trunk()
 
         if self.model_config.AUX_TRUNK.NAME is not None:
-            breakpoint()
             aux_model_config = copy.deepcopy(self.model_config)
             aux_model_config.TRUNK = dict_recursive_update(aux_model_config.TRUNK, aux_model_config.AUX_TRUNK)
             self.aux_trunk = self._get_trunk(model_config=aux_model_config)
@@ -113,23 +112,26 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
             0,
         )
 
-        feats = []
-        start_idx = 0
         # in order to optimize memory usage, we can do single pass per
         # crop as well. Set the flag to be true.
         if self.model_config.SINGLE_PASS_EVERY_CROP:
             idx_crops = torch.Tensor(list(range(1, 1 + len(batch)))).int()
 
-        if self.model_config.AUX_TRUNK.NAME is not None:
-            breakpoint()
-            pass
-
+        feats = []
+        start_idx = 0
         for end_idx in idx_crops:
             feat = self.trunk(torch.cat(batch[start_idx:end_idx]), feature_names)
             start_idx = end_idx
             assert len(feat) == 1
             feats.append(feat[0])
         multi_feats = [torch.cat(feats[start:end]) for start, end in self.model_config.MULTI_RES_SPLIT_CROPS]
+
+        if self.model_config.AUX_TRUNK.NAME is not None:
+            # currently works if teacher is only for the first resolution
+            assert self.model_config.MULTI_RES_SPLIT_CROPS[0] == [0,1]
+            aux_feat = self.aux_trunk(torch.cat(batch[:idx_crops[0]]), feature_names)[0]
+            multi_feats[0] = aux_feat
+
         return self.heads_forward(multi_feats, self.heads)
 
     def single_input_forward(self, batch, feature_names, heads):
@@ -143,6 +145,7 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         feats = self.trunk(batch, feature_names)
 
         if self.model_config.AUX_TRUNK.NAME is not None:
+            # TO TEST
             # adding features from auxiliary trunk
             feats += self.aux_trunk(batch, feature_names)
 
