@@ -28,7 +28,9 @@ from vissl.utils.checkpoint import (
 )
 from vissl.utils.env import get_machine_local_and_dist_rank
 from vissl.utils.fsdp_utils import fsdp_recursive_reset_lazy_init
-from vissl.utils.misc import set_torch_seed
+from vissl.utils.misc import set_torch_seed, dict_recursive_update
+
+
 
 
 @register_model("multi_input_output_model")
@@ -65,8 +67,10 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         self.trunk = self._get_trunk()
 
         if self.model_config.AUX_TRUNK.NAME is not None:
-            self.aux_trunk = self._get_trunk(trunk_name=self.model_config.AUX_TRUNK.NAME)
-
+            breakpoint()
+            aux_model_config = copy.deepcopy(self.model_config)
+            aux_model_config.TRUNK = dict_recursive_update(aux_model_config.TRUNK, aux_model_config.AUX_TRUNK)
+            self.aux_trunk = self._get_trunk(model_config=aux_model_config)
 
         self.heads = nn.ModuleList()
         self.head_names = []
@@ -257,23 +261,22 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         feats = self.trunk(batch)
         return feats
 
-    def _get_trunk(self, trunk_name=None):
+    def _get_trunk(self, model_config=None):
         """
         Construct the model trunk given the architecture specified
 
         The trunks could be convnet (AlexNet, ResNe(X)t, RegNet,...etc), transformers etc.
         """
-        model_config = self.model_config
+        if model_config is None:
+            model_config = self.model_config
+
         # if we are going to evaluate trunk only we shift to feature extractor backbone
-        if is_feature_extractor_model(self.model_config):
+        if is_feature_extractor_model(model_config):
             self.eval_mode = True
-            return FeatureExtractorModel(model_config, trunk_name=trunk_name)
+            return FeatureExtractorModel(model_config)
         else:
             self.eval_mode = False
-            if trunk_name is None:
-                breakpoint()
-                trunk_name = model_config.AUX_TRUNK.NAME
-                model_config = model_config  # need to make the changes for aux
+            trunk_name = model_config.TRUNK.NAME
             return get_model_trunk(trunk_name)(model_config, trunk_name)
 
     def _build_head_module(self, head_param):

@@ -6,6 +6,7 @@
 import collections
 import logging
 import os
+import collections.abc
 import random
 import sys
 import tempfile
@@ -265,6 +266,17 @@ def set_rng_state(state):
     torch.set_rng_state(state["torch_rng_state"])
     if torch.cuda.is_available():
         torch.cuda.set_rng_state(state["cuda_rng_state"])
+
+def dict_recursive_update(original, update):
+    """Recursively update a dict."""
+    if not isinstance(original, collections.abc.Mapping):
+        return update
+    for key, value in update.items():
+        if isinstance(value, collections.abc.Mapping):
+            original[key] = dict_recursive_update(original.get(key, {}), value)
+        else:
+            original[key] = value
+    return original
 
 
 class set_torch_seed(object):
