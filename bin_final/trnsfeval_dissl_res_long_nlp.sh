@@ -4,7 +4,7 @@ model_name=dissl_zdim8_long
 base_dir="$model_name"_dir
 
 ./dev/launch_slurm.sh \
-    $base_dir/augeval \
+    $base_dir/trsnfeval \
     config=benchmark/linear_image_classification/cifar10/eval_resnet_8gpu_transfer_cifar10_linear \
     +config/server=sphinx2_4gpu \
     config.DISTRIBUTED.NUM_NODES=1 \
