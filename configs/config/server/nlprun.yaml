@@ -1,0 +1,5 @@
+# @package _global_
+config:
+    IS_NLP_CLUSTER: True
+    SLURM:
+        PARTITION: jag-standard
