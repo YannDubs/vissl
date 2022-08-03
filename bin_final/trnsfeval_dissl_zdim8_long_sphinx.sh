@@ -15,3 +15,17 @@ base_dir="$model_name"_dir
     config.SLURM.PORT_ID=40092 \
     config.SLURM.MEM_GB=300 \
     config.SLURM.NUM_CPU_PER_PROC=16 \
+
+
+./dev/launch_slurm.sh \
+    $base_dir/trsnfeval/dtd \
+    config=benchmark/linear_image_classification/dtd/eval_resnet_transfer_dtd_linear_z8 \
+    +config/server=sphinx1_4gpu \
+    config.DISTRIBUTED.NUM_NODES=1 \
+    config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
+    config.MODEL.WEIGHTS_INIT.PARAMS_FILE=$base_dir/checkpoints/model_final_checkpoint_phase399.torch \
+    config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=196 \
+    config.DATA.NUM_DATALOADER_WORKERS=15 \
+    config.SLURM.PORT_ID=40092 \
+    config.SLURM.MEM_GB=300 \
+    config.SLURM.NUM_CPU_PER_PROC=16 \

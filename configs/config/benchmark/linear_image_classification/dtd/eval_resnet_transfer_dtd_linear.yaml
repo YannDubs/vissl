@@ -15,8 +15,8 @@ config:
     TRAIN:
       DATA_SOURCES: [ disk_folder ]
       LABEL_SOURCES: [ disk_folder ]
-      DATASET_NAMES: [ caltech101_folder ]
-      DATA_PATHS: [ "./data/caltech101/train" ]
+      DATASET_NAMES: [ dtd_folder ]
+      DATA_PATHS: [ "./data/DTD/train" ]
       BATCHSIZE_PER_REPLICA: 96
       TRANSFORMS:
         - name: RandomResizedCrop
@@ -28,12 +28,12 @@ config:
           std: [0.229, 0.224, 0.225]
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
-      COPY_DESTINATION_DIR: /tmp/caltech101/
+      COPY_DESTINATION_DIR: /tmp/dtd/
     TEST:
       DATA_SOURCES: [ disk_folder ]
       LABEL_SOURCES: [ disk_folder ]
-      DATASET_NAMES: [ caltech101_folder ]
-      DATA_PATHS: [ "./data/caltech101/test" ]
+      DATASET_NAMES: [ dtd_folder ]
+      DATA_PATHS: [ "./data/DTD/test" ]
       BATCHSIZE_PER_REPLICA: 96
       TRANSFORMS:
         - name: Resize
@@ -46,7 +46,7 @@ config:
           std: [0.229, 0.224, 0.225]
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
-      COPY_DESTINATION_DIR: /tmp/caltech101/
+      COPY_DESTINATION_DIR: /tmp/dtd/
   METERS:
     name: accuracy_list_meter
     accuracy_list_meter:
@@ -70,8 +70,8 @@ config:
         IS_SKIP_RESIZER: False
     HEAD:
       PARAMS: [
-        [ "eval_mlp", { "in_channels": 2048, "dims": [ 2048, 102 ] } ],
-        [ "mlp", { "dims": [ 2048, 102 ] } ],
+        [ "eval_mlp", { "in_channels": 2048, "dims": [ 2048, 47 ] } ],
+        [ "mlp", { "dims": [ 2048, 47 ] } ],
       ]
     WEIGHTS_INIT:
       PARAMS_FILE: "specify the model weights"
@@ -121,7 +121,7 @@ config:
     CHECKPOINT_FREQUENCY: 5
 
   SLURM:
-    NAME: "eval_caltech_linear"
+    NAME: "eval_dtd_linear"
     MEM_GB: 96 #  3 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 24
