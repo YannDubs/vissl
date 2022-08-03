@@ -102,7 +102,7 @@ config:
         lr:
           auto_lr_scaling:
             auto_scale: true
-            base_value: 0.01
+            base_value: 0.1
             base_lr_batch_size: 256
           name: multistep
           values: [0.01, 0.001, 0.0001, 0.00001]
@@ -122,7 +122,7 @@ config:
     CHECKPOINT_FREQUENCY: 5
 
   SLURM:
-    NAME: "eval_cifar10_linear_z8"
+    NAME: "eval_caltech_linear_z8"
     MEM_GB: 96 #  3 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 24
