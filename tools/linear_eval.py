@@ -640,7 +640,7 @@ def get_sklearn_clf(cfg, seed):
         clf = LinearSVC(dual=False, **shared_kwargs)
     else:
         # don't use parallel if parallelize over hyperparameters or multi output already
-        n_jobs = None if (cfg.is_validation or is_multilabel_tgt) else -1
+        n_jobs = None if (is_multilabel_tgt) else -1 #cfg.is_validation or
         clf = LogisticRegression(
             solver="lbfgs",
             max_iter=400,
