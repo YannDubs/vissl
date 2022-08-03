@@ -26,6 +26,6 @@ base_dir="$model_name"_dir
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE=$base_dir/checkpoints/model_final_checkpoint_phase399.torch \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=2048 \
     config.DATA.NUM_DATALOADER_WORKERS=31 \
-    config.SLURM.PORT_ID=40093 \
+    config.SLURM.PORT_ID=40094 \
     config.SLURM.MEM_GB=200 \
     config.SLURM.NUM_CPU_PER_PROC=32 \
