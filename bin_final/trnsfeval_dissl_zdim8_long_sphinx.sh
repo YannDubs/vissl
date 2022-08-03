@@ -4,7 +4,7 @@ model_name=dissl_zdim8_long
 base_dir="$model_name"_dir
 
 ./dev/launch_slurm.sh \
-    $base_dir/trsnfeval/dtd \
+    $base_dir/trsnfeval/caltech \
     config=benchmark/linear_image_classification/caltech101/eval_resnet_transfer_caltech_linear_z8 \
     +config/server=sphinx1_2gpu \
     config.DISTRIBUTED.NUM_NODES=1 \
