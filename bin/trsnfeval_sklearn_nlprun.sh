@@ -44,8 +44,6 @@ fi
 # LINEAR EVAL
 echo "Linear eval."
 conda activate probing
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_sklearn --is-sklearn --is-no-progress-bar
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_svm --is-sklearn --is-no-progress-bar --is-svm
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_sklearn_hyper --is-sklearn --is-no-progress-bar --is-validation
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_svm_hyper --is-sklearn --is-no-progress-bar --is-svm --is-validation
 

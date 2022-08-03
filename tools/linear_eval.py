@@ -409,7 +409,7 @@ def train(train_dataset, val_dataset, cfg, seed):
                 param_space,
                 scoring=make_scorer(accuracy, is_balance=is_balance_val),
                 # MultiOutputClassifier already uses parallel
-                n_jobs=None if train_dataset.is_multilabel_tgt else -1,
+                n_jobs=None,# if train_dataset.is_multilabel_tgt else -1,
                 cv=PredefinedSplit(
                     [-1] * len(train_dataset.Z) + [0] * len(val_dataset.Z)
                 ),
