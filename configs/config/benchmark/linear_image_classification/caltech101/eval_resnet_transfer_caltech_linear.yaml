@@ -68,11 +68,10 @@ config:
       RESNETS:
         DEPTH: 50
         IS_SKIP_RESIZER: False
-        Z_DIM_OLD_TMP_NEW: [ 2048, 512, 8192 ]
     HEAD:
       PARAMS: [
-        [ "eval_mlp", { "in_channels": 8192, "dims": [ 8192, 102 ] } ],
-        [ "mlp", { "dims": [ 8192, 102 ] } ],
+        [ "eval_mlp", { "in_channels": 2048, "dims": [ 2048, 102 ] } ],
+        [ "mlp", { "dims": [ 2048, 102 ] } ],
       ]
     WEIGHTS_INIT:
       PARAMS_FILE: "specify the model weights"
