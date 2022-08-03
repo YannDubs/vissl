@@ -959,7 +959,7 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
         help="Whether to use a validation set => hyperparameter tuning. If yes you will use:"
-        "valid data if available split else  10%% of the original training data.",
+        "valid data if available split else 10% of the original training data.",
     )
     # NB : using a validation set is not realistic when train_size small (because validation would be larger than train)
     train_args.add_argument(
@@ -1047,7 +1047,7 @@ if __name__ == "__main__":
         "--no-scale-features",
         default=False,
         action="store_true",
-        help="Whether not to min max scale the features before classifier. Not that still linear.",
+        help="Whether not to min max scale the features before classifier. Note that still linear.",
     )
     sk_args.add_argument(
         "--sk-validate-param",

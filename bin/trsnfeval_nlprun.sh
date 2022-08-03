@@ -7,7 +7,7 @@ sffx="$2"
 data="$3"
 mkdir -p "$dir"/eval_logs
 mkdir -p "$dir"/trnsf/"$data"
-echo "Evaluating" "$dir" "$sffx"
+echo "Evaluating" "$dir" "$sffx" "on" "$data"
 feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
 
 sbatch <<EOT
