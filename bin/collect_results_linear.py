@@ -9,7 +9,7 @@ paths += list(DIR.glob("eval/model_*/**/train_size_-1/seed_0/all_metrics.csv"))
 
 results = dict()
 for p in paths:
-    eval_dir = str(p).split("/")[1]
+    eval_dir = str(p).split("eval_")[1].split("/")[0]
     results[eval_dir] = pd.read_csv(p, index_col=0)[[METRIC]].T
 
 all_results = pd.concat(results).droplevel(1)
