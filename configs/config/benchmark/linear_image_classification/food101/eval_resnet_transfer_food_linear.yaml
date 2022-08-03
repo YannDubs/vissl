@@ -116,7 +116,7 @@ config:
   CHECKPOINT:
     DIR: "."
     AUTO_RESUME: True
-    CHECKPOINT_FREQUENCY: 5
+    CHECKPOINT_FREQUENCY: 100
 
   SLURM:
     NAME: "eval_food_linear"
