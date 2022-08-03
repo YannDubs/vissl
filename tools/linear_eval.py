@@ -207,7 +207,7 @@ def main(cfg):
                     predictions_path = dir_seed / PRED_FILENAME.format(split=name)
 
                     logging.info(
-                        f"Predicting {name} and saving Y,Yhat,(Yhat_score) to {predictions_path}."
+                        f"Predicting {name}." # and saving Y,Yhat,(Yhat_score) to {predictions_path}."
                     )
                     Yhat, Yhat_score, Y = predict(trainer, dataset, cfg.is_sklearn)
                     to_save = dict(Yhat=Yhat, Y=Y)

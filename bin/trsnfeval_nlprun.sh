@@ -29,7 +29,7 @@ echo \$(which -p conda)
 
 # EXTRACT FEATURES
 echo "Feature directory : $feature_dir"
-is_already_features=\$( python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk63*'))) > 0)" )
+is_already_features=\$( python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk0*'))) > 0)" )
 echo "is_already_features: \$is_already_features"
 
 if [[ "\$is_already_features" == "True" ]]
@@ -38,7 +38,7 @@ then
 else
     echo "featurizing."
     conda activate vissl
-    bin/extract_trsnf_features_sphinx.sh "$dir" "$sffx" "$data"
+    bin/extract_trnsf_features_sphinx.sh "$dir" "$sffx" "$data"
 fi
 
 # LINEAR EVAL
