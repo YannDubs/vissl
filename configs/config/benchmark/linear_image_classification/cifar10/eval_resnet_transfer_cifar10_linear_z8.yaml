@@ -77,7 +77,7 @@ config:
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
-        GROUP_SIZE: -1
+      GROUP_SIZE: -1
     AMP_PARAMS:
       USE_AMP: True
       AMP_TYPE: pytorch
