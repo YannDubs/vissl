@@ -18,8 +18,8 @@ sbatch <<EOT
 #SBATCH --job-name=eval_"$dir""$sffx"_"$data"
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=32
-#SBATCH --mem=120G
-#SBATCH --nodelist=john5
+#SBATCH --mem=220G
+#SBATCH --nodelist=john10
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
