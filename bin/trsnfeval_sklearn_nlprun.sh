@@ -16,7 +16,6 @@ feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
 sbatch <<EOT
 #!/usr/bin/env zsh
 #SBATCH --job-name=eval_"$dir""$sffx"_"$data"
-#SBATCH --gres=gpu:0
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=120G
