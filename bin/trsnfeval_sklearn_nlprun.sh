@@ -23,6 +23,8 @@ sbatch <<EOT
 #SBATCH --output="$dir"/eval_logs/"$data"/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/"$data"/slurm-%j.err
 
+echo /u/scr/nlp/data/features_issl/"\$dir"/"\$data"/
+
 mkdir -p /scr/biggest/yanndubs/"\$dir"/features/
 cp -r  /u/scr/nlp/data/features_issl/"\$dir"/"\$data"/ /scr/biggest/yanndubs/"\$dir"/features/
 
