@@ -10,8 +10,8 @@ mkdir -p "$dir"/trnsf/"$data"
 echo "Evaluating" "$dir" "$sffx" "on" "$data"
 feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
 
-mkdir -p /john5/scr1/yanndubs/dissl_zdim8_long_dir/features/"$data"/
-cp -r /jagupard25/scr0/yanndubs/dissl_zdim8_long_dir/features/"$data"/model_final_checkpoint_phase399/ /john5/scr1/yanndubs/dissl_zdim8_long_dir/features/"$data"/
+mkdir -p /u/scr/nlp/data/features_issl/$dir/$data
+cp -r /jagupard25/scr0/yanndubs/dissl_zdim8_long_dir/features/"$data"/model_final_checkpoint_phase399/ /u/scr/nlp/data/features_issl/$dir/$data
 
 sbatch <<EOT
 #!/usr/bin/env zsh
@@ -25,6 +25,7 @@ sbatch <<EOT
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
+cp -r  /u/scr/nlp/data/features_issl/"\$dir"/"\$data"/model_final_checkpoint_phase399/ /scr/biggest/yanndubs/"\$dir"/features/"\$data"
 
 # prepare your environment here
 source ~/.zshrc_nojuice
