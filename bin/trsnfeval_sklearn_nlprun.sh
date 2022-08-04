@@ -9,8 +9,8 @@ mkdir -p "$dir"/eval_logs
 mkdir -p "$dir"/trnsf/"$data"
 echo "Evaluating" "$dir" "$sffx" "on" "$data"
 feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
-mkdir -p "$feature_dir"
 
+mkdir -p /john5/scr1/yanndubs/dissl_zdim8_long_dir/features/"$data"/
 cp -r /jagupard25/scr0/yanndubs/dissl_zdim8_long_dir/features/"$data"/model_final_checkpoint_phase399/ /john5/scr1/yanndubs/dissl_zdim8_long_dir/features/"$data"/
 
 sbatch <<EOT
