@@ -10,8 +10,8 @@ mkdir -p "$dir"/trnsf/"$data"
 echo "Evaluating" "$dir" "$sffx" "on" "$data"
 feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
 
-mkdir -p /u/scr/nlp/data/features_issl/$dir
-cp -r /jagupard25/scr0/yanndubs/dissl_zdim8_long_dir/features/ /u/scr/nlp/data/features_issl/$dir
+#mkdir -p /u/scr/nlp/data/features_issl/$dir
+#cp -r /jagupard25/scr0/yanndubs/dissl_zdim8_long_dir/features/ /u/scr/nlp/data/features_issl/$dir
 
 sbatch <<EOT
 #!/usr/bin/env zsh
