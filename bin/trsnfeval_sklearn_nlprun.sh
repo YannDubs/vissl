@@ -16,9 +16,9 @@ feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
 sbatch <<EOT
 #!/usr/bin/env zsh
 #SBATCH --job-name=eval_"$dir""$sffx"_"$data"
-#SBATCH --qos=normal
+#SBATCH --partition=john
 #SBATCH --cpus-per-task=32
-#SBATCH --mem=220G
+#SBATCH --mem=128G
 #SBATCH --nodelist=john10
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
