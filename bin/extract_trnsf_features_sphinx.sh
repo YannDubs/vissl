@@ -10,8 +10,7 @@ OUT_DIR="/scr/biggest/yanndubs/$EXP_ROOT_DIR/features/$DATA/$BASE_PARAMS"
 
 mkdir -p $OUT_DIR
 
-if  [[ "$DATA" == "sun397" ]]
-then
+if  [[ "$DATA" == "sun397" ]]; then
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet_nocrop"$SFFX" \
@@ -21,6 +20,26 @@ then
     config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/test_images.npy"] \
     config.DATA.TEST.LABEL_PATHS=["./data/biggest/$DATA/test_labels.npy"] \
     config.DATA.TEST.DATASET_NAMES=["$DATA"_filelist] \
+    config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
+    config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
+    config.DISTRIBUTED.NUM_NODES=1 \
+    config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
+    config.SLURM.USE_SLURM=False
+elif  [[ "$DATA" == "CIFAR10" || "$DATA" == "CIFAR100" ]]; then
+
+  if  [[ "$DATA" == "CIFAR10" ]]; then
+    dataset_dir="cifar-10-batches-py"
+  elif [[ "$DATA" == "CIFAR100" ]]; then
+    dataset_dir="cifar-100-batches-py"
+  fi
+
+  python3 tools/run_distributed_engines.py \
+    hydra.verbose=true \
+    config=feature_extraction/extract_resnet_nocrop"$SFFX" \
+    config.DATA.TRAIN.DATASET_NAMES=["$DATA"] \
+    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/$dataset_dir"] \
+    config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/$dataset_dir"] \
+    config.DATA.TEST.DATASET_NAMES=["$DATA"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \
