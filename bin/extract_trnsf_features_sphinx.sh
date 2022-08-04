@@ -17,9 +17,9 @@ if  [[ "$DATA" == "sun397" ]]; then
     config.DATA.TRAIN.DATASET_NAMES=["$DATA"_filelist] \
     config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/train_images.npy"] \
     config.DATA.TRAIN.LABEL_PATHS=["./data/biggest/$DATA/train_labels.npy"] \
+    config.DATA.TEST.DATASET_NAMES=["$DATA"_filelist] \
     config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/test_images.npy"] \
     config.DATA.TEST.LABEL_PATHS=["./data/biggest/$DATA/test_labels.npy"] \
-    config.DATA.TEST.DATASET_NAMES=["$DATA"_filelist] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \
@@ -29,17 +29,19 @@ elif  [[ "$DATA" == "cifar10" || "$DATA" == "cifar100" ]]; then
 
   if  [[ "$DATA" == "cifar10" ]]; then
     dataset_dir="cifar-10-batches-py"
+    dataset_name="CIAR10"
   elif [[ "$DATA" == "cifar100" ]]; then
     dataset_dir="cifar-100-batches-py"
+    dataset_name="CIAR100"
   fi
 
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet_nocrop"$SFFX" \
-    config.DATA.TRAIN.DATASET_NAMES=["$DATA"] \
+    config.DATA.TEST.DATASET_NAMES=["$dataset_name"] \
+    config.DATA.TRAIN.DATASET_NAMES=["$dataset_name"] \
     config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/$dataset_dir"] \
     config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/$dataset_dir"] \
-    config.DATA.TEST.DATASET_NAMES=["$DATA"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \
@@ -49,6 +51,8 @@ else
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet"$SFFX" \
+    config.DATA.TEST.DATASET_NAMES=["$DATA"_folder] \
+    config.DATA.TRAIN.DATASET_NAMES=["$DATA"_folder] \
     config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/train"] \
     config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/test"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
