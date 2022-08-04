@@ -12,14 +12,19 @@ mkdir -p $OUT_DIR
 
 if  [[ "$DATA" == "sun397" ]]
 then
-  ls ./data/biggest/$DATA/
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet"$SFFX" \
+    config.DATA.TRAIN.DATA_SOURCES=[disk_filelist] \
+    config.DATA.TRAIN.LABEL_SOURCES=[disk_filelist] \
+    config.DATA.TRAIN.DATASET_NAMES=[sun397_filelist] \
     config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/train_images.npy"] \
     config.DATA.TRAIN.LABEL_PATHS=["./data/biggest/$DATA/train_labels.npy"] \
     config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/test_images.npy"] \
     config.DATA.TEST.LABEL_PATHS=["./data/biggest/$DATA/test_labels.npy"] \
+    config.DATA.TEST.DATA_SOURCES=[disk_filelist] \
+    config.DATA.TEST.LABEL_SOURCES=[disk_filelist] \
+    config.DATA.TEST.DATASET_NAMES=[sun397_filelist] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \
