@@ -19,8 +19,8 @@ sbatch <<EOT
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
 #SBATCH --nodelist=jagupard25
-#SBATCH --output="$dir"/eval_logs/slurm-%j.out
-#SBATCH --error="$dir"/eval_logs/slurm-%j.err
+#SBATCH --output="$dir"/eval_logs/"$data"/slurm-%j.out
+#SBATCH --error="$dir"/eval_logs/"$data"/slurm-%j.err
 
 
 # prepare your environment here
