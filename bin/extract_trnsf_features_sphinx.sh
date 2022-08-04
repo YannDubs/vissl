@@ -37,7 +37,7 @@ elif  [[ "$DATA" == "cifar10" || "$DATA" == "cifar100" ]]; then
 
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
-    config=feature_extraction/extract_resnet_nocrop"$SFFX" \
+    config=feature_extraction/extract_resnet_torchvision"$SFFX" \
     config.DATA.TEST.DATASET_NAMES=["$dataset_name"] \
     config.DATA.TRAIN.DATASET_NAMES=["$dataset_name"] \
     config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$dataset_dir/"] \
