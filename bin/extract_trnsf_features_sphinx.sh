@@ -12,7 +12,7 @@ mkdir -p $OUT_DIR
 
 if  [[ "$DATA" == "sun397" ]]
 then
-  echo "sun397"
+  ls ./data/biggest/$DATA/
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet"$SFFX" \
@@ -29,7 +29,7 @@ else
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet"$SFFX" \
-    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/train/"] \
+    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/train"] \
     config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/test"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
