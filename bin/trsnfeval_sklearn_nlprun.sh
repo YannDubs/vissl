@@ -9,16 +9,19 @@ mkdir -p "$dir"/eval_logs
 mkdir -p "$dir"/trnsf/"$data"
 echo "Evaluating" "$dir" "$sffx" "on" "$data"
 feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
+mkdir -p "$feature_dir"
+
+cp -r /jagupard25/scr0/yanndubs/dissl_zdim8_long_dir/features/"$data"/model_final_checkpoint_phase399/ /john5/scr1/yanndubs/dissl_zdim8_long_dir/features/"$data"/
 
 sbatch <<EOT
 #!/usr/bin/env zsh
 #SBATCH --job-name=eval_"$dir""$sffx"_"$data"
-#SBATCH --partition=jag-standard
-#SBATCH --gres=gpu:1
+#SBATCH --partition=john-standard
+#SBATCH --gres=gpu:0
 #SBATCH --qos=normal
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
-#SBATCH --nodelist=jagupard25
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=120G
+#SBATCH --nodelist=john5
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 

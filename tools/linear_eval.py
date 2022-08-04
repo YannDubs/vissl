@@ -396,7 +396,7 @@ def train(train_dataset, val_dataset, cfg, seed):
             param_space = dict()
             for param in cfg.sk_validate_param:
                 if param == "C":
-                    param_space[f"{prfx}C"] = loguniform(1e-3, 10)
+                    param_space[f"{prfx}C"] = loguniform(1e-4, 100)
                 elif param == "penalty":
                     param_space[f"{prfx}penalty"] = ["l1", "l2"]
 
@@ -643,7 +643,7 @@ def get_sklearn_clf(cfg, seed):
         n_jobs = None if (is_multilabel_tgt) else -1 #cfg.is_validation or
         clf = LogisticRegression(
             solver="lbfgs",
-            max_iter=400,
+            max_iter=1000,
             n_jobs=n_jobs,
             warm_start=True,
             **shared_kwargs,
@@ -965,7 +965,7 @@ if __name__ == "__main__":
     train_args.add_argument(
         "--n-hyper-param",
         type=int,
-        default=5,
+        default=10,
         help="Number of parameters to sample when performing validation.",
     )
 
