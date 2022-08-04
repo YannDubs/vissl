@@ -25,11 +25,11 @@ if  [[ "$DATA" == "sun397" ]]; then
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
     config.SLURM.USE_SLURM=False
-elif  [[ "$DATA" == "CIFAR10" || "$DATA" == "CIFAR100" ]]; then
+elif  [[ "$DATA" == "cifar10" || "$DATA" == "cifar100" ]]; then
 
-  if  [[ "$DATA" == "CIFAR10" ]]; then
+  if  [[ "$DATA" == "cifar10" ]]; then
     dataset_dir="cifar-10-batches-py"
-  elif [[ "$DATA" == "CIFAR100" ]]; then
+  elif [[ "$DATA" == "cifar100" ]]; then
     dataset_dir="cifar-100-batches-py"
   fi
 
