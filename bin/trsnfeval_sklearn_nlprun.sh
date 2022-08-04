@@ -26,7 +26,7 @@ sbatch <<EOT
 mkdir -p /scr/biggest/yanndubs/"\$dir"/features/
 cp -r  /u/scr/nlp/data/features_issl/"\$dir"/"\$data"/ /scr/biggest/yanndubs/"\$dir"/features/
 
-echo \$(/scr/biggest/yanndubs/"\$dir"/features/)
+ls /scr/biggest/yanndubs/"\$dir"/features/
 
 # prepare your environment here
 source ~/.zshrc_nojuice
