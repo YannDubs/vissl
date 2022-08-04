@@ -5,7 +5,7 @@
 dir="$1"
 sffx="$2"
 data="$3"
-mkdir -p "$dir"/eval_logs
+mkdir -p "$dir"/eval_logs/"$data"
 mkdir -p "$dir"/trnsf/"$data"
 echo "Evaluating" "$dir" "$sffx" "on" "$data"
 feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
@@ -20,11 +20,13 @@ sbatch <<EOT
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=128G
 #SBATCH --nodelist=john10
-#SBATCH --output="$dir"/eval_logs/slurm-%j.out
-#SBATCH --error="$dir"/eval_logs/slurm-%j.err
+#SBATCH --output="$dir"/eval_logs/"$data"/slurm-%j.out
+#SBATCH --error="$dir"/eval_logs/"$data"/slurm-%j.err
 
 mkdir -p /scr/biggest/yanndubs/"\$dir"/features/
 cp -r  /u/scr/nlp/data/features_issl/"\$dir"/"\$data"/ /scr/biggest/yanndubs/"\$dir"/features/
+
+echo \$(/scr/biggest/yanndubs/"\$dir"/features/)
 
 # prepare your environment here
 source ~/.zshrc_nojuice
