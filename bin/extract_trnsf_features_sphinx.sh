@@ -29,10 +29,10 @@ elif  [[ "$DATA" == "cifar10" || "$DATA" == "cifar100" ]]; then
 
   if  [[ "$DATA" == "cifar10" ]]; then
     dataset_dir="cifar-10-batches-py"
-    dataset_name="CIAR10"
+    dataset_name="CIFAR10"
   elif [[ "$DATA" == "cifar100" ]]; then
     dataset_dir="cifar-100-batches-py"
-    dataset_name="CIAR100"
+    dataset_name="CIFAR100"
   fi
 
   python3 tools/run_distributed_engines.py \
