@@ -40,8 +40,8 @@ elif  [[ "$DATA" == "cifar10" || "$DATA" == "cifar100" ]]; then
     config=feature_extraction/extract_resnet_nocrop"$SFFX" \
     config.DATA.TEST.DATASET_NAMES=["$dataset_name"] \
     config.DATA.TRAIN.DATASET_NAMES=["$dataset_name"] \
-    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$dataset_dir"] \
-    config.DATA.TEST.DATA_PATHS=["./data/biggest/$dataset_dir"] \
+    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$dataset_dir/"] \
+    config.DATA.TEST.DATA_PATHS=["./data/biggest/$dataset_dir/"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \
