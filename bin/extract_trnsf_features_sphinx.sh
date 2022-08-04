@@ -12,6 +12,7 @@ mkdir -p $OUT_DIR
 
 if  [[ "$DATA" == "sun397" ]]
 then
+  echo "sun397"
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet"$SFFX" \
@@ -35,4 +36,4 @@ else
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
     config.SLURM.USE_SLURM=False
-if
+fi
