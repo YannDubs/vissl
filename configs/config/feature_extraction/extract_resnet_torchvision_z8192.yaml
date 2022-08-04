@@ -4,13 +4,13 @@ config:
   DATA:
     NUM_DATALOADER_WORKERS: 5
     TRAIN:
-      DATA_SOURCES: [ disk_filelist ]
-      LABEL_SOURCES: [ disk_filelist ]
-      DATASET_NAMES: [ sun397_filelist ]
+      DATA_SOURCES: [ torchvision_dataset ]
+      LABEL_SOURCES: [ torchvision_dataset ]
+      DATASET_NAMES: [ CIFAR10 ]
       BATCHSIZE_PER_REPLICA: 128
       TRANSFORMS:
         - name: Resize
-          size: [224, 224]
+          size: 224
         - name: ToTensor
         - name: Normalize
           mean: [0.485, 0.456, 0.406]
@@ -20,13 +20,13 @@ config:
       COPY_DESTINATION_DIR: /tmp/imagenet1k/
       ENABLE_QUEUE_DATASET: False
     TEST:
-      DATA_SOURCES: [ disk_filelist ]
-      LABEL_SOURCES: [ disk_filelist ]
-      DATASET_NAMES: [ sun397_filelist ]
+      DATA_SOURCES: [ torchvision_dataset ]
+      LABEL_SOURCES: [ torchvision_dataset ]
+      DATASET_NAMES: [ CIFAR10 ]
       BATCHSIZE_PER_REPLICA: 128
       TRANSFORMS:
         - name: Resize
-          size: [224, 224]
+          size: 224
         - name: ToTensor
         - name: Normalize
           mean: [0.485, 0.456, 0.406]
