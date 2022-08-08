@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-for DATA in flowers pets caltech cars aircrafts dtd food101 cifar10 cifar100
+for DATA in flowers pets caltech cars food101 cifar10 cifar100 #aircrafts dtd
 do
     #bin/trsnfeval_nlprun.sh dissl_zdim8_long_dir _z8192 $DATA
     bin/trsnfeval_nlprun.sh swav_queuelong_dir "" $DATA
