@@ -188,10 +188,12 @@ class ResNeXt(nn.Module):
         }
 
     def forward(
-        self, x: torch.Tensor, out_feat_keys: List[str] = None
+        self, x: torch.Tensor, out_feat_keys: List[str] = None, is_skip_resizer=False
     ) -> List[torch.Tensor]:
 
-        if self.trunk_config.IS_SKIP_RESIZER:
+        is_skip_resizer = is_skip_resizer or self.trunk_config.IS_SKIP_RESIZER
+
+        if is_skip_resizer:
             out_feat_keys = ["res5","flatten"]
 
         if isinstance(x, MultiDimensionalTensor):
@@ -218,11 +220,11 @@ class ResNeXt(nn.Module):
                 checkpointing_splits=self.num_checkpointing_splits,
             )
 
-        if self.trunk_config.IS_SKIP_RESIZER:
+        if is_skip_resizer:
             avgpool = self._feature_blocks["avgpool"]
             flatten = self._feature_blocks["flatten"]
             out[0] = flatten(avgpool(out[0]))
-            out = [torch.cat(out, dim=1)]  # shape : [bs, 2048 + 4096]
+            out = [torch.cat(out, dim=1)]  # shape : [bs, 2048 + resized]
 
         return out
 

@@ -118,9 +118,17 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
             idx_crops = torch.Tensor(list(range(1, 1 + len(batch)))).int()
 
         feats = []
+        aux_feat = []
         start_idx = 0
-        for end_idx in idx_crops:
-            feat = self.trunk(torch.cat(batch[start_idx:end_idx]), feature_names)
+        for i, end_idx in enumerate(idx_crops):
+            if i == 0 and self.model_config.IS_AUX_SKIP_RESIZER:
+                # select only the non resized version for the teacher
+                # currently works only with initial dim 2048
+                feat = self.trunk(torch.cat(batch[start_idx:end_idx]), feature_names, is_skip_resizer=True)
+                feat[0] = feat[0][:, 2048:]
+                aux_feat = feat[0][:, :2048]
+            else:
+                feat = self.trunk(torch.cat(batch[start_idx:end_idx]), feature_names)
             start_idx = end_idx
             assert len(feat) == 1
             feats.append(feat[0])
@@ -130,6 +138,11 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
             # currently works if teacher is only for the first resolution
             assert self.model_config.MULTI_RES_SPLIT_CROPS[0] == [0,1]
             aux_feat = self.aux_trunk(torch.cat(batch[:idx_crops[0]]), feature_names)[0]
+            multi_feats[0] = aux_feat
+
+        elif self.model_config.IS_AUX_SKIP_RESIZER:
+            # currently works if teacher is only for the first resolution
+            assert self.model_config.MULTI_RES_SPLIT_CROPS[0] == [0, 1]
             multi_feats[0] = aux_feat
 
         return self.heads_forward(multi_feats, self.heads)

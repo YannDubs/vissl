@@ -27,10 +27,10 @@ config:
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
         - name: ImgPilToMultiCrop
-          total_num_crops: 6
-          size_crops: [ 160, 96 ]
-          num_crops: [ 2, 4 ]
-          crop_scales: [ [ 0.14, 1 ], [ 0.05, 0.14 ] ]  # imagenet
+          total_num_crops: 2
+          size_crops: [ 224 ]
+          num_crops: [ 2 ]
+          crop_scales: [ [ 0.08, 1 ] ]
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
@@ -41,8 +41,8 @@ config:
           radius_max: 2.0
         - name: ToTensor
         - name: Normalize
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
+          mean: [ 0.485, 0.456, 0.406 ]
+          std: [ 0.229, 0.224, 0.225 ]
       COLLATE_FUNCTION: multicrop_collator
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
@@ -54,30 +54,23 @@ config:
     name: ""
   MODEL:
     MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
+    IS_AUX_SKIP_RESIZER: True # TO TEST
     TRUNK:
       NAME: resnet
       RESNETS:
         DEPTH: 50
-        Z_DIM_OLD_TMP_NEW : [2048, 512, 16384]
-        IS_SKIP_RESIZER: True
+        Z_DIM_OLD_TMP_NEW : [2048, 512, 8192]
     HEAD:
       PARAMS: [
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual":True } ],
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
+          [ "mlp", { "dims": [ 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False,  "is_JL_init": True } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 16384, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
+          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": True } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
-      ]
-      TEMP_FROZEN_PARAMS_ITER_MAP: [
-        [ 'module.heads.0.1.clf.0.weight', 919 ],
-        [ 'module.heads.0.2.clf.0.weight', 313 ],
-        [ 'module.heads.0.2.clf.0.bias', 313 ],
-        [ 'module.heads.1.0.clf.0.weight', 919 ],
       ]
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
@@ -94,41 +87,44 @@ config:
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
       crops_for_assign: [ 0, 1 ]
-      beta_pM_unif: 1.9
-      beta_H_MlZ: 0.5
-      ema_weight_marginal: 0.7
+      beta_pM_unif: 2.3 # 2.1
+      beta_H_MlZ: 0.8 # 0.5
+      ema_weight_marginal: null
+      warmup_beta_unif_iter: 1000
+      warmup_teacher_iter: 1000
   OPTIMIZER:
-      name: sgd
-      use_larc: True
-      larc_config:
-        clip: False
-        trust_coefficient: 0.001
-        eps: 0.00000001
-      weight_decay: 0.000001
-      momentum: 0.9
-      nesterov: False
-      num_epochs: 100
-      #num_epochs: 400
-      regularize_bn: True
-      regularize_bias: True
-      param_schedulers:
-        lr:
-          auto_lr_scaling:
-            auto_scale: true
-            base_value: 0.3
-            base_lr_batch_size: 256
-          name: composite
-          schedulers:
-            - name: linear
-              start_value: 0.001 # TODO test
-              end_value: 4.8
-            - name: cosine
-              start_value: 4.8
-              end_value: 0.0048
-          update_interval: step
-          interval_scaling: [rescaled, fixed]
-          lengths: [0.1, 0.9]                 # 100ep
-          #lengths: [0.025, 0.975]           # 400ep
+    name: sgd
+    use_zero: False
+    use_larc: True
+    larc_config:
+      clip: False
+      trust_coefficient: 0.001
+      eps: 0.00000001
+    weight_decay: 0.000001
+    momentum: 0.9
+    nesterov: False
+    num_epochs: 100
+    # num_epochs: 400
+    regularize_bn: True
+    regularize_bias: True
+    param_schedulers:
+      lr:
+        auto_lr_scaling:
+          auto_scale: true
+          base_value: 0.3
+          base_lr_batch_size: 256
+        name: composite
+        schedulers:
+          - name: linear
+            start_value: 0.001
+            end_value: 4.8
+          - name: cosine
+            start_value: 4.8
+            end_value: 0.0000
+        update_interval: step
+        interval_scaling: [rescaled, fixed]
+        lengths: [0.1, 0.9]                 # 100ep
+        # lengths: [0.025, 0.975]           # 400ep
   DISTRIBUTED:
     BACKEND: nccl
     NUM_NODES: 2    # gives batch size of 20
@@ -143,7 +139,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_zskip16"
+    NAME: "dissl_zdim8_nomulti_noema_asymm"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
