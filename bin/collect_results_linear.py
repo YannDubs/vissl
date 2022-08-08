@@ -14,6 +14,8 @@ for p in paths:
     else:
         eval_dir = "?"
     results[eval_dir] = pd.read_csv(p, index_col=0)[METRICS].T
+    results[eval_dir] = results[eval_dir].unstack().to_frame().sort_index(level=1).T
+    results[eval_dir].columns = results[eval_dir].columns.map('_'.join)
 
 all_results = pd.concat(results).droplevel(1)
 print(all_results)
