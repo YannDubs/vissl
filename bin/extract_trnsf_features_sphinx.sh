@@ -48,11 +48,25 @@ elif  [[ "$DATA" == "cifar10" || "$DATA" == "cifar100" ]]; then
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
     config.SLURM.USE_SLURM=False
 else
+  if  [[ "$DATA" == "cars" ]]; then
+    dataset_name="stanford_cars_folder"
+  elif [[ "$DATA" == "caltech" ]]; then
+    dataset_name="caltech101_folder"
+  elif [[ "$DATA" == "food" ]]; then
+    dataset_name="food101_folder"
+  elif [[ "$DATA" == "flowers" ]]; then
+    dataset_name="oxford_flowers_folder"
+  elif [[ "$DATA" == "pets" ]]; then
+    dataset_name="oxford_pets_folder"
+  else
+    dataset_name="$DATA"_folder
+  fi
+
   python3 tools/run_distributed_engines.py \
     hydra.verbose=true \
     config=feature_extraction/extract_resnet"$SFFX" \
-    config.DATA.TEST.DATASET_NAMES=["$DATA"_folder] \
-    config.DATA.TRAIN.DATASET_NAMES=["$DATA"_folder] \
+    config.DATA.TEST.DATASET_NAMES=["$dataset_name"] \
+    config.DATA.TRAIN.DATASET_NAMES=["$dataset_name"] \
     config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/train"] \
     config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/test"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \

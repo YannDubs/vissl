@@ -16,7 +16,7 @@ sbatch <<EOT
 #SBATCH --partition=jag-hi
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
 #SBATCH --nodelist=jagupard24
 #SBATCH --output="$dir"/eval_logs/"$data"/slurm-%j.out
