@@ -5,7 +5,7 @@ model=dissl_zdim8_nomulti_noema_noJL
 ./dev/launch_slurm.sh \
     "$model"_dir \
     config=pretrain/dstl/"$model" \
-    +config/server=sphinx1_std \
+    +config/server=sphinx2_std \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
