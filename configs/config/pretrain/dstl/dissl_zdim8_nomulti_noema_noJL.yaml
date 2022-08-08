@@ -87,8 +87,8 @@ config:
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
       crops_for_assign: [ 0, 1 ]
-      beta_pM_unif: 2.3 # 2.1
-      beta_H_MlZ: 0.8 # 0.5
+      beta_pM_unif: 2.3
+      beta_H_MlZ: 0.6
       ema_weight_marginal: null
   OPTIMIZER:
     name: sgd
