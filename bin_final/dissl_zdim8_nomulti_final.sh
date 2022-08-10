@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-model=dissl_zdim8_nomulti_last
+model=dissl_zdim8_nomulti_final
 
 ./dev/launch_slurm.sh \
     "$model"_dir \
