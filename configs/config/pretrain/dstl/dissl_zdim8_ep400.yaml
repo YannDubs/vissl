@@ -58,12 +58,13 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
+        Z_DIM_OLD_TMP_NEW : [2048, 512, 8192]
     HEAD:
       PARAMS: [
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True } ],
-          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
+          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
+          [ "mlp", { "dims": [ 512, 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True, "is_JL_init": True } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
@@ -102,8 +103,8 @@ config:
     weight_decay: 0.000001
     momentum: 0.9
     nesterov: False
-    num_epochs: 100
-    # num_epochs: 400
+    #num_epochs: 100
+    num_epochs: 400
     regularize_bn: True
     regularize_bias: True
     param_schedulers:
@@ -122,8 +123,8 @@ config:
             end_value: 0.0000
         update_interval: step
         interval_scaling: [rescaled, fixed]
-        lengths: [0.1, 0.9]                 # 100ep
-        # lengths: [0.025, 0.975]           # 400ep
+        #lengths: [0.1, 0.9]                 # 100ep
+        lengths: [0.025, 0.975]           # 400ep
   DISTRIBUTED:
     BACKEND: nccl
     NUM_NODES: 2    # gives batch size of 20
@@ -138,7 +139,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_nomulti"
+    NAME: "dissl_zdim8_ep400"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120

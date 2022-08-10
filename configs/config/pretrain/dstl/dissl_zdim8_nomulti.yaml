@@ -90,8 +90,8 @@ config:
       beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
       ema_weight_marginal: null
-      warmup_beta_unif_iter: 500
-      warmup_teacher_iter: 500
+      warmup_teacher_iter: 300
+      #warmup_beta_unif_iter: 300 # didn't use it for trainign but I think we should
   OPTIMIZER:
     name: sgd
     use_zero: False
