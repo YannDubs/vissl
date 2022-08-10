@@ -5,7 +5,7 @@
 dir="$1"
 sffx="$2"
 mkdir -p "$dir"/eval_logs
-echo "Evaluating" "$dir" "$sffx"
+echo "Evaluating " "$dir" "$sffx"
 feature_dir=/scr/biggest/yanndubs/"$dir"/features
 
 sbatch <<EOT
