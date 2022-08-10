@@ -92,6 +92,7 @@ class DiskImageDataset(QueueDataset):
             else:
                 self.image_dataset = load_file(path)
         elif self.data_source == "disk_folder":
+            logging.info(f"Loading from folder {path}")
             self.image_dataset = ImageFolder(path)
             logging.info(f"Loaded {len(self.image_dataset)} samples from folder {path}")
 
