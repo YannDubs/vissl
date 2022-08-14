@@ -30,7 +30,7 @@ config:
           total_num_crops: 6
           size_crops: [ 160, 96 ]
           num_crops: [ 2, 4 ]
-          crop_scales: [ [ 0.14, 1 ], [ 0.05, 0.14 ] ]  # imagenet
+          crop_scales: [ [ 0.14, 1 ], [0.05, 0.14] ]
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
@@ -41,8 +41,8 @@ config:
           radius_max: 2.0
         - name: ToTensor
         - name: Normalize
-          mean: [0.485, 0.456, 0.406]
-          std: [0.229, 0.224, 0.225]
+          mean: [ 0.485, 0.456, 0.406 ]
+          std: [ 0.229, 0.224, 0.225 ]
       COLLATE_FUNCTION: multicrop_collator
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
@@ -62,13 +62,13 @@ config:
       PARAMS: [
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False } ],
-          [ "mlp", { "dims": [ 2048, 256 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init":True } ],
-          [ "mlp", { "dims": [ 256, 32768 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False} ],
+          [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 2048, 256 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init":True} ],
-          [ "mlp", { "dims": [ 256, 32768 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
     SYNC_BN_CONFIG:
@@ -81,46 +81,47 @@ config:
   LOSS:
     name: dstl_issl_loss
     dstl_issl_loss:
-      n_Mx: 32768  # automatically inferred from model HEAD settings
+      n_Mx: 16384  # automatically inferred from model HEAD settings
       temperature_assign: 0.5
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
       crops_for_assign: [ 0, 1 ]
-      beta_pM_unif: 1.9
-      beta_H_MlZ: 0.5
-      ema_weight_marginal: 0.7
+      beta_pM_unif: 2.3 # 2.1
+      beta_H_MlZ: 0.6 # 0.5
+      ema_weight_marginal: null
   OPTIMIZER:
-      name: sgd
-      use_larc: True
-      larc_config:
-        clip: False
-        trust_coefficient: 0.001
-        eps: 0.00000001
-      weight_decay: 0.000001
-      momentum: 0.9
-      nesterov: False
-      num_epochs: 100
-      #num_epochs: 400
-      regularize_bn: True
-      regularize_bias: True
-      param_schedulers:
-        lr:
-          auto_lr_scaling:
-            auto_scale: true
-            base_value: 0.3
-            base_lr_batch_size: 256
-          name: composite
-          schedulers:
-            - name: linear
-              start_value: 0.001
-              end_value: 4.8
-            - name: cosine
-              start_value: 4.8
-              end_value: 0.0048
-          update_interval: step
-          interval_scaling: [rescaled, fixed]
-          lengths: [0.1, 0.9]                 # 100ep
-          #lengths: [0.025, 0.975]           # 400ep
+    name: sgd
+    use_zero: False
+    use_larc: True
+    larc_config:
+      clip: False
+      trust_coefficient: 0.001
+      eps: 0.00000001
+    weight_decay: 0.000001
+    momentum: 0.9
+    nesterov: False
+    #num_epochs: 100
+    num_epochs: 400
+    regularize_bn: True
+    regularize_bias: True
+    param_schedulers:
+      lr:
+        auto_lr_scaling:
+          auto_scale: true
+          base_value: 0.3
+          base_lr_batch_size: 256
+        name: composite
+        schedulers:
+          - name: linear
+            start_value: 0.001
+            end_value: 4.8
+          - name: cosine
+            start_value: 4.8
+            end_value: 0.0000
+        update_interval: step
+        interval_scaling: [rescaled, fixed]
+        #lengths: [0.1, 0.9]                 # 100ep
+        lengths: [0.025, 0.975]           # 400ep
   DISTRIBUTED:
     BACKEND: nccl
     NUM_NODES: 2    # gives batch size of 20
@@ -135,7 +136,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_large"
+    NAME: "dissl_nomulti_ep400"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120

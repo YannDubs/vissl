@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-model=dissl_zdim8_ep400
+model=dissl_ep400
 
 ./dev/launch_slurm.sh \
     "$model"_dir \
@@ -11,7 +11,7 @@ model=dissl_zdim8_ep400
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=320 \
     config.DATA.NUM_DATALOADER_WORKERS=31 \
-    config.SLURM.PORT_ID=40053 \
+    config.SLURM.PORT_ID=40055 \
     config.SLURM.NAME="$model" \
     config.SLURM.MEM_GB=1000 \
     config.SLURM.NUM_CPU_PER_PROC=32 \
