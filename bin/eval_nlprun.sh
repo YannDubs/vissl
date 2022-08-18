@@ -16,7 +16,7 @@ sbatch <<EOT
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=64G
-#SBATCH --nodelist=jagupard26
+#SBATCH --nodelist=jagupard27
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
