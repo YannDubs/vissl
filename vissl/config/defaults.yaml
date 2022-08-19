@@ -1012,6 +1012,7 @@ config:
       ema_weight_marginal: 0.7
       warmup_beta_unif_iter: null
       warmup_teacher_iter: null
+      detach_teacher_iter: null
 
     # ----------------------------------------------------------------------------------- #
     # Regularized DISSL
