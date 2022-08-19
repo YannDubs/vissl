@@ -90,6 +90,7 @@ config:
       beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
       ema_weight_marginal: null
+      warmup_beta_unif_iter: 1000 # probably not needed
   OPTIMIZER:
     name: sgd
     use_zero: False
@@ -139,7 +140,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_zdim8_largemulti_ep800"
+    NAME: "dissl_e800_d8192_m8"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
