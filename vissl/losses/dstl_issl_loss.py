@@ -199,7 +199,7 @@ class DstlISSLCriterion(nn.Module):
             # warming up the distillation loss => focus on teacher first
             CE_pMlz_qMlza = CE_pMlz_qMlza * warming_factor
             # distillation also decreases determinism and invariance => rescales
-            CE_pMlz_pMlza = CE_pMlz_pMlza / warming_factor
+            #CE_pMlz_pMlza = CE_pMlz_pMlza / warming_factor
 
         loss = CE_pMlz_qMlza + beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
 
