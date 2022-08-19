@@ -48,7 +48,6 @@ class DstlISSLLoss(ClassyLoss):
             beta_pM_unif = self.loss_config.beta_pM_unif,
             ema_weight_marginal = self.loss_config.ema_weight_marginal,
             warmup_teacher_iter = self.loss_config.warmup_teacher_iter,
-            detach_teacher_iter = self.loss_config.detach_teacher_iter,
             warmup_beta_unif_iter = self.loss_config.warmup_beta_unif_iter,
             warmup_beta_CE_iter = self.loss_config.warmup_beta_CE_iter
         )
@@ -87,7 +86,6 @@ class DstlISSLCriterion(nn.Module):
                  beta_pM_unif: float = 1.9,
                  ema_weight_marginal : float = 0.7,
                  warmup_beta_unif_iter: int = None,  # haven't tried but might be worth
-                 detach_teacher_iter: int=None,
                  warmup_teacher_iter: int= None,
                 warmup_beta_CE_iter: int=None
                 ):
@@ -105,7 +103,6 @@ class DstlISSLCriterion(nn.Module):
         self.warmup_beta_unif_iter = warmup_beta_unif_iter
         self.warmup_teacher_iter = warmup_teacher_iter
         self.warmup_beta_CE_iter = warmup_beta_CE_iter
-        self.detach_teacher_iter = detach_teacher_iter
         self.dist_rank = get_rank()
         self.register_buffer("num_iteration", torch.zeros(1, dtype=int))
 
@@ -173,9 +170,6 @@ class DstlISSLCriterion(nn.Module):
                 if i_p == i_q:
                     # we skip cases where student and teacher operate on the same view
                     continue
-
-                if self.detach_teacher_iter is not None and self.num_iteration < self.detach_teacher_iter:
-                    p_Mlz = p_Mlz.detach() # detach teacher initially
 
                 # KL = - H[M|Z] - E_{p(M|Z)}[log q(M|Z)]. As you want to have a deterministic
                 # p(M|Z) you want to min H[M|Z]. So min KL + H[M|Z] = - E_{p(M|Z)}[log q(M|Z)]
