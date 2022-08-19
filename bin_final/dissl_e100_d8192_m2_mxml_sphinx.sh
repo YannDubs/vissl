@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-model=dissl_e100_d2048_m2_mxml
+model=dissl_e100_d8192_m2_mxml
 
 ./dev/launch_slurm.sh \
     "$model"_dir \
