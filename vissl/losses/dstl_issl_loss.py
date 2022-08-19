@@ -162,15 +162,20 @@ class DstlISSLCriterion(nn.Module):
                 n_CE_pp += 1
             #########################
 
+            ##### Distillation #####
             for i_q, log_q_Mlza in enumerate(all_log_q_Mlz):
                 if i_p == i_q:
                     # we skip cases where student and teacher operate on the same view
                     continue
 
+                # if self.warmup_teacher_iter is not None and self.num_iteration < self.warmup_teacher_iter:
+                #     p_Mlz = p_Mlz.detach() # detach teacher initially
+
                 # KL = - H[M|Z] - E_{p(M|Z)}[log q(M|Z)]. As you want to have a deterministic
                 # p(M|Z) you want to min H[M|Z]. So min KL + H[M|Z] = - E_{p(M|Z)}[log q(M|Z)]
                 CE_pMlz_qMlza = CE_pMlz_qMlza - (p_Mlz * log_q_Mlza).sum(-1).mean(0)
                 n_CE_pq += 1
+            #########################
 
         CE_pMlz_qMlza /= n_CE_pq
         H_M /= len(all_p_Mlz)
@@ -191,7 +196,10 @@ class DstlISSLCriterion(nn.Module):
 
         if self.warmup_teacher_iter is not None and self.num_iteration < self.warmup_teacher_iter:
             warming_factor = (1 + self.num_iteration) / self.warmup_teacher_iter
-            CE_pMlz_pMlza = CE_pMlz_pMlza * warming_factor
+            # warming up the distillation loss => focus on teacher first
+            CE_pMlz_qMlza = CE_pMlz_qMlza * warming_factor
+            # distillation also decreases determinism and invariance => rescales
+            CE_pMlz_pMlza = CE_pMlz_pMlza / warming_factor
 
         loss = CE_pMlz_qMlza + beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
 
