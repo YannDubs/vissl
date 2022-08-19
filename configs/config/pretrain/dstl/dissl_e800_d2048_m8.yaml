@@ -27,10 +27,10 @@ config:
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
         - name: ImgPilToMultiCrop
-          total_num_crops: 2
-          size_crops: [ 224 ]
-          num_crops: [ 2 ]
-          crop_scales: [ [ 0.08, 1 ] ]
+          total_num_crops: 8
+          size_crops: [224, 96]
+          num_crops: [ 2, 6 ]
+          crop_scales: [[0.14, 1], [0.05, 0.14]]  # imagenet
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
@@ -58,13 +58,12 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
-        Z_DIM_OLD_TMP_NEW : [2048, 512, 8192]
     HEAD:
       PARAMS: [
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
-          [ "mlp", { "dims": [ 512, 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True, "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
@@ -87,7 +86,7 @@ config:
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
       crops_for_assign: [ 0, 1 ]
-      beta_pM_unif: 2.5 # 2.1
+      beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
       ema_weight_marginal: null
       warmup_beta_CE_iter: 1000
@@ -102,9 +101,9 @@ config:
     weight_decay: 0.000001
     momentum: 0.9
     nesterov: False
-    num_epochs: 100
+    #num_epochs: 100
     #num_epochs: 400
-    #num_epochs: 800
+    num_epochs: 800
     regularize_bn: True
     regularize_bias: True
     param_schedulers:
@@ -123,9 +122,9 @@ config:
             end_value: 0.0000
         update_interval: step
         interval_scaling: [rescaled, fixed]
-        lengths: [0.1, 0.9]                 # 100ep
+        #lengths: [0.1, 0.9]                 # 100ep
         #lengths: [0.025, 0.975]           # 400ep
-        #lengths: [0.0125, 0.9875]         # 800ep
+        lengths: [0.0125, 0.9875]         # 800ep
   DISTRIBUTED:
     BACKEND: nccl
     NUM_NODES: 2    # gives batch size of 20
@@ -140,7 +139,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_e100_d8192_m2_mxml"
+    NAME: "dissl_e800_d2048_m8"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
