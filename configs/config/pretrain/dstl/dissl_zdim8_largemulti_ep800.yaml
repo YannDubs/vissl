@@ -27,9 +27,9 @@ config:
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
         - name: ImgPilToMultiCrop
-          total_num_crops: 6
+          total_num_crops: 8
           size_crops: [224, 96]
-          num_crops: [ 2, 4 ]
+          num_crops: [ 2, 6 ]
           crop_scales: [[0.14, 1], [0.05, 0.14]]  # imagenet
         - name: RandomHorizontalFlip
           p: 0.5

@@ -42,9 +42,9 @@ fi
 # LINEAR EVAL
 echo "Linear eval."
 conda activate probing
+python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-6_l01_b2048 --weight-decay 3e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-5_l01_b2048 --weight-decay 3e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-4_l01_b2048 --weight-decay 1e-4 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-7_l01_b2048 --weight-decay 1e-7 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
