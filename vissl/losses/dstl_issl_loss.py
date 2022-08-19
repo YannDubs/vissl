@@ -49,7 +49,8 @@ class DstlISSLLoss(ClassyLoss):
             ema_weight_marginal = self.loss_config.ema_weight_marginal,
             warmup_teacher_iter = self.loss_config.warmup_teacher_iter,
             detach_teacher_iter = self.loss_config.detach_teacher_iter,
-            warmup_beta_unif_iter = self.loss_config.warmup_beta_unif_iter
+            warmup_beta_unif_iter = self.loss_config.warmup_beta_unif_iter,
+            warmup_beta_CE_iter = self.loss_config.warmup_beta_CE_iter
         )
 
     @classmethod
@@ -87,7 +88,8 @@ class DstlISSLCriterion(nn.Module):
                  ema_weight_marginal : float = 0.7,
                  warmup_beta_unif_iter: int = None,  # haven't tried but might be worth
                  detach_teacher_iter: int=None,
-                 warmup_teacher_iter: int= None
+                 warmup_teacher_iter: int= None,
+                warmup_beta_CE_iter: int=None
                 ):
         super(DstlISSLCriterion, self).__init__()
 
@@ -102,6 +104,7 @@ class DstlISSLCriterion(nn.Module):
         self.ema_weight_marginal = ema_weight_marginal
         self.warmup_beta_unif_iter = warmup_beta_unif_iter
         self.warmup_teacher_iter = warmup_teacher_iter
+        self.warmup_beta_CE_iter = warmup_beta_CE_iter
         self.detach_teacher_iter = detach_teacher_iter
         self.dist_rank = get_rank()
         self.register_buffer("num_iteration", torch.zeros(1, dtype=int))
@@ -197,6 +200,14 @@ class DstlISSLCriterion(nn.Module):
         else:
             beta_pM_unif = self.beta_pM_unif
 
+        if self.warmup_beta_CE_iter is not None and self.num_iteration < self.warmup_beta_CE_iter:
+            start_beta = self.beta_pM_unif
+            final_beta = self.beta_H_MlZ
+            warming_factor = (1 + self.num_iteration) / self.warmup_beta_CE_iter
+            beta_H_MlZ = start_beta + (final_beta - start_beta) * warming_factor
+        else:
+            beta_H_MlZ = self.beta_H_MlZ
+
         if self.warmup_teacher_iter is not None and self.num_iteration < self.warmup_teacher_iter:
             warming_factor = (1 + self.num_iteration) / self.warmup_teacher_iter
             # warming up the distillation loss => focus on teacher first
@@ -204,7 +215,7 @@ class DstlISSLCriterion(nn.Module):
             # distillation also decreases determinism and invariance => rescales
             #CE_pMlz_pMlza = CE_pMlz_pMlza / warming_factor
 
-        loss = CE_pMlz_qMlza + beta_pM_unif * fit_pM_Unif + self.beta_H_MlZ * CE_pMlz_pMlza
+        loss = CE_pMlz_qMlza + beta_pM_unif * fit_pM_Unif + beta_H_MlZ * CE_pMlz_pMlza
 
         if self.num_iteration % 200 == 0 and self.dist_rank == 0:
             logging.info(f"H[M]: {H_M.mean()}")
