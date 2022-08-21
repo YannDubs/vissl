@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard17,jagupard20,jagupard30,jagupard31
-#SBATCH --nodelist=jagupard29
+#jagupard27,jagupard26,jagupard21
 dir="$1"
 sffx="$2"
 mkdir -p "$dir"/eval_logs
