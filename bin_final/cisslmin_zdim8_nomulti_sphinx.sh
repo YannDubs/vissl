@@ -4,7 +4,7 @@ model=cisslmin_zdim8_nomulti
 
 ./dev/launch_slurm.sh \
     "$model"_dir \
-    config=pretrain/simclr/"$model" \
+    config=pretrain/cntr/"$model" \
     +config/server=sphinx5 \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \
