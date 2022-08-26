@@ -60,7 +60,7 @@ config:
       FREEZE_TRUNK_ONLY: True
       SHOULD_FLATTEN_FEATS: False
       LINEAR_EVAL_FEAT_POOL_OPS_MAP: [
-        ["res5avg", ["Identity", []]],
+        ["res5", ["AvgPool2d", [[6, 6], 1, 0]]],
         ["res5avg", ["Identity", []]],
       ]
     TRUNK:
@@ -70,8 +70,8 @@ config:
         IS_SKIP_RESIZER: False
     HEAD:
       PARAMS: [
+        ["eval_mlp", {"in_channels": 2048, "dims": [8192, 1000]}],
         ["eval_mlp", {"in_channels": 2048, "dims": [2048, 1000]}],
-        ["mlp", {"dims": [2048, 1000]}],
       ]
     WEIGHTS_INIT:
       PARAMS_FILE: "specify the model weights"
@@ -118,7 +118,7 @@ config:
   CHECKPOINT:
     DIR: "."
     AUTO_RESUME: True
-    CHECKPOINT_FREQUENCY: 5
+    CHECKPOINT_FREQUENCY: 25
 
   SLURM:
     NAME: "eval_linear"
