@@ -90,14 +90,9 @@ config:
       ignore_index: -1
   OPTIMIZER:
       name: sgd
-      use_larc: True
-      larc_config:
-        clip: False
-        trust_coefficient: 0.001
-        eps: 0.00000001
-      weight_decay: 0.0
+      weight_decay: 0.000001
       momentum: 0.9
-      num_epochs: 90
+      num_epochs: 100
       nesterov: False
       regularize_bn: True
       regularize_bias: True
@@ -105,16 +100,11 @@ config:
         lr:
           auto_lr_scaling:
             auto_scale: true
-            base_value: 0.1
+            base_value: 0.3
             base_lr_batch_size: 256
-          name: composite
-          schedulers:
-            - name: linear
-              start_value: 0.001 # TODO test
-              end_value: 0.8
-            - name: cosine
-              start_value: 0.8
-              end_value: 0.0048
+          name: cosine
+          start_value: 2.4
+          end_value: 0.0048
           update_interval: step
           interval_scaling: [ rescaled, fixed ]
           lengths: [ 0.1, 0.9 ]                 # 100ep

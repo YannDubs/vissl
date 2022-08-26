@@ -18,5 +18,5 @@ epochs="$2"
     config.DATA.NUM_DATALOADER_WORKERS=31 \
     config.SLURM.PORT_ID=40064 \
     config.SLURM.NAME=augevalss_"$base_dir" \
-    config.SLURM.MEM_GB=128 \
+    config.SLURM.MEM_GB=256 \
     config.SLURM.NUM_CPU_PER_PROC=32 \
