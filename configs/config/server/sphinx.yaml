@@ -4,3 +4,4 @@ config:
         PARTITION: sphinx
         ADDITIONAL_PARAMETERS:
             exclude: sphinx3
+            gres: gpu:1
