@@ -1,7 +1,0 @@
-# @package _global_
-config:
-    SLURM:
-        PARTITION: sphinx
-        ADDITIONAL_PARAMETERS:
-            nodelist: sphinx1
-            gres: gpu:4
