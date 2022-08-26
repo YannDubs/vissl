@@ -70,7 +70,7 @@ config:
         IS_SKIP_RESIZER: False
     HEAD:
       PARAMS: [
-        [ "eval_mlp_large", { "in_channels": 2048, "dims": [ 8192, 1000 ] } ],
+        [ "eval_mlp", { "in_channels": 2048, "dims": [ 8192, 1000 ] } ],
         [ "eval_mlp", { "in_channels": 2048, "dims": [ 2048, 1000 ] } ],
       ]
     WEIGHTS_INIT:
@@ -105,9 +105,7 @@ config:
           name: cosine
           start_value: 2.4
           end_value: 0.0048
-          update_interval: step
-          interval_scaling: [ rescaled, fixed ]
-          lengths: [ 0.1, 0.9 ]                 # 100ep
+          update_interval: step     # 100ep
   DISTRIBUTED:
     BACKEND: nccl
     NUM_NODES: 1
