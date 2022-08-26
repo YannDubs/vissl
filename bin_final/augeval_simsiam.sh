@@ -5,7 +5,7 @@ epochs="$2"
 
 
 ./dev/launch_slurm.sh \
-    $base_dir/augeval \
+    $base_dir/augeval_simsiam \
     config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_simsiam \
     +config/server=sphinx \
     config.DISTRIBUTED.NUM_NODES=1 \
