@@ -11,6 +11,7 @@ epochs="799"
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
+    config.DATA.TEST.DATA_PATHS=["./data/imagenet/train"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE=$base_dir/checkpoints/model_final_checkpoint_phase"$epochs".torch \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=480 \
     config.DATA.NUM_DATALOADER_WORKERS=31 \
