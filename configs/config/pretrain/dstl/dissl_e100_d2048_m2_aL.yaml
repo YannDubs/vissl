@@ -34,11 +34,11 @@ config:
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
-          strength: 2.0
+          strength: 1.5
         - name: ImgPilGaussianBlur
           p: 0.5
           radius_min: 0.1
-          radius_max: 2.0
+          radius_max: 3.0
         - name: ToTensor
         - name: Normalize
           mean: [ 0.485, 0.456, 0.406 ]
