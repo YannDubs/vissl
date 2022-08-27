@@ -1,4 +1,4 @@
-test_barlow_remote_noslurm.sh
+#!/usr/bin/env bash
 
 dir="$1"
 name="$2"
