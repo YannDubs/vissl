@@ -16,8 +16,8 @@ config:
       DATA_SOURCES: [disk_folder]
       LABEL_SOURCES: [disk_folder]
       DATASET_NAMES: [imagenet1k_folder]
-      DATA_PATHS: [ "./data/imagenet256/train" ]
-      BATCHSIZE_PER_REPLICA: 96
+      DATA_PATHS: [ "./data/imagenet/train" ]
+      BATCHSIZE_PER_REPLICA: 1024
       TRANSFORMS:
         - name: RandomResizedCrop
           size: 224
@@ -33,8 +33,8 @@ config:
       DATA_SOURCES: [disk_folder]
       LABEL_SOURCES: [disk_folder]
       DATASET_NAMES: [imagenet1k_folder]
-      DATA_PATHS: [ "./data/imagenet256/val" ]
-      BATCHSIZE_PER_REPLICA: 128
+      DATA_PATHS: [ "./data/imagenet/val" ]
+      BATCHSIZE_PER_REPLICA: 2048
       TRANSFORMS:
         - name: Resize
           size: 256
@@ -60,19 +60,19 @@ config:
       FREEZE_TRUNK_ONLY: True
       SHOULD_FLATTEN_FEATS: False
       LINEAR_EVAL_FEAT_POOL_OPS_MAP: [
-        ["res5avg", ["Identity", []]],
-        ["res5avg", ["Identity", []]],
+        [ "res5avg", [ "Identity", [ ] ] ],
+        [ "res5avg", [ "Identity", [ ] ] ],
       ]
     TRUNK:
       NAME: resnet
       RESNETS:
         DEPTH: 50
         IS_SKIP_RESIZER: False
-        Z_DIM_OLD_TMP_NEW : [2048, 512, 16384]
+        Z_DIM_OLD_TMP_NEW: [ 2048, 512, 8192 ]
     HEAD:
       PARAMS: [
-        ["eval_mlp", {"in_channels": 16384, "dims": [16384, 1000]}],
-        ["mlp", {"dims": [16384, 1000]}],
+        [ "eval_mlp", { "in_channels": 8192, "dims": [ 8192, 1000 ] } ],
+        [ "mlp", { "dims": [ 8192, 1000 ] } ],
       ]
     WEIGHTS_INIT:
       PARAMS_FILE: "specify the model weights"
@@ -91,23 +91,22 @@ config:
       ignore_index: -1
   OPTIMIZER:
       name: sgd
-      # In the OSS Caffe2 benchmark, RN50 models use 1e-4 and AlexNet models 5e-4
-      weight_decay: 0.0005
+      weight_decay: 0.000001
       momentum: 0.9
-      num_epochs: 28
-      nesterov: True
-      regularize_bn: False
+      num_epochs: 100
+      nesterov: False
+      regularize_bn: True
       regularize_bias: True
       param_schedulers:
         lr:
           auto_lr_scaling:
             auto_scale: true
-            base_value: 0.01
+            base_value: 0.3
             base_lr_batch_size: 256
-          name: multistep
-          values: [0.01, 0.001, 0.0001, 0.00001]
-          milestones: [8, 16, 24]
-          update_interval: epoch
+          name: cosine
+          start_value: 2.4
+          end_value: 0.0048
+          update_interval: step     # 100ep
   DISTRIBUTED:
     BACKEND: nccl
     NUM_NODES: 1
@@ -119,10 +118,10 @@ config:
   CHECKPOINT:
     DIR: "."
     AUTO_RESUME: True
-    CHECKPOINT_FREQUENCY: 5
+    CHECKPOINT_FREQUENCY: 10
 
   SLURM:
-    NAME: "eval_linear_z16"
-    MEM_GB: 96 #  3 (gpu per node) * 32
+    NAME: "eval_linear_z8_swav"
+    MEM_GB: 128 #  3 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 24

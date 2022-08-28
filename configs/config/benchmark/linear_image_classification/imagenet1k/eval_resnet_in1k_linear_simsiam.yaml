@@ -17,7 +17,7 @@ config:
       LABEL_SOURCES: [disk_folder]
       DATASET_NAMES: [imagenet1k_folder]
       DATA_PATHS: [ "./data/imagenet/train" ]
-      BATCHSIZE_PER_REPLICA: 2048
+      BATCHSIZE_PER_REPLICA: 1024
       TRANSFORMS:
         - name: RandomResizedCrop
           size: 224
@@ -34,7 +34,7 @@ config:
       LABEL_SOURCES: [disk_folder]
       DATASET_NAMES: [imagenet1k_folder]
       DATA_PATHS: [ "./data/imagenet/val" ]
-      BATCHSIZE_PER_REPLICA: 4096
+      BATCHSIZE_PER_REPLICA: 2048
       TRANSFORMS:
         - name: Resize
           size: 256
@@ -131,7 +131,7 @@ config:
   CHECKPOINT:
     DIR: "."
     AUTO_RESUME: True
-    CHECKPOINT_FREQUENCY: 25
+    CHECKPOINT_FREQUENCY: 10
 
   SLURM:
     NAME: "eval_linear_simsiam"

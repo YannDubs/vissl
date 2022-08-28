@@ -120,7 +120,7 @@ config:
   CHECKPOINT:
     DIR: "."
     AUTO_RESUME: True
-    CHECKPOINT_FREQUENCY: 25
+    CHECKPOINT_FREQUENCY: 10
 
   SLURM:
     NAME: "eval_linear"
