@@ -34,7 +34,7 @@ config:
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
-          strength: 1.5
+          strength: 1.25
         - name: ImgPilGaussianBlur
           p: 0.5
           radius_min: 0.1
@@ -89,7 +89,6 @@ config:
       beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
       ema_weight_marginal: null
-      warmup_beta_CE_iter: 1000
   OPTIMIZER:
     name: sgd
     use_zero: False
