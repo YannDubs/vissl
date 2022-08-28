@@ -988,14 +988,14 @@ config:
       temperature: 0.1
       buffer_params:
         world_size: 64                # automatically inferred
-        embedding_dim: 2048
+        embedding_dim: 128
         effective_batch_size: 4096    # automatically inferred
 
     simple_cntr_issl_loss:
       temperature: 0.1
       buffer_params:
         world_size: 64                # automatically inferred
-        embedding_dim: 2048
+        embedding_dim: 128
         effective_batch_size: 4096    # automatically inferred
 
     # ----------------------------------------------------------------------------------- #

@@ -79,7 +79,7 @@ config:
       AMP_TYPE: "pytorch"  # apex | pytorch
   LOSS:
     name: cntr_issl_loss # can use simple_cntr_issl_loss
-    simple_cntr_issl_loss:
+    cntr_issl_loss:
       temperature: 0.1
       buffer_params:
         embedding_dim: 128
