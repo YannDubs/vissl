@@ -64,11 +64,11 @@ config:
         [
           [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True } ],
           [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
-          [ "mlp", { "dims": [ 512, 20480 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
           [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": False } ],
-          [ "mlp", { "dims": [ 512, 20480 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
     SYNC_BN_CONFIG:
