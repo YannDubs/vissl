@@ -73,7 +73,7 @@ config:
       PARAMS: [
         ["eval_mlp", {"in_channels": 2048, "dims": [8192, 1000]}],
         ["eval_mlp", {"in_channels": 2048, "dims": [2048, 1000]}],
-        ["mlp", {"in_channels": 2048, "dims": [2048, 1000]}],
+        ["mlp", {"dims": [2048, 1000]}],
       ]
     WEIGHTS_INIT:
       PARAMS_FILE: "specify the model weights"
