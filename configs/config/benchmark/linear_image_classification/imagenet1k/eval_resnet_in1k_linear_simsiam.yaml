@@ -131,7 +131,7 @@ config:
   CHECKPOINT:
     DIR: "."
     AUTO_RESUME: True
-    CHECKPOINT_FREQUENCY: 10
+    CHECKPOINT_FREQUENCY: 5
 
   SLURM:
     NAME: "eval_linear_simsiam"
