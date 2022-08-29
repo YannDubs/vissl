@@ -109,7 +109,7 @@ class CntrISSLCriterion(nn.Module):
         # to make the loss symmetric we passed the embeddings of both x,a into projector and predictor
         # here z_pred should be thought as final layer in a neural net that needs to be dot proudct with W
         # then classification loss. In reality W is the output of the projector.
-        z_pred, W = embedding
+        W, z_pred = embedding
 
         z_pred = nn.functional.normalize(z_pred, dim=1, p=2)
         W = nn.functional.normalize(W, dim=1, p=2)

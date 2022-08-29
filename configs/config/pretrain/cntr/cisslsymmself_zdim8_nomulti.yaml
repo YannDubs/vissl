@@ -67,9 +67,9 @@ config:
         [
           [ "mlp", { "dims": [ 8192, 512, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": True } ],
           [ "mlp", { "dims": [ 2048, 128 ], "use_relu": False, "use_bn": True, "use_bias": False , "skip_last_layer_relu_bn": False } ],
-        ]
+        ],
       ]
-      NON_TRAINABLE_PARAMS: [ "heads.0.1.clf.1.bias","heads.1.1.clf.1.bias" ]  # corresponds to the BN of the last BN layers
+      NON_TRAINABLE_PARAMS: [ "heads.1.1.clf.1.bias","heads.0.1.clf.1.bias" ]  # corresponds to the BN of the last BN layers
     SYNC_BN_CONFIG:
       CONVERT_BN_TO_SYNC_BN: True
       SYNC_BN_TYPE: pytorch
