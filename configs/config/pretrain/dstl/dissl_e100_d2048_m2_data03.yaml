@@ -21,10 +21,10 @@ config:
     NUM_DATALOADER_WORKERS: 8
     TRAIN:
       DATA_SOURCES: [ disk_folder ]
+      LABEL_SOURCES: [disk_folder]
       DATASET_NAMES: [ imagenet1k_folder ]
       DATA_PATHS: [ "./data/imagenet256/train" ]
       BATCHSIZE_PER_REPLICA: 96
-      LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
         - name: ImgPilToMultiCrop
           total_num_crops: 2
