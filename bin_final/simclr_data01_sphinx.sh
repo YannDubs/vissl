@@ -4,7 +4,7 @@ model=simclr_data01
 
 ./dev/launch_slurm.sh \
     "$model"_dir \
-    config=pretrain/cntr/"$model" \
+    config=pretrain/simclr/"$model" \
     +config/server=sphinx8 \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=8 \
