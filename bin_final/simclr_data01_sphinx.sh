@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-model=dissl_e100_d2048_m2_data01
+model=simclr_data01
 
 ./dev/launch_slurm.sh \
     "$model"_dir \
