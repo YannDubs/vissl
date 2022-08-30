@@ -42,13 +42,13 @@ else
 fi
 
 # LINEAR EVAL
-echo "Linear eval."
-conda activate probing
-
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_sklearn --is-sklearn --is-no-progress-bar
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_svm --is-sklearn --is-no-progress-bar --is-svm
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
+#echo "Linear eval."
+#conda activate probing
+#
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_sklearn --is-sklearn --is-no-progress-bar
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_svm --is-sklearn --is-no-progress-bar --is-svm
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 
 #python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_w3e-6_l01_b2048 --weight-decay 3e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 #python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_w3e-5_l01_b2048 --weight-decay 3e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
@@ -68,8 +68,8 @@ python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path 
 #python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/trnsf/"$data"/eval_w1e-5_l01_bn_2048 --weight-decay 1e-5 --lr 0.1 --is-batchnorm --batch-size 2048 --is-no-progress-bar --is-monitor-test
 
 
-if [[ -f "$dir"/eval ]]; then
-    rm -rf "$feature_dir"
-fi
+#if [[ -f "$dir"/eval ]]; then
+#    rm -rf "$feature_dir"
+#fi
 
 EOT
