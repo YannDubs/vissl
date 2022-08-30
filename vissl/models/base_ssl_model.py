@@ -183,8 +183,17 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
                #outputs = 1
         """
         if self.model_config.TRUNK.RESNETS.IS_SKIP_RESIZER:
-            feats[0] = feats[0][:, :2048]
-            feats[1] = feats[1][:, 2048:]
+            if len(feats) == 1:
+                new_feats = []
+                # without multicrop
+                new_feats.append(feats[0][:, :2048])
+                new_feats.append(feats[0][:, 2048:])
+                # now has two sets of features
+                feats = new_feats
+            else:
+                # with multi crop
+                feats[0] = feats[0][:, :2048]
+                feats[1] = feats[1][:, 2048:]
 
         # Example case: training linear classifiers on various layers
         if len(feats) == len(heads):
