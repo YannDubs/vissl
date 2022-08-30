@@ -7,7 +7,7 @@ epochs="$2"
 ./dev/launch_slurm.sh \
     $base_dir/augeval \
     config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear \
-    +config/server=sphinx \
+    +config/server=sphinx4_1 \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
@@ -16,7 +16,6 @@ epochs="$2"
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=1024 \
     config.DATA.TEST.BATCHSIZE_PER_REPLICA=2048 \
     config.DATA.NUM_DATALOADER_WORKERS=15 \
-    config.SLURM.PORT_ID=40051 \
     config.SLURM.NAME=augeval_"$base_dir" \
     config.SLURM.MEM_GB=128 \
     config.SLURM.NUM_CPU_PER_PROC=16 \
