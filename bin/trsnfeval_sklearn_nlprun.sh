@@ -16,8 +16,8 @@ feature_dir=/scr/biggest/yanndubs/"$dir"/features/"$data"
 sbatch <<EOT
 #!/usr/bin/env zsh
 #SBATCH --job-name=eval_"$dir""$sffx"_"$data"
-#SBATCH --partition=john
-#SBATCH --cpus-per-task=32
+#SBATCH --partition=jagupard-hi
+#SBATCH --cpus-per-task=16
 #SBATCH --mem=128G
 #SBATCH --nodelist=jagupard24
 #SBATCH --output="$dir"/eval_logs/"$data"/slurm-%j.out
