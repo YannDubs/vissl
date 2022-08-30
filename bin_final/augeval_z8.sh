@@ -7,7 +7,7 @@ epochs="$2"
 ./dev/launch_slurm.sh \
     $base_dir/augeval \
     config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_z8 \
-    +config/server=sphinx7_1 \
+    +config/server=sphinx4_1 \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
     config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
