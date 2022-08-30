@@ -19,7 +19,7 @@ sbatch <<EOT
 #SBATCH --partition=john
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=128G
-#SBATCH --nodelist=john10
+#SBATCH --nodelist=jagupard24
 #SBATCH --output="$dir"/eval_logs/"$data"/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/"$data"/slurm-%j.err
 
