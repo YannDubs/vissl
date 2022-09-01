@@ -27,10 +27,10 @@ config:
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
         - name: ImgPilToMultiCrop
-          total_num_crops: 6
-          size_crops: [ 160, 96 ]
-          num_crops: [ 2, 4 ]
-          crop_scales: [ [ 0.14, 1 ], [ 0.05, 0.14 ] ]
+          total_num_crops: 2
+          size_crops: [ 224 ]
+          num_crops: [ 2 ]
+          crop_scales: [ [ 0.08, 1 ] ]
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
@@ -58,17 +58,16 @@ config:
       NAME: resnet
       RESNETS:
         DEPTH: 50
-        Z_DIM_OLD_TMP_NEW : [2048, 512, 8192]
     HEAD:
       PARAMS: [
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
-          [ "mlp", { "dims": [ 512, 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True, "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
@@ -86,10 +85,9 @@ config:
       temperature_assign: 0.5
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
-      crops_for_assign: [ 0, 1 ]
+      crops_for_teacher: [ 0, 1 ]
       beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
-      ema_weight_marginal: null
   OPTIMIZER:
     name: sgd
     use_zero: False
@@ -137,7 +135,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_zdim8_ep400"
+    NAME: "dissl_e400_d2048_m2"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120

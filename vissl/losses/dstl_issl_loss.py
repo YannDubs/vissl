@@ -29,9 +29,9 @@ class DstlISSLLoss(ClassyLoss):
         temperature_assign (float):     the temperature to be applied on the logits for assigning M(X).
         temperature_pred (float):       the temperature to be applied on the logits for predicting M(X)
         num_crops (int):                number of crops used
-        crops_for_assign (List[int]):   what crops to use for assignment
+        crops_for_teacher (List[int]):  what crops to use for teacher (including invariance)
+        crops_for_Mx (List[int]):      what crops to use as M(X) for student. By default same as teacher.
         beta_pM_unif (float):           scaling to use for the entropy.
-        ema_weight_marginal (float):    ema to use for the prior. If None no ema.
     """
 
     def __init__(self, loss_config: AttrDict, device: str = "gpu"):
@@ -43,10 +43,10 @@ class DstlISSLLoss(ClassyLoss):
             temperature_assign = self.loss_config.temperature_assign,
             temperature_pred = self.loss_config.temperature_pred,
             num_crops = self.loss_config.num_crops,
-            crops_for_assign = self.loss_config.crops_for_assign,
+            crops_for_teacher = self.loss_config.crops_for_teacher,
+            crops_for_Mx=self.loss_config.crops_for_Mx,
             beta_H_MlZ = self.loss_config.beta_H_MlZ,
             beta_pM_unif = self.loss_config.beta_pM_unif,
-            ema_weight_marginal = self.loss_config.ema_weight_marginal,
             warmup_teacher_iter = self.loss_config.warmup_teacher_iter,
             warmup_beta_unif_iter = self.loss_config.warmup_beta_unif_iter,
             warmup_beta_CE_iter = self.loss_config.warmup_beta_CE_iter
@@ -81,10 +81,10 @@ class DstlISSLCriterion(nn.Module):
                  temperature_assign : float = 0.5,
                  temperature_pred : float = 1,
                  num_crops : int = 2,
-                 crops_for_assign : list[int] = [0,1],
+                 crops_for_teacher : list[int] = [0,1],
+                 crops_for_Mx : list[int] = None,
                  beta_H_MlZ : float = 0.5,
                  beta_pM_unif: float = 1.9,
-                 ema_weight_marginal : float = 0.7,
                  warmup_beta_unif_iter: int = None,  # haven't tried but might be worth
                  warmup_teacher_iter: int= None,
                 warmup_beta_CE_iter: int=None
@@ -96,10 +96,10 @@ class DstlISSLCriterion(nn.Module):
         self.temperature_assign = temperature_assign
         self.temperature_pred = temperature_pred
         self.num_crops = num_crops
-        self.crops_for_assign = crops_for_assign
+        self.crops_for_teacher = crops_for_teacher
+        self.crops_for_Mx = crops_for_Mx or self.crops_for_teacher
         self.beta_pM_unif = beta_pM_unif
         self.beta_H_MlZ = beta_H_MlZ
-        self.ema_weight_marginal = ema_weight_marginal
         self.warmup_beta_unif_iter = warmup_beta_unif_iter
         self.warmup_teacher_iter = warmup_teacher_iter
         self.warmup_beta_CE_iter = warmup_beta_CE_iter
@@ -109,13 +109,6 @@ class DstlISSLCriterion(nn.Module):
         if self.beta_pM_unif >= self.beta_H_MlZ + 1:
             logging.info(f"Theory suggests beta_pM_unif >= beta_H_MlZ + 1, which doesn't currently hold {beta_pM_unif} < {beta_H_MlZ + 1}.")
 
-        if self.ema_weight_marginal is not None:
-            # initialize running means with uniform
-            uniform = torch.ones(self.n_Mx) / self.n_Mx
-            self.running_means = nn.ModuleList([RunningMean(uniform,
-                                                            alpha_use=self.ema_weight_marginal)
-                                                for _ in range(len(self.crops_for_assign))])
-
     def forward(self, output: List[torch.Tensor]):
 
         self.num_iteration += 1
@@ -124,10 +117,10 @@ class DstlISSLCriterion(nn.Module):
         logits_assign = logits_assign.float() / self.temperature_assign
 
         all_p_Mlz = F.softmax(logits_assign, dim=-1
-                              ).chunk(len(self.crops_for_assign))
+                              ).chunk(len(self.crops_for_teacher))
 
         all_log_p_Mlz = F.log_softmax(logits_assign, dim=-1
-                                      ).chunk(len(self.crops_for_assign))
+                                      ).chunk(len(self.crops_for_teacher))
 
         all_log_q_Mlz = F.log_softmax(logits_predict.float() / self.temperature_pred, dim=-1
                                      ).chunk(self.num_crops)
@@ -137,28 +130,25 @@ class DstlISSLCriterion(nn.Module):
         CE_pMlz_pMlza = 0
         n_CE_pq = 0
         n_CE_pp = 0
-        for i_p, p_Mlz in enumerate(all_p_Mlz):
+        n_H = 0
+        for i_p, p_Mlz in zip(self.crops_for_teacher, all_p_Mlz):
+            if i_p not in self.crops_for_Mx:
+                continue  # skip crops that are not used for expectation
+
 
             ##### Ensure maximality #####
             # current marginal estimate p(M). batch shape: [] ; event shape: []
             p_M = p_Mlz.mean(0, keepdim=True)
             p_M = self.gather_marginal(p_M)  # avg marginal across all gpus
 
-            if self.ema_weight_marginal is not None:
-                is_ema = self.num_iteration > 5000
-                if is_ema:
-                    p_M = self.running_means[i_p](p_M)
-                else:
-                    # first few steps you update the running mean
-                    _ = self.running_means[i_p](p_M)
-
             # D[\hat{p}(M) || Unif(\calM)]. shape: []
             # for unif prior same as maximizing entropy. Could be computed once per GPU, but fast so ok
             H_M = H_M + Categorical(probs=p_M).entropy()
+            n_H += 1
             #############################
 
             ##### Ensure invariance and determinism of assignement #####
-            for i_log_p, log_p_Mlza in enumerate(all_log_p_Mlz):
+            for i_log_p, log_p_Mlza in zip(self.crops_for_teacher, all_log_p_Mlz):
                 if i_p == i_log_p:
                     continue
                 CE_pMlz_pMlza = CE_pMlz_pMlza - (p_Mlz * log_p_Mlza).sum(-1)
@@ -167,6 +157,8 @@ class DstlISSLCriterion(nn.Module):
 
             ##### Distillation #####
             for i_q, log_q_Mlza in enumerate(all_log_q_Mlz):
+                # TODO this currently assumes that the first crops of student are the teacher ones
+
                 if i_p == i_q:
                     # we skip cases where student and teacher operate on the same view
                     continue
@@ -178,13 +170,10 @@ class DstlISSLCriterion(nn.Module):
             #########################
 
         CE_pMlz_qMlza /= n_CE_pq
-        H_M /= len(all_p_Mlz)
+        H_M /= n_H
         CE_pMlz_pMlza /= n_CE_pp
 
         fit_pM_Unif = - H_M  # want to max entropy
-        if self.ema_weight_marginal is not None and is_ema:
-            # try to balance the scaling in gradients due to running mean
-            fit_pM_Unif = fit_pM_Unif / self.ema_weight_marginal
 
         if self.warmup_beta_unif_iter is not None and self.num_iteration < self.warmup_beta_unif_iter:
             start_beta = self.beta_H_MlZ + 1
@@ -227,10 +216,9 @@ class DstlISSLCriterion(nn.Module):
             "temperature_assign": self.temperature_assign,
             "temperature_pred": self.temperature_pred,
             "num_crops": self.num_crops,
-            "crops_for_assign": self.crops_for_assign,
+            "crops_for_teacher": self.crops_for_teacher,
             "beta_pM_unif": self.beta_pM_unif,
             "beta_H_MlZ": self.beta_H_MlZ,
-            "ema_weight_marginal": self.ema_weight_marginal,
             "warmup_beta_unif_iter": self.warmup_beta_unif_iter,
             "warmup_teacher_iter": self.warmup_teacher_iter,
         }

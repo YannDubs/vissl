@@ -24,7 +24,7 @@ _TRANSFORMS_WITH_COPIES = [
     "ImgPilToPatchesAndImage",
     "ImgPilToMultiCrop",
 ]
-_TRANSFORMS_WITH_GROUPING = ["ImgPilMultiCropRandomApply"]
+_TRANSFORMS_WITH_GROUPING = ["ImgPilMultiCropRandomApply","ImgTensorMask"]
 _TRANSFORMS_WITH_OVERWRITE_ENTIRE_BATCH = ["OneHotEncode"]
 
 DEFAULT_TRANSFORM_TYPES = {

@@ -514,7 +514,7 @@ config:
     # i.e the parameters are frozen for specified iterations and then start training.
     TEMP_FROZEN_PARAMS_ITER_MAP: []
     # Colorization models take lab input. Everything else takes rgb. Options:
-    # lab | rgb | bgr
+    # lab | rgb | bgr | rgbm
     INPUT_TYPE: "rgb"
     # Multi-input model: input keys in the sample dictionary and which head
     # uses them for example, input contains "images" and "patches" and there
@@ -1006,29 +1006,13 @@ config:
       temperature_assign: 0.5
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
-      crops_for_assign: [0, 1]
-      beta_pM_unif: 1.9
-      beta_H_MlZ: 0.5
-      ema_weight_marginal: 0.7
+      crops_for_teacher: [0, 1]
+      beta_pM_unif: 2.3
+      beta_H_MlZ: 0.6
       warmup_beta_unif_iter: null
       warmup_teacher_iter: null
       warmup_beta_CE_iter: null
-
-    # ----------------------------------------------------------------------------------- #
-    # Regularized DISSL
-    # ----------------------------------------------------------------------------------- #
-    dissl_reg_loss:
-      n_Mx: 16384  # automatically inferred from model HEAD settings
-      z_dim: 2048  # automatically inferred from model HEAD settings
-      temperature_assign: 0.5
-      temperature_pred: 1
-      num_crops: 2 # automatically inferred from data transforms
-      crops_for_assign: [ 0, 1 ]
-      beta_pM_unif: 1.9
-      beta_H_MlZ: 0.5
-      ema_weight_marginal: 0.7
-      beta_reg: 1e-1
-      mode: etf
+      crops_for_Mx: null # by default it's the same as crops for assign. The difference is that assign is also for forcing invariance of teacher while expectation is only for the Mx
 
     # ----------------------------------------------------------------------------------- #
     # Multi-crop version of SimCLR InfoNCE LOSS (supports multicrop augmentation proposed

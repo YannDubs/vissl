@@ -45,6 +45,7 @@ class INPUT_CHANNEL(int, Enum):
     lab = 1
     bgr = 3
     rgb = 3
+    rgba = 4
 
 
 class SUPPORTED_L4_STRIDE(int, Enum):
