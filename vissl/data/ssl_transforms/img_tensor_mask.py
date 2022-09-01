@@ -29,7 +29,7 @@ class ImgTensorMask(ClassyTransform):
 
     def __call__(self, image_list: List[torch.Tensor]):
         assert isinstance(image_list, list), "image_list must be a list"
-        assert len(image_list) == len(self.prob)
+        assert len(image_list) == len(self.prob_mask)
 
         return [self.mask_single_img(img,p)
                 for img, p in zip(image_list, self.prob_mask)]
