@@ -18,7 +18,7 @@ config:
       LOG_PARAMS: False
       LOG_PARAMS_GRADIENTS: False
   DATA:
-    NUM_DATALOADER_WORKERS: 8
+    NUM_DATALOADER_WORKERS: 0 # 8
     TRAIN:
       DATA_SOURCES: [ disk_folder ]
       DATASET_NAMES: [ imagenet1k_folder ]

@@ -35,6 +35,7 @@ class ImgTensorMask(ClassyTransform):
                 for img, p in zip(image_list, self.prob_mask)]
 
     def mask_single_img(self, img, p):
+        breakpoint()
         alpha = torch.ones_like(img[0:1])
         new_img = torch.cat([img, alpha], dim=0)
         if p > 0 and not math.isclose(p, 0, abs_tol=1e-5):
