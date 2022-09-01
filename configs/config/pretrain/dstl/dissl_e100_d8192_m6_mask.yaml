@@ -18,7 +18,7 @@ config:
       LOG_PARAMS: False
       LOG_PARAMS_GRADIENTS: False
   DATA:
-    NUM_DATALOADER_WORKERS: 0 # 8
+    NUM_DATALOADER_WORKERS: 8
     TRAIN:
       DATA_SOURCES: [ disk_folder ]
       DATASET_NAMES: [ imagenet1k_folder ]
@@ -92,6 +92,7 @@ config:
       crops_for_teacher: [ 0, 1 ]
       beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
+      crops_for_Mx: [0] # should try None (ie same as teacher
   OPTIMIZER:
     name: sgd
     use_zero: False

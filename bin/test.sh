@@ -9,4 +9,6 @@ python3 tools/run_distributed_engines.py \
     config.SLURM.USE_SLURM=False \
     config.DATA.TRAIN.DATA_LIMIT=100000 \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=24 \
+    config.DATA.TRAIN.DATA_PATHS=["./data/imagenet/train"] \
+    config.DATA.NUM_DATALOADER_WORKERS=0 \
     config.OPTIMIZER.num_epochs=3
