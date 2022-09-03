@@ -27,10 +27,10 @@ config:
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
         - name: ImgPilToMultiCrop
-          total_num_crops: 2
-          size_crops: [ 224 ]
-          num_crops: [ 2 ]
-          crop_scales: [ [ 0.08, 1 ] ]
+          total_num_crops: 6
+          size_crops: [224,  96]
+          num_crops: [ 2, 4 ]
+          crop_scales: [[0.3, 1], [0.05, 0.3]]  # like MSN
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
@@ -43,6 +43,9 @@ config:
         - name: Normalize
           mean: [ 0.485, 0.456, 0.406 ]
           std: [ 0.229, 0.224, 0.225 ]
+        - name: ImgTensorMask
+          prob_mask: [ 0, 0.15, 0, 0, 0, 0] # should also try 0.3
+          patch_size: 16
       COLLATE_FUNCTION: multicrop_collator
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
@@ -53,22 +56,22 @@ config:
   METERS:
     name: ""
   MODEL:
+    INPUT_TYPE: "rgba" # uses also a mask => one more channel
     MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
     TRUNK:
       NAME: resnet
       RESNETS:
         DEPTH: 50
-        Z_DIM_OLD_TMP_NEW : [2048, 512, 8192]
     HEAD:
       PARAMS: [
         # the first is the teacher
         [
-          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
-          [ "mlp", { "dims": [ 512, 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True, "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 2048, 2048, 2048 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
         [ # that's a low rank linear layer
-          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 2048, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": False } ],
           [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
         ],
       ]
@@ -87,8 +90,9 @@ config:
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
       crops_for_teacher: [ 0, 1 ]
-      beta_pM_unif: 2.3
-      beta_H_MlZ: 0.6
+      beta_pM_unif: 2.3 # 2.1
+      beta_H_MlZ: 0.6 # 0.5
+      crops_for_Mx: [0] # should try None (ie same as teacher
   OPTIMIZER:
     name: sgd
     use_zero: False
@@ -136,7 +140,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_e100_d8192_m2"
+    NAME: "dissl_e100_d2048_m6_r015"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120

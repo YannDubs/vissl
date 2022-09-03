@@ -1,0 +1,149 @@
+# @package _global_
+config:
+  VERBOSE: False
+  LOG_FREQUENCY: 100
+  TEST_ONLY: False
+  TEST_MODEL: False
+  SEED_VALUE: 0
+  MULTI_PROCESSING_METHOD: forkserver
+  HOOKS:
+    PERF_STATS:
+      MONITOR_PERF_STATS: True
+      ROLLING_BTIME_FREQ: 313
+    TENSORBOARD_SETUP:
+      USE_TENSORBOARD: False
+      LOG_DIR: "."
+      EXPERIMENT_LOG_DIR: "tensorboard"
+      FLUSH_EVERY_N_MIN: 5
+      LOG_PARAMS: False
+      LOG_PARAMS_GRADIENTS: False
+  DATA:
+    NUM_DATALOADER_WORKERS: 8
+    TRAIN:
+      DATA_SOURCES: [ disk_folder ]
+      DATASET_NAMES: [ imagenet1k_folder ]
+      DATA_PATHS: [ "./data/imagenet256/train" ]
+      BATCHSIZE_PER_REPLICA: 96
+      LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
+      TRANSFORMS:
+        - name: ImgPilToMultiCrop
+          total_num_crops: 2
+          size_crops: [ 224 ]
+          num_crops: [ 2 ]
+          crop_scales: [ [ 0.08, 1 ] ]
+        - name: RandomHorizontalFlip
+          p: 0.5
+        - name: ImgPilColorDistortion
+          strength: 1.0
+        - name: ImgPilGaussianBlur
+          p: 0.5
+          radius_min: 0.1
+          radius_max: 2.0
+        - name: ToTensor
+        - name: Normalize
+          mean: [ 0.485, 0.456, 0.406 ]
+          std: [ 0.229, 0.224, 0.225 ]
+        - name: ImgTensorMask
+          prob_mask: [ 0.15, 0.15 ]
+          patch_size: 16
+      COLLATE_FUNCTION: multicrop_collator
+      MMAP_MODE: True
+      COPY_TO_LOCAL_DISK: False
+      COPY_DESTINATION_DIR: /tmp/imagenet1k/
+      DROP_LAST: True
+  TRAINER:
+    TRAIN_STEP_NAME: standard_train_step
+  METERS:
+    name: ""
+  MODEL:
+    INPUT_TYPE: "rgba"
+    MULTI_RES_SPLIT_CROPS: [ [ 0, 1 ], [ 0, null ] ] # for the assignement we give large resolution while for predictor only small
+    TRUNK:
+      NAME: resnet
+      RESNETS:
+        DEPTH: 50
+        Z_DIM_OLD_TMP_NEW : [2048, 512, 8192]
+    HEAD:
+      PARAMS: [
+        # the first is the teacher
+        [
+          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 512, 2048, 2048, 512 ], "use_relu": True, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False, "is_residual": True, "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
+        ],
+        [ # that's a low rank linear layer
+          [ "mlp", { "dims": [ 8192, 512 ], "use_relu": False, "use_bn": True, "use_bias": False, "skip_last_layer_relu_bn": False , "is_JL_init": False } ],
+          [ "mlp", { "dims": [ 512, 16384 ], "use_relu": False, "use_bn": False, "use_bias": True, "skip_last_layer_relu_bn": False } ],
+        ],
+      ]
+    SYNC_BN_CONFIG:
+      CONVERT_BN_TO_SYNC_BN: True
+      SYNC_BN_TYPE: pytorch
+      GROUP_SIZE: -1
+    AMP_PARAMS:
+      USE_AMP: True
+      AMP_TYPE: "pytorch"  # apex | pytorch
+  LOSS:
+    name: dstl_issl_loss
+    dstl_issl_loss:
+      n_Mx: 16384  # automatically inferred from model HEAD settings
+      temperature_assign: 0.5
+      temperature_pred: 1
+      num_crops: 2 # automatically inferred from data transforms
+      crops_for_teacher: [ 0, 1 ]
+      beta_pM_unif: 2.3 # 2.1
+      beta_H_MlZ: 0.6 # 0.5
+      crops_for_Mx: [ 0, 1 ]
+  OPTIMIZER:
+    name: sgd
+    use_zero: False
+    use_larc: True
+    larc_config:
+      clip: False
+      trust_coefficient: 0.001
+      eps: 0.00000001
+    weight_decay: 0.000001
+    momentum: 0.9
+    nesterov: False
+    num_epochs: 100
+    # num_epochs: 400
+    regularize_bn: True
+    regularize_bias: True
+    param_schedulers:
+      lr:
+        auto_lr_scaling:
+          auto_scale: true
+          base_value: 0.3
+          base_lr_batch_size: 256
+        name: composite
+        schedulers:
+          - name: linear
+            start_value: 0.001
+            end_value: 4.8
+          - name: cosine
+            start_value: 4.8
+            end_value: 0.0000
+        update_interval: step
+        interval_scaling: [rescaled, fixed]
+        lengths: [0.1, 0.9]                 # 100ep
+        # lengths: [0.025, 0.975]           # 400ep
+  DISTRIBUTED:
+    BACKEND: nccl
+    NUM_NODES: 2    # gives batch size of 20
+    NUM_PROC_PER_NODE: 4
+    INIT_METHOD: tcp
+    NCCL_DEBUG: True
+  MACHINE:
+    DEVICE: gpu
+  CHECKPOINT:
+    AUTO_RESUME: True
+    CHECKPOINT_FREQUENCY: 5
+    CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
+
+  SLURM:
+    NAME: "dissl_e100_d8192_m2_r015_same"
+    MEM_GB: 128 #  4 (gpu per node) * 32
+    USE_SLURM: True
+    TIME_HOURS: 120
+    #NUM_CPU_PER_PROC: 64 # for sphinx
+    #MEM_GB: 250 # for sphinx

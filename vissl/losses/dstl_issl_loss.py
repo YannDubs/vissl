@@ -131,7 +131,6 @@ class DstlISSLCriterion(nn.Module):
         n_CE_pq = 0
         n_CE_pp = 0
         n_H = 0
-        breakpoint()
         for i_p, p_Mlz in zip(self.crops_for_teacher, all_p_Mlz):
             if i_p not in self.crops_for_Mx:
                 continue  # skip crops that are not used for expectation

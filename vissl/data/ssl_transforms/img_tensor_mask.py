@@ -10,6 +10,7 @@ import torch
 from classy_vision.dataset.transforms import build_transform, register_transform
 from classy_vision.dataset.transforms.classy_transform import ClassyTransform
 import math
+import einops
 
 @register_transform("ImgTensorMask")
 class ImgTensorMask(ClassyTransform):
@@ -35,7 +36,6 @@ class ImgTensorMask(ClassyTransform):
                 for img, p in zip(image_list, self.prob_mask)]
 
     def mask_single_img(self, img, p):
-        breakpoint()
         alpha = torch.ones_like(img[0:1])
         new_img = torch.cat([img, alpha], dim=0)
         if p > 0 and not math.isclose(p, 0, abs_tol=1e-5):
@@ -44,7 +44,7 @@ class ImgTensorMask(ClassyTransform):
             n_h_patch = h // self.patch_size
             n_w_patch = w // self.patch_size
             n_patches = n_h_patch * n_w_patch
-            masked_patches = (torch.rand((n_patches, 1, 1)) < p).float() * self.base_patch
+            masked_patches = (torch.rand((n_patches, 1, 1)) > p).float() * self.base_patch
             mask = einops.rearrange(masked_patches, "(nh nw) p1 p2 -> (nh p1) (nw p2)",
                                     nh=n_h_patch, nw=n_w_patch)
             new_img *= mask

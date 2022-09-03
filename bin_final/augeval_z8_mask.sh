@@ -5,8 +5,8 @@ epochs="$2"
 
 
 ./dev/launch_slurm.sh \
-    $base_dir/augeval_barlow \
-    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_z8_barlow \
+    $base_dir/augeval \
+    config=benchmark/linear_image_classification/imagenet1k/eval_resnet_in1k_linear_z8_mask \
     +config/server=sphinx \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=1 \
@@ -16,7 +16,7 @@ epochs="$2"
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=1024 \
     config.DATA.TEST.BATCHSIZE_PER_REPLICA=2048 \
     config.DATA.NUM_DATALOADER_WORKERS=15 \
-    config.SLURM.PORT_ID=40016 \
-    config.SLURM.NAME=augevalbt_"$base_dir" \
+    config.SLURM.PORT_ID=40005 \
+    config.SLURM.NAME=augeval_"$base_dir" \
     config.SLURM.MEM_GB=128 \
     config.SLURM.NUM_CPU_PER_PROC=16 \
