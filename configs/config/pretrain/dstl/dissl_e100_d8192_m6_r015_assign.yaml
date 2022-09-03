@@ -93,7 +93,7 @@ config:
       crops_for_teacher: [ 0, 1 ]
       beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
-      crops_for_Mx: [0] # should try None (ie same as teacher
+      crops_for_Mx: [0,1] # should try None (ie same as teacher
   OPTIMIZER:
     name: sgd
     use_zero: False
@@ -141,7 +141,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_e100_d8192_m6_r015"
+    NAME: "dissl_e100_d8192_m6_r015_assign"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
