@@ -15,11 +15,11 @@ if  [[ "$DATA" == "sun397" ]]; then
     hydra.verbose=true \
     config=feature_extraction/extract_resnet_nocrop"$SFFX" \
     config.DATA.TRAIN.DATASET_NAMES=["$DATA"_filelist] \
-    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/train_images.npy"] \
-    config.DATA.TRAIN.LABEL_PATHS=["./data/biggest/$DATA/train_labels.npy"] \
+    config.DATA.TRAIN.DATA_PATHS=["./data/nlp/$DATA/train_images.npy"] \
+    config.DATA.TRAIN.LABEL_PATHS=["./data/nlp/$DATA/train_labels.npy"] \
     config.DATA.TEST.DATASET_NAMES=["$DATA"_filelist] \
-    config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/test_images.npy"] \
-    config.DATA.TEST.LABEL_PATHS=["./data/biggest/$DATA/test_labels.npy"] \
+    config.DATA.TEST.DATA_PATHS=["./data/nlp/$DATA/test_images.npy"] \
+    config.DATA.TEST.LABEL_PATHS=["./data/nlp/$DATA/test_labels.npy"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \
@@ -40,8 +40,8 @@ elif  [[ "$DATA" == "cifar10" || "$DATA" == "cifar100" ]]; then
     config=feature_extraction/extract_resnet_torchvision"$SFFX" \
     config.DATA.TEST.DATASET_NAMES=["$dataset_name"] \
     config.DATA.TRAIN.DATASET_NAMES=["$dataset_name"] \
-    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/"] \
-    config.DATA.TEST.DATA_PATHS=["./data/biggest/"] \
+    config.DATA.TRAIN.DATA_PATHS=["./data/nlp/"] \
+    config.DATA.TEST.DATA_PATHS=["./data/nlp/"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \
@@ -67,8 +67,8 @@ else
     config=feature_extraction/extract_resnet"$SFFX" \
     config.DATA.TEST.DATASET_NAMES=["$dataset_name"] \
     config.DATA.TRAIN.DATASET_NAMES=["$dataset_name"] \
-    config.DATA.TRAIN.DATA_PATHS=["./data/biggest/$DATA/train"] \
-    config.DATA.TEST.DATA_PATHS=["./data/biggest/$DATA/test"] \
+    config.DATA.TRAIN.DATA_PATHS=["./data/nlp/$DATA/train"] \
+    config.DATA.TEST.DATA_PATHS=["./data/nlp/$DATA/test"] \
     config.MODEL.WEIGHTS_INIT.PARAMS_FILE="$CKPT_DIR""$PARAMS_FILE" \
     config.EXTRACT_FEATURES.OUTPUT_DIR="$OUT_DIR" \
     config.DISTRIBUTED.NUM_NODES=1 \

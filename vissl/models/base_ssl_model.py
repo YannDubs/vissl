@@ -123,7 +123,7 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         for i, end_idx in enumerate(idx_crops):
             if i == 0 and self.model_config.IS_AUX_SKIP_RESIZER:
                 # select only the non resized version for the teacher
-                # currently works only with initial dim 2048
+                # TODO currently works only with initial dim 2048
                 feat = self.trunk(torch.cat(batch[start_idx:end_idx]), feature_names, is_skip_resizer=True)
                 feat[0] = feat[0][:, 2048:]
                 aux_feat = feat[0][:, :2048]
@@ -135,15 +135,16 @@ class BaseSSLMultiInputOutputModel(ClassyModel):
         multi_feats = [torch.cat(feats[start:end]) for start, end in self.model_config.MULTI_RES_SPLIT_CROPS]
 
         if self.model_config.AUX_TRUNK.NAME is not None:
-            # currently works if teacher is only for the first resolution
+            # TODO currently works if teacher is only for the first resolution
             assert self.model_config.MULTI_RES_SPLIT_CROPS[0] == [0,1]
             aux_feat = self.aux_trunk(torch.cat(batch[:idx_crops[0]]), feature_names)[0]
             multi_feats[0] = aux_feat
 
         elif self.model_config.IS_AUX_SKIP_RESIZER:
-            # currently works if teacher is only for the first resolution
+            # TODO currently works if teacher is only for the first resolution
             assert self.model_config.MULTI_RES_SPLIT_CROPS[0] == [0, 1]
             multi_feats[0] = aux_feat
+
 
         return self.heads_forward(multi_feats, self.heads)
 

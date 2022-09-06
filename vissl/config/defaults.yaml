@@ -646,6 +646,7 @@ config:
         # If using GroupNorm, this sets number of groups. Recommend 32 as a
         # naive suggestion. GroupNorm only available for ResNe(X)t.
         GROUPNORM_GROUPS: 32
+        IS_NORMALIZE_SETCONV: False # ADDED
         # Use weight-standardized convolutions
         STANDARDIZE_CONVOLUTIONS: False
         GROUPS: 1
@@ -656,7 +657,7 @@ config:
         # use this so we set the default as 2.
         LAYER4_STRIDE: 2
         OUT_FEAT_KEYS: null
-        AVG_POOL_KERNEL_SIZE: -1
+        AVG_POOL_KERNEL_SIZE: -1 #
         Z_DIM_OLD_TMP_NEW: null
         IS_SKIP_RESIZER: False
 

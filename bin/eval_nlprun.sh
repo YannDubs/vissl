@@ -3,19 +3,20 @@
 #jagupard27,jagupard26,jagupard21
 dir="$1"
 sffx="$2"
+data=${3:-'imagenet256'} # should be imagenet256 or imagenet_100
 mkdir -p "$dir"/eval_logs
-echo "Evaluating " "$dir" "$sffx"
-feature_dir=/scr/biggest/yanndubs/"$dir"/features
+echo "Evaluating " "$dir" "$sffx" on  "$data"
+feature_dir=/scr/biggest/yanndubs/"$dir"/"$data"/features
 
 sbatch <<EOT
 #!/usr/bin/env zsh
-#SBATCH --job-name=eval_"$dir""$sffx"
-#SBATCH --partition=jag-hi
+#SBATCH --job-name=eval_"$dir""$sffx"_"$data"
+#SBATCH --partition=jag-standard
 #SBATCH --gres=gpu:1
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=64G
-#SBATCH --nodelist=jagupard26
+#SBATCH --mem=48G
+#SBATCH --exclude=jagupard10,jagupard11,jagupard12,jagupard13,jagupard14,jagupard15,jagupard16,jagupard17,jagupard18
 #SBATCH --output="$dir"/eval_logs/slurm-%j.out
 #SBATCH --error="$dir"/eval_logs/slurm-%j.err
 
@@ -26,17 +27,12 @@ echo \$(which -p conda)
 
 # EXTRACT FEATURES
 echo "Feature directory : $feature_dir"
-is_already_features=\$( python -c "from pathlib import Path; print(len(list(Path('"$feature_dir"').glob('**/*chunk63*'))) > 0)" )
-echo "is_already_features: \$is_already_features"
+end_featurized="$feature_dir/is_featurized"
 
-if [[ "\$is_already_features" == "True" ]]
-then
-    echo "Features already present."
-else
-    echo "featurizing."
-    conda activate vissl
-    bin/extract_features_sphinx.sh "$dir" "$sffx"
-fi
+echo "featurizing."
+conda activate vissl
+bin/extract_features_sphinx.sh "$dir" "$sffx" "$data"
+touch "\$end_featurized"
 
 # LINEAR EVAL
 echo "Linear eval."
@@ -44,20 +40,19 @@ conda activate probing
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_b2048 --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-6_l01_b2048 --weight-decay 3e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-5_l01_b2048 --weight-decay 3e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-4_l01_b2048 --weight-decay 1e-4 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-7_l01_b2048 --weight-decay 1e-7 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l03_b2048 --weight-decay 1e-6 --lr 0.3 --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l1_b2048 --weight-decay 1e-6 --lr 1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l003_b2048 --weight-decay 1e-6 --lr 0.03 --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b2048_lars --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-lars --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_b2048_lars --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-lars --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w0_l001_b2048_lars --weight-decay 0 --lr 0.01 --batch-size 2048 --is-lars --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b2048 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b2048_e300 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --n-epochs 300 --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l001_b2048 --weight-decay 1e-6 --lr 0.01 --batch-size 2048 --is-no-progress-bar --is-monitor-test
 python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_bn_2048 --weight-decay 1e-6 --lr 0.1 --is-batchnorm --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_bn_2048 --weight-decay 1e-5 --lr 0.1 --is-batchnorm --batch-size 2048 --is-no-progress-bar --is-monitor-test
-python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval --is-no-progress-bar --is-monitor-test
+python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w0_l001_b2048_lars --weight-decay 0 --lr 0.01 --batch-size 2048 --is-lars --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w3e-5_l01_b2048 --weight-decay 3e-5 --lr 0.1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l1_b2048 --weight-decay 1e-6 --lr 1 --batch-size 2048 --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b2048_lars --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --is-lars --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_b2048_lars --weight-decay 1e-5 --lr 0.1 --batch-size 2048 --is-lars --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w0_l001_b2048_lars --weight-decay 0 --lr 0.01 --batch-size 2048 --is-lars --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-6_l01_b2048_e300 --weight-decay 1e-6 --lr 0.1 --batch-size 2048 --n-epochs 300 --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval_w1e-5_l01_bn_2048 --weight-decay 1e-5 --lr 0.1 --is-batchnorm --batch-size 2048 --is-no-progress-bar --is-monitor-test
+#python tools/linear_eval.py --no-wandb --feature-path "$feature_dir" --out-path "$dir"/eval --is-no-progress-bar --is-monitor-test
 
 if [[ -f "$dir"/eval ]]; then
     rm -rf "$feature_dir"

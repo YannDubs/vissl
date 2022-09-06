@@ -11,6 +11,7 @@ from classy_vision.dataset.transforms import build_transform, register_transform
 from classy_vision.dataset.transforms.classy_transform import ClassyTransform
 import math
 import einops
+import numpy as np
 
 @register_transform("ImgTensorMask")
 class ImgTensorMask(ClassyTransform):
@@ -18,19 +19,33 @@ class ImgTensorMask(ClassyTransform):
     Apply masking for CNNs to a list of tensor images.
     """
 
-    def __init__(self, prob_mask: List[float], patch_size: int=16):
+    def __init__(self, prob_mask: List[float], patch_size: int=16, warmup_imgs=None):
         """
         Args:
             prob_mask (List(float)): Probability of masking patches for each image.
             patch_size (int): Size of patches.
+            warmup_imgs (int): if not None warms up linearly the masking probability
+                for that number of steps. Note that steps here are number of images =>
+                iter * batch_size.
         """
-        self.prob_mask = prob_mask
+        self._prob_mask = np.array(prob_mask)
         self.patch_size = patch_size
         self.base_patch = torch.ones(1, patch_size, patch_size).float()
+        self.warmup_imgs = warmup_imgs
+        self.step_counter = 0
+
+    @property
+    def prob_mask(self):
+        # TODO this does not currently work if get preempted / continue
+        if self.warmup_imgs is None or self.step_counter > self.warmup_imgs:
+            return self._prob_mask
+        # linear warmup
+        return self._prob_mask * self.step_counter / self.warmup_imgs
 
     def __call__(self, image_list: List[torch.Tensor]):
         assert isinstance(image_list, list), "image_list must be a list"
         assert len(image_list) == len(self.prob_mask)
+        self.step_counter += 1
 
         return [self.mask_single_img(img,p)
                 for img, p in zip(image_list, self.prob_mask)]
@@ -63,5 +78,6 @@ class ImgTensorMask(ClassyTransform):
         """
         patch_size = config.get("patch_size", 16)
         prob_mask = config.get("prob_mask", [])
-        logging.info(f"ImgTensorMask | Using prob: {prob_mask}")
-        return cls(prob_mask=prob_mask, patch_size=patch_size)
+        warmup_imgs = config.get("warmup_imgs", None)
+        logging.info(f"ImgTensorMask | Using prob: {prob_mask} | warmup_imgs: {warmup_imgs}")
+        return cls(prob_mask=prob_mask, patch_size=patch_size, warmup_imgs=warmup_imgs)

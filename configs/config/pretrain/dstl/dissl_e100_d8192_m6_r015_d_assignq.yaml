@@ -30,15 +30,17 @@ config:
           total_num_crops: 6
           size_crops: [224,  96]
           num_crops: [ 2, 4 ]
-          crop_scales: [[0.3, 1], [0.05, 0.3]]  # like MSN
+          crop_scales: [[0.3, 1], [0.05, 0.3]]  # actually dino would be crop_scales: [[0.4, 1], [0.05, 0.4]]
         - name: RandomHorizontalFlip
           p: 0.5
         - name: ImgPilColorDistortion
-          strength: 1.0
-        - name: ImgPilGaussianBlur
-          p: 0.5
-          radius_min: 0.1
-          radius_max: 2.0
+          strength: 0.5 # decreased strength just like DINO and RELICv2
+        - name: ImgPilMultiCropRandomApply
+          transforms: [ { "name": "ImgPilGaussianBlur", "p": 1., "radius_min": 0.1, "radius_max": 2.0 } ]
+          prob: [ 1., 0.1, 0.5, 0.5, 0.5, 0.5] # change gaussian blurring
+        - name: ImgPilMultiCropRandomApply
+          transforms: [ { "name": "ImgPilRandomSolarize", "p": 1. } ]
+          prob: [ 0., 0.2, 0., 0., 0, 0] # added solarize
         - name: ToTensor
         - name: Normalize
           mean: [ 0.485, 0.456, 0.406 ]
@@ -46,7 +48,7 @@ config:
         - name: ImgTensorMask
           prob_mask: [ 0.15, 0.15, 0, 0, 0, 0] # should also try 0.3
           patch_size: 16
-          warmup_imgs: 30000000
+          warmup_imgs: 500000
       COLLATE_FUNCTION: multicrop_collator
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
@@ -94,6 +96,7 @@ config:
       crops_for_teacher: [ 0, 1 ]
       beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
+      crops_for_Mx: [0] # should try None (ie same as teacher
   OPTIMIZER:
     name: sgd
     use_zero: False
@@ -141,7 +144,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_e100_d8192_m6_r015_assign"
+    NAME: "dissl_e100_d8192_m6_r015_d_assignq"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
