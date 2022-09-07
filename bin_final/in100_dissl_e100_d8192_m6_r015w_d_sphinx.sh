@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-model=dissl_e100_d8192_m4b4s_r015w
+model=dissl_e100_d8192_m6_r015w_d
 
 ./dev/launch_slurm.sh \
     in100_"$model"_dir \
@@ -11,7 +11,7 @@ model=dissl_e100_d8192_m4b4s_r015w
     config.DATA.TRAIN.DATA_PATHS=["./data/nlp/imagenet_100/train"] \
     config.DATA.TRAIN.BATCHSIZE_PER_REPLICA=320 \
     config.DATA.NUM_DATALOADER_WORKERS=15 \
-    config.SLURM.PORT_ID=40213 \
+    config.SLURM.PORT_ID=40216 \
     config.SLURM.NAME=in100_"$model" \
     config.SLURM.MEM_GB=480 \
     config.SLURM.NUM_CPU_PER_PROC=18 \

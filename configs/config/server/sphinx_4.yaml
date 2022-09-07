@@ -3,5 +3,5 @@ config:
     SLURM:
         PARTITION: sphinx
         ADDITIONAL_PARAMETERS:
-            exclude: sphinx3
+            #exclude: sphinx3,sphinx1
             gres: gpu:4

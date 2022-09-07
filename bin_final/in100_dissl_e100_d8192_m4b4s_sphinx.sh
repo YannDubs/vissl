@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-model=dissl_e100_d8192_m4b4s
+model=dissl_e100_d8192_m6_r015w_d
 
 ./dev/launch_slurm.sh \
     in100_"$model"_dir \
