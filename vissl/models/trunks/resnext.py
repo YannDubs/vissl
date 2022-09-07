@@ -110,23 +110,14 @@ class ResNeXt(nn.Module):
         # and re-construct the conv1
         self.input_channels = INPUT_CHANNEL[self.model_config.INPUT_TYPE]
 
-        if self.trunk_config.IS_NORMALIZE_SETCONV:
-            model_conv1 = SetConv2d(self.input_channels,
-                model.inplanes,
-                kernel_size=7,
-                stride=2,
-                padding=3,
-                bias=False,
-            )
-        else:
-            model_conv1 = nn.Conv2d(
-                self.input_channels,
-                model.inplanes,
-                kernel_size=7,
-                stride=2,
-                padding=3,
-                bias=False,
-            )
+        model_conv1 = nn.Conv2d(
+            self.input_channels,
+            model.inplanes,
+            kernel_size=7,
+            stride=2,
+            padding=3,
+            bias=False,
+        )
 
 
         model_bn1 = self._norm_layer(model.inplanes)
@@ -369,37 +360,6 @@ def variance_scaling_(tensor, scale=1.0, mode='fan_in', distribution='truncated_
     else:
         raise ValueError(f"invalid distribution {distribution}")
 
-
-
-
-class DensityConv2d(nn.Conv2d):
-    def __init__(self, in_channels, out_channels, **kwargs):
-        self.real_in_channels = in_channels
-        super().__init__(in_channels=1, out_channels=out_channels, **kwargs)
-
-    @property
-    def conv_args(self):
-        return [self.bias,
-                self.stride,
-                self.padding,
-                self.dilation]
-
-    def forward(self, x):
-        return F.conv2d(
-            x,
-            self.weight.abs().repeat(self.real_in_channels, 1, 1, 1),
-            *self.conv_args,
-            groups=self.real_in_channels,
-        )
-
-    def forward_mask(self, mask):
-        return F.conv2d(
-            mask,
-            self.weight.abs(),
-            *self.conv_args,
-            groups=1,
-        )
-
 class AbsConv2d(nn.Conv2d):
     def forward(self, x):
         return F.conv2d(
@@ -411,42 +371,3 @@ class AbsConv2d(nn.Conv2d):
             self.dilation
         )
 
-class SetConv2d(nn.Module):
-    def __init__(self, in_channels, out_channels, is_normalize_conv=True, is_multi_mask=True, **kwargs):
-        super().__init__()
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.is_normalize_conv = is_normalize_conv
-        self.is_multi_mask = is_multi_mask
-
-        if self.is_normalize_conv:
-            kwargs_density = dict(kernel_size=32, padding=32 // 2, bias=False)
-            if self.is_multi_mask:
-                self.density_conf = AbsConv2d(self.in_channels-1, self.in_channels-1, **kwargs_density)
-                in_channels = (self.in_channels - 1)*2
-            else:
-                self.density_conf = DensityConv2d(self.in_channels - 1, 1, **kwargs_density)
-
-        self.conv = nn.Conv2d(in_channels, self.out_channels, **kwargs)
-
-    def forward(self, x):
-        if not self.is_normalize_conv:
-            return self.conv(x)
-
-        mask = x[:, -1:, :, :]
-        set_signal = self.density_conf(x[:, :-1, :, :])
-
-        if self.is_multi_mask:
-            # for colors will have 3 channels
-            density = self.density_conf(mask.repeat(1, self.in_channels-1, 1, 1))
-        else:
-            # always single channel
-            density = self.density_conf.forward_mask(mask)
-
-        normalized_signal = set_signal / torch.clamp(density, min=1e-5)
-
-        # should not be needed (ensure that masked values stay masked)
-        # and only correct if mask is binary
-        normalized_signal = normalized_signal * mask
-
-        return self.conv(torch.cat([normalized_signal, density], dim=1))

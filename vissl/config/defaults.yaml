@@ -646,7 +646,6 @@ config:
         # If using GroupNorm, this sets number of groups. Recommend 32 as a
         # naive suggestion. GroupNorm only available for ResNe(X)t.
         GROUPNORM_GROUPS: 32
-        IS_NORMALIZE_SETCONV: False # ADDED
         # Use weight-standardized convolutions
         STANDARDIZE_CONVOLUTIONS: False
         GROUPS: 1
