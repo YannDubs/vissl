@@ -3,5 +3,5 @@ config:
     SLURM:
         PARTITION: sphinx-hi
         ADDITIONAL_PARAMETERS:
-            nodelist: sphinx7
+            nodelist: sphinx6
             gres: gpu:8
