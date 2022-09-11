@@ -6,7 +6,7 @@ port=$2
 ./dev/launch_slurm.sh \
     in100_"$model"_dir \
     config=pretrain/dstl/"$model" \
-    +config/server=sphinx_4 \
+    +config/server=sphinx4_4hi \
     config.DISTRIBUTED.NUM_NODES=1 \
     config.DISTRIBUTED.NUM_PROC_PER_NODE=4 \
     config.DATA.TRAIN.DATA_PATHS=["./data/nlp/imagenet_100/train"] \

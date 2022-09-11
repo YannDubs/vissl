@@ -27,9 +27,9 @@ config:
       LABEL_TYPE: sample_index    # just an implementation detail. Label isn't used
       TRANSFORMS:
         - name: ImgPilToMultiCrop
-          total_num_crops: 12
+          total_num_crops: 6
           size_crops: [224,  96]
-          num_crops: [ 4, 8 ]
+          num_crops: [ 2, 4 ]
           crop_scales: [[0.3, 1], [0.05, 0.3]]  # actually dino would be crop_scales: [[0.4, 1], [0.05, 0.4]]
         - name: RandomHorizontalFlip
           p: 0.5
@@ -37,16 +37,16 @@ config:
           strength: 0.5 # decreased strength just like DINO and RELICv2
         - name: ImgPilMultiCropRandomApply
           transforms: [ { "name": "ImgPilGaussianBlur", "p": 1., "radius_min": 0.1, "radius_max": 2.0 } ]
-          prob: [ 1.,1., 0.1, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5] # change gaussian blurring
+          prob: [ 1., 0.1, 0.5, 0.5, 0.5, 0.5] # change gaussian blurring
         - name: ImgPilMultiCropRandomApply
           transforms: [ { "name": "ImgPilRandomSolarize", "p": 1. } ]
-          prob: [ 0., 0., 0.2, 0.2, 0., 0., 0, 0, 0., 0., 0, 0] # added solarize
+          prob: [ 0.0, 0.5, 0., 0., 0, 0] # added solarize
         - name: ToTensor
         - name: Normalize
           mean: [ 0.485, 0.456, 0.406 ]
           std: [ 0.229, 0.224, 0.225 ]
         - name: ImgTensorMask
-          prob_mask: [ 0.15, 0.15, 0.30, 0.30, 0, 0, 0, 0, 0, 0, 0, 0] # should also try 0.3
+          prob_mask: [ 0.30, 0.30, 0, 0, 0, 0] # should also try 0.3
           patch_size: 16
           warmup_imgs: 10000000
       COLLATE_FUNCTION: multicrop_collator
@@ -90,12 +90,13 @@ config:
     name: dstl_issl_loss
     dstl_issl_loss:
       n_Mx: 16384  # automatically inferred from model HEAD settings
-      temperature_assign: 0.5
+      temperature_assign: 0.8
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
-      crops_for_teacher: [ 0, 1,2,3 ]
-      beta_pM_unif: 2.3 # 2.1
+      crops_for_teacher: [ 0, 1 ]
+      beta_pM_unif: 2.4 # 2.1
       beta_H_MlZ: 0.6 # 0.5
+      crops_for_Mx: [0,1] # should try None (ie same as teacher
   OPTIMIZER:
     name: sgd
     use_zero: False
@@ -143,7 +144,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_e100_d8192_m4b8s_r030ws_da_l05"
+    NAME: "dissl_e100_d8192_m6_r030ws_dalst_solXL"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120
