@@ -48,7 +48,7 @@ config:
         - name: ImgTensorMask
           prob_mask: [ 0.30, 0.30, 0, 0, 0, 0] # should also try 0.3
           patch_size: 16
-          warmup_imgs: 100000000
+          warmup_imgs: 10000000
       COLLATE_FUNCTION: multicrop_collator
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
@@ -141,7 +141,7 @@ config:
     CHECKPOINT_ITER_FREQUENCY: -1  # set this variable to checkpoint every few iterations
 
   SLURM:
-    NAME: "dissl_e100_d8192_m6_r030"
+    NAME: "dissl_e100_d8192_m6_r030_nowarm"
     MEM_GB: 128 #  4 (gpu per node) * 32
     USE_SLURM: True
     TIME_HOURS: 120

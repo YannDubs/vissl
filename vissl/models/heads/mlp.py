@@ -41,6 +41,7 @@ class MLP(nn.Module):
         dims: List[int],
         use_bn: bool = False,
         use_relu: bool = False,
+        use_gelu: bool = False,
         use_dropout: bool = False,
         use_bias: bool = True,
         skip_last_layer_relu_bn: bool = True,
@@ -66,6 +67,7 @@ class MLP(nn.Module):
         super().__init__()
         self.is_residual = is_residual
         self.is_cosine = is_cosine
+        assert not(use_gelu and use_relu), "Cannot use both ReLU and GELU"
 
         if self.is_residual:
             assert dims[0] == dims[-1]
@@ -89,6 +91,8 @@ class MLP(nn.Module):
                 )
             if use_relu:
                 layers.append(nn.ReLU(inplace=True))
+            if use_gelu:
+                layers.append(nn.GELU())
             if use_dropout:
                 layers.append(nn.Dropout())
             last_dim = dim
