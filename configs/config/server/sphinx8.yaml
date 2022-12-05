@@ -1,7 +1,8 @@
 # @package _global_
 config:
     SLURM:
-        PARTITION: sphinx
+        PARTITION: sphinx-lo
         ADDITIONAL_PARAMETERS:
             nodelist: sphinx8
             gres: gpu:8
+            account: nlp

@@ -5,3 +5,4 @@ config:
         ADDITIONAL_PARAMETERS:
             nodelist: sphinx5
             gres: gpu:1
+            account: nlp

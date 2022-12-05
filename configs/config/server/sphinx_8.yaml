@@ -4,3 +4,4 @@ config:
         PARTITION: sphinx
         ADDITIONAL_PARAMETERS:
             gres: gpu:8
+            account: nlp

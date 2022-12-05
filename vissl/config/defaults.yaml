@@ -93,6 +93,20 @@ config:
     # ----------------------------------------------------------------------------------- #
     CHECK_NAN: True
 
+    EMA_MODEL:
+      # Save an exponential moving average of the model weights.
+      SAVE_EMA_MODEL: False
+      # Calculate the meters for the model.
+      ENABLE_EMA_METERS: False
+      # after how many iterations should you update the EMA.
+      UPDATE_ITER: 1
+      # Decimal after what percent of the training to start the EMA. Defaults is 0.05 or 5%.
+      WARMUP: 0.05
+      # decay to use for the exponential moving average.
+      DECAY: 0.9999
+      # device to put EMA model on: gpu | cpu.
+      EMA_DEVICE: gpu
+
     # ----------------------------------------------------------------------------------- #
     # Perf hooks for several steps of model training
     # ----------------------------------------------------------------------------------- #
@@ -208,6 +222,7 @@ config:
   # DATA
   # ----------------------------------------------------------------------------------- #
   DATA:
+    IS_NOWARMUP: False
     # Common data options
     NUM_DATALOADER_WORKERS: 4 # Set this depending on the number of CPUs you have
     PIN_MEMORY: true # Makes CPU->GPU copy of the data faster
@@ -668,6 +683,8 @@ config:
         DEPTH: [3, 3, 27, 3]
         DIMS: [96, 192, 384, 768]
         DROP_PATH_RATE: 0.0
+        NORM_TYPE: "layernorm"
+        IS_SKIP_LAST_NORM: false
 
       # ------------------------------------------------------------- #
       # SimCLR-v2 ResNet params that includes selective kernel

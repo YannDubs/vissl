@@ -106,7 +106,7 @@ class DstlISSLCriterion(nn.Module):
         self.dist_rank = get_rank()
         self.register_buffer("num_iteration", torch.zeros(1, dtype=int))
 
-        if self.beta_pM_unif >= self.beta_H_MlZ + 1:
+        if self.beta_pM_unif < self.beta_H_MlZ + 1:
             logging.info(f"Theory suggests beta_pM_unif >= beta_H_MlZ + 1, which doesn't currently hold {beta_pM_unif} < {beta_H_MlZ + 1}.")
 
     def forward(self, output: List[torch.Tensor]):
@@ -200,7 +200,8 @@ class DstlISSLCriterion(nn.Module):
 
         loss = CE_pMlz_qMlza + beta_pM_unif * fit_pM_Unif + beta_H_MlZ * CE_pMlz_pMlza
 
-        if self.num_iteration % 200 == 0 and self.dist_rank == 0:
+        is_start = (self.num_iteration < 200) and (self.num_iteration in [1, 10, 20, 50, 100, 150])
+        if ((self.num_iteration % 200 == 0) or is_start) and self.dist_rank == 0:
             logging.info(f"H[M]: {H_M.mean()}")
             logging.info(f"Distil: {CE_pMlz_qMlza.mean()}")
             logging.info(f"Inv + det: {CE_pMlz_pMlza.mean()}")
@@ -235,19 +236,3 @@ class DstlISSLCriterion(nn.Module):
             marginal = marginal
         return marginal.mean(0)
 
-class RunningMean(nn.Module):
-    """Keep track of an exponentially moving average"""
-    def __init__(self, init: torch.tensor, alpha_use: float=0.5, alpha_store: float=0.1):
-        super().__init__()
-
-        assert 0.0 <= alpha_use <= 1.0
-        assert 0.0 <= alpha_store <= 1.0
-        self.alpha_use = alpha_use
-        self.alpha_store = alpha_store
-        self.register_buffer('running_mean', init.double())
-
-    def forward(self, x):
-        out = self.alpha_use * x + (1 - self.alpha_use) * self.running_mean.float()
-        # don't keep all the computational graph to avoid memory++
-        self.running_mean = (self.alpha_store * x.detach().double() + (1 - self.alpha_store) * self.running_mean).detach().double()
-        return out

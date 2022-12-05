@@ -24,7 +24,7 @@ class ImgPilMultiCropRandomApply(ClassyTransform):
     multi-crop input.
     """
 
-    def __init__(self, transforms: List[Dict[str, Any]], prob: List[float], warmup_imgs=None):
+    def __init__(self, transforms: List[Dict[str, Any]], prob: List[float], warmup_epochs=None):
         """
         Args:
             transforms ( List(tranforms) ): List of transforms that should be applied
@@ -33,15 +33,15 @@ class ImgPilMultiCropRandomApply(ClassyTransform):
                                 composition on each crop.
                                 example: for 2 crop in BYOL, for solarization:
                                          prob = [0.0, 0.2]
-            warmup_imgs (int): if not None warms up linearly the probability of applying
-                the transform. Note that steps here are number of images => iter * batch_size.
+            warmup_epochs (int): if not None warms up linearly the probability of applying
+                the transform.
         """
 
         self.prob = prob
         self.transforms = None
         self._build_transform(transforms)
-        self.warmup_imgs = warmup_imgs
-        self.step_counter = 0
+        self.warmup_epochs = warmup_epochs
+        self.epoch = 0
 
     def _build_transform(self, transforms: List[Dict[str, Any]]):
         out_transforms = []
@@ -55,16 +55,19 @@ class ImgPilMultiCropRandomApply(ClassyTransform):
                 pth_transforms.RandomApply([out_transform], p=self.prob[idx])
             )
 
+    def set_epoch(self, epoch):
+        logging.info(f"set epoch to {epoch} in ImgPilMultiCropRandomApply")
+        self.epoch = epoch
+
     def get_current_prob(self, idx):
-        if self.warmup_imgs is None or self.step_counter > self.warmup_imgs:
+        if self.warmup_epochs is None or self.epoch > self.warmup_epochs:
             return self.prob[idx]
-        return self.prob[idx] * self.step_counter / self.warmup_imgs
+        return self.prob[idx] * self.epoch / self.warmup_epochs
 
     def __call__(self, image_list: List[Image.Image]):
         assert isinstance(image_list, list), "image_list must be a list"
         assert len(image_list) == len(self.prob)
         assert len(image_list) == len(self.transforms)
-        self.step_counter += 1
 
         output = []
         for idx in range(len(image_list)):
@@ -85,5 +88,6 @@ class ImgPilMultiCropRandomApply(ClassyTransform):
         """
         transforms = config.get("transforms", [])
         prob = config.get("prob", [])
-        logging.info(f"ImgPilMultiCropRandomApply | Using prob: {prob}")
-        return cls(transforms=transforms, prob=prob)
+        warmup_epochs = config.get("warmup_epochs", None)
+        logging.info(f"ImgPilMultiCropRandomApply | Using prob: {prob} | warmup_epochs: {warmup_epochs}")
+        return cls(transforms=transforms, prob=prob, warmup_epochs=warmup_epochs)

@@ -267,6 +267,9 @@ class LayerNorm2d(nn.GroupNorm):
             num_groups=1, num_channels=num_channels, eps=eps, affine=affine
         )
 
+class BatchNorm2d(nn.BatchNorm2d):
+    pass
+
 
 class RESNET_NORM_LAYER(str, Enum):
     """

@@ -48,7 +48,7 @@ config:
         - name: ImgTensorMask
           prob_mask: [ 0.30, 0.30, 0, 0, 0, 0] # should also try 0.3
           patch_size: 16
-          warmup_imgs: 100000000
+          warmup_epochs: 100
       COLLATE_FUNCTION: multicrop_collator
       MMAP_MODE: True
       COPY_TO_LOCAL_DISK: False
@@ -86,6 +86,9 @@ config:
     AMP_PARAMS:
       USE_AMP: True
       AMP_TYPE: "pytorch"  # apex | pytorch
+    CUDA_CACHE:
+      CLEAR_CUDA_CACHE: True
+      CLEAR_FREQ: 2000
   LOSS:
     name: dstl_issl_loss
     dstl_issl_loss:
@@ -94,7 +97,7 @@ config:
       temperature_pred: 1
       num_crops: 2 # automatically inferred from data transforms
       crops_for_teacher: [ 0, 1 ]
-      beta_pM_unif: 2.4 # 2.1
+      beta_pM_unif: 2.3 # 2.1
       beta_H_MlZ: 0.6 # 0.5
   OPTIMIZER:
     name: sgd
@@ -120,9 +123,9 @@ config:
         schedulers:
           - name: linear
             start_value: 0.001
-            end_value: 4.8
+            end_value: 5
           - name: cosine
-            start_value: 4.8
+            start_value: 5
             end_value: 0.0000
         update_interval: step
         interval_scaling: [rescaled, fixed]

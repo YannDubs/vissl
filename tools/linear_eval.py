@@ -829,6 +829,12 @@ class Probe(pl.LightningModule):
                 weight_decay=self.hparams.weight_decay,
                 momentum=0.9,
             )
+        elif self.hparams.is_adamw:
+            optimizer = torch.optim.AdamW(
+                self.probe.parameters(),
+                lr=linear_lr,
+                weight_decay=self.hparams.weight_decay,
+            )
         else:
             optimizer = torch.optim.SGD(
                 self.probe.parameters(),
@@ -1029,6 +1035,12 @@ if __name__ == "__main__":
         default=False,
         action="store_true",
         help="Whether to use the LARS optimizer, which can be helpful in large batch settings.",
+    )
+    torch_args.add_argument(
+        "--is-adamw",
+        default=False,
+        action="store_true",
+        help="Whether to use the AdamW optimizer.",
     )
 
     sk_args.add_argument(

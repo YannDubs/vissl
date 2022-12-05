@@ -17,6 +17,7 @@ Then modified to support VISSL format.
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 from enum import Enum
+from functools import partial
 from typing import List
 
 import torch
@@ -46,12 +47,21 @@ class Block(nn.Module):
         layer_scale_init_value (float): Init value for Layer Scale. Default: 1e-6.
     """
 
-    def __init__(self, dim, drop_path=0.0, layer_scale_init_value=1e-6):
+    def __init__(self, dim, drop_path=0.0, layer_scale_init_value=1e-6, norm_type="layernorm"):
         super().__init__()
+        self.norm_type = norm_type
+
         self.dwconv = nn.Conv2d(
             dim, dim, kernel_size=(7, 7), padding=(3, 3), groups=dim
         )  # depthwise conv
-        self.norm = LayerNorm(dim, eps=1e-6)
+
+        if self.norm_type == "layernorm":
+            self.norm = LayerNorm(dim, eps=1e-6)
+        elif self.norm_type == "batchnorm":
+            self.norm = nn.BatchNorm2d(dim)
+        else:
+            raise ValueError(f"Invalid norm type: {self.norm_type}")
+
         self.pwconv1 = nn.Linear(
             dim, 4 * dim
         )  # pointwise/1x1 convs, implemented with linear layers
@@ -67,8 +77,15 @@ class Block(nn.Module):
     def forward(self, x):
         input = x
         x = self.dwconv(x)
-        x = x.permute(0, 2, 3, 1)  # (N, C, H, W) -> (N, H, W, C)
-        x = self.norm(x)
+
+        if self.norm_type == "layernorm":
+            x = x.permute(0, 2, 3, 1)  # (N, C, H, W) -> (N, H, W, C)
+            x = self.norm(x)
+        elif self.norm_type == "batchnorm":
+            # batchnorm expects (N, C, H, W)
+            x = self.norm(x)
+            x = x.permute(0, 2, 3, 1)  # (N, C, H, W) -> (N, H, W, C)
+
         x = self.pwconv1(x)
         x = self.act(x)
         x = self.pwconv2(x)
@@ -101,15 +118,25 @@ class LayerNorm(nn.Module):
         self.normalized_shape = (normalized_shape,)
 
     def forward(self, x):
+
+        # make sure fp32 to avoid nan
+        x = x.float()
+        weight = self.weight.float()
+        bias = self.bias.float()
+
         if self.data_format == "channels_last":
             return F.layer_norm(
-                x, self.normalized_shape, self.weight, self.bias, self.eps
+                x,
+                self.normalized_shape,
+                weight,
+                bias,
+                self.eps
             )
         elif self.data_format == "channels_first":
             u = x.mean(1, keepdim=True)
             s = (x - u).pow(2).mean(1, keepdim=True)
             x = (x - u) / torch.sqrt(s + self.eps)
-            x = self.weight[:, None, None] * x + self.bias[:, None, None]
+            x = weight[:, None, None] * x + bias[:, None, None]
             return x
 
 
@@ -132,20 +159,31 @@ class ConvNeXt(nn.Module):
         in_chans: int = 3,
         drop_path_rate=0.0,
         layer_scale_init_value=1e-6,
+        norm_type="layernorm",
+        is_skip_last_norm=False,
     ):
         super().__init__()
+        self.norm_type = norm_type
+
+        if self.norm_type == "layernorm":
+            Norm = partial(LayerNorm, eps=1e-6, data_format="channels_first")
+        elif self.norm_type == "batchnorm":
+            Norm = nn.BatchNorm2d
+        else:
+            raise ValueError(f"Invalid norm type: {self.norm_type}")
 
         self.downsample_layers = (
             nn.ModuleList()
         )  # stem and 3 intermediate downsampling conv layers
+
         stem = nn.Sequential(
             nn.Conv2d(in_chans, dims[0], kernel_size=4, stride=4),
-            LayerNorm(dims[0], eps=1e-6, data_format="channels_first"),
+            Norm(dims[0]),
         )
         self.downsample_layers.append(stem)
         for i in range(3):
             downsample_layer = nn.Sequential(
-                LayerNorm(dims[i], eps=1e-6, data_format="channels_first"),
+                Norm(dims[i]),
                 nn.Conv2d(dims[i], dims[i + 1], kernel_size=2, stride=2),
             )
             self.downsample_layers.append(downsample_layer)
@@ -162,6 +200,7 @@ class ConvNeXt(nn.Module):
                         dim=dims[i],
                         drop_path=dp_rates[cur + j],
                         layer_scale_init_value=layer_scale_init_value,
+                        norm_type=norm_type
                     )
                     for j in range(depths[i])
                 ]
@@ -169,7 +208,14 @@ class ConvNeXt(nn.Module):
             self.stages.append(stage)
             cur += depths[i]
 
-        self.norm = nn.LayerNorm(dims[-1], eps=1e-6)  # final norm layer
+        # final norm layer
+        if is_skip_last_norm:
+            self.norm = nn.Identity()
+        elif self.norm_type == "layernorm":
+            self.norm = LayerNorm(dims[-1], eps=1e-6)  # final norm layer
+        elif self.norm_type == "batchnorm":
+            self.norm = nn.BatchNorm1d(dims[-1])
+
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
@@ -197,5 +243,7 @@ def ConvNeXtTrunk(model_config: AttrDict, model_name: str) -> nn.Module:
         depths=trunk_config.DEPTH,
         dims=trunk_config.DIMS,
         drop_path_rate=trunk_config.DROP_PATH_RATE,
-        in_chans=INPUT_CHANNEL[model_config.INPUT_TYPE]
+        in_chans=INPUT_CHANNEL[model_config.INPUT_TYPE],
+        norm_type=trunk_config.NORM_TYPE,
+        is_skip_last_norm=trunk_config.IS_SKIP_LAST_NORM,
     )

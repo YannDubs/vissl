@@ -112,6 +112,11 @@ class SetDataSamplerEpochHook(ClassyHook):
                         # task.phase_idx is current running phase id
                         data_obj.set_epoch(task.phase_idx)
 
+                # added in case warming up transforms
+                for transform in dataset.transform.transforms:
+                    if hasattr(transform.transform, "set_epoch"):
+                        transform.transform.set_epoch(task.phase_idx)
+
         logging.info(f"Starting phase {task.phase_idx} [{phase_type}]")
 
 

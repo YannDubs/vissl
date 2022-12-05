@@ -1,0 +1,8 @@
+# @package _global_
+config:
+    SLURM:
+        PARTITION: sphinx
+        ADDITIONAL_PARAMETERS:
+            exclude: sphinx1,sphinx2,sphinx3
+            gres: gpu:8
+            account: nlp

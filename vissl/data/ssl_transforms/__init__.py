@@ -22,6 +22,7 @@ def get_transform(input_transforms_list):
     """
     output_transforms = []
     for transform_config in input_transforms_list:
+
         transform = SSLTransformsWrapper.from_config(
             transform_config, transform_types=DEFAULT_TRANSFORM_TYPES
         )
